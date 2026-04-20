@@ -227,7 +227,7 @@ export default function Insights() {
       {activeTab === "Analytics" && (
         <div className="space-y-6">
           <div className={`border rounded-2xl p-6 ${card}`}>
-            <h3 className="font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Spending Trends</h3>
+            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Spending Trends</h3>
             <p className={`text-sm ${muted} mb-4`}>Your monthly spending compared to your established budget</p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={spendingData} barGap={2}>
@@ -245,14 +245,15 @@ export default function Insights() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className={`border rounded-2xl p-5 ${card}`}>
-              <h4 className="font-bold mb-1">Spending Prediction</h4>
-              <p className="text-2xl font-black mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$1,580 <span className="text-emerald-500 text-sm">ON TRACK</span></p>
+              <h4 className={`font-bold mb-1 ${text}`}>Spending Prediction</h4>
+              <p className={`text-2xl font-black mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$1,580 <span className="text-emerald-500 text-sm">ON TRACK</span></p>
               <p className={`text-xs ${muted}`}>Based on your current habits, you are projected to finish the month $20 under budget.</p>
             </div>
             <div className={`border rounded-2xl p-5 ${card}`}>
-              <h4 className="font-bold mb-1">Savings Potential</h4>
-              <p className="text-2xl font-black mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$450 <span className={`text-sm font-normal ${muted}`}>per month</span></p>
+              <h4 className={`font-bold mb-1 ${text}`}>Savings Potential</h4>
+              <p className={`text-2xl font-black mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$450 <span className={`text-sm font-normal ${muted}`}>per month</span></p>
               <p className={`text-xs ${muted}`}>If you maintain your transport savings, you could reach your House Deposit goal 2 months early.</p>
+
             </div>
           </div>
         </div>
@@ -261,7 +262,7 @@ export default function Insights() {
       {activeTab === "Markets" && (
         <div className="space-y-4">
           <div className={`border rounded-2xl p-6 ${card}`}>
-            <h3 className="font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Stay Connected to the Homeland</h3>
+            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Stay Connected to the Homeland</h3>
             <p className={`text-sm ${muted} mb-4`}>Monitoring the Philippine economy helps you time your transfers and investments perfectly.</p>
             <div className="grid grid-cols-2 gap-4">
               {[
@@ -291,7 +292,7 @@ export default function Insights() {
             <div className={`border rounded-2xl p-5 ${card}`}>
               <p className={`text-xs ${muted} uppercase tracking-wider mb-1`}>PSEI (Manila)</p>
               <p className={`text-xs ${muted} mb-2`}>Philippine Stock Exchange Index</p>
-              <p className="text-3xl font-black my-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>6,850.40</p>
+              <p className={`text-3xl font-black my-2 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>6,850.40</p>
               <p className="text-red-400 text-xs mb-3">▲ -0.45%</p>
               <p className={`text-xs ${muted}`}>The Manila market is seeing slight consolidation. Financials and Real Estate sectors are leading the volume today.</p>
             </div>

@@ -120,7 +120,7 @@ export default function Dashboard() {
               <span className="text-primary text-xs font-bold">+2.34%</span>
             </div>
           </div>
-          <p className="text-white/70 text-sm mt-4">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || "OFW"}</span></p>
+          <p className="text-white/70 text-sm mt-4">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || (user === null ? "..." : "OFW")}</span></p>
         </div>
       </div>
 
