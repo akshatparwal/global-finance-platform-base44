@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Shield, CheckCircle, ChevronDown } from "lucide-react";
+import { ArrowRight, Shield, CheckCircle, ChevronDown, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Ticker Bar ─── */
@@ -167,55 +167,83 @@ function FAQ() {
   );
 }
 
+/* ─── Hero Slides ─── */
+const HERO_SLIDES = [
+  {
+    img: "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/449dd6e54_generated_image.png",
+    title: "Built by Filipinos. For the World.",
+    desc: "Fiesta & Celebration — banderitas, lechon, kamayan feast — authentic Filipino joy.",
+  },
+  {
+    img: "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/e70ef8335_generated_image.png",
+    title: "Connected, No Matter the Distance.",
+    desc: "The OFW Connection — mano po across oceans — the sacrifice and love of working abroad.",
+  },
+  {
+    img: "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/ef027e246_generated_image.png",
+    title: "Trust in Every Peso Sent.",
+    desc: "Padala's Home — capiz windows, Santo Nino, Filipino food — the warmth of receiving.",
+  },
+  {
+    img: "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/c2c6a74a4_generated_image.png",
+    title: "The Philippines, Connected.",
+    desc: "Banaue Rice Terraces, El Nido, Manila Bay — golden bridges of finance linking them all.",
+  },
+];
+
 /* ─── Main page ─── */
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [darkHero, setDarkHero] = useState(true);
+  const [slideIdx, setSlideIdx] = useState(0);
+
+  // Auto-advance slides
+  useEffect(() => {
+    const t = setInterval(() => setSlideIdx(i => (i + 1) % HERO_SLIDES.length), 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  const slide = HERO_SLIDES[slideIdx];
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden pt-24 pb-16 sm:pt-32 sm:pb-24" style={{ backgroundColor: "#F5EFE3", ...DOT_BG }}>
-        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-          {/* Left */}
-          <div className="flex-1 max-w-xl">
-            <div className="inline-flex items-center gap-2 bg-white border border-[#e8dece] rounded-full px-4 py-1.5 text-sm text-[#0D1F3C] font-semibold mb-8 shadow-sm">
-              <span className="w-2 h-2 bg-[#C97B22] rounded-full animate-pulse" />
-              Private Beta: Now Accepting Early Access
+      {/* ── Hero — split screen ── */}
+      <section className="flex flex-col lg:flex-row" style={{ minHeight: "100vh" }}>
+
+        {/* LEFT — photo side */}
+        <div className="relative flex-1 min-h-[55vw] lg:min-h-0 overflow-hidden">
+          <img
+            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=85"
+            alt="Filipino family celebration"
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+          {/* Dark gradient overlay */}
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0.15) 100%)" }} />
+
+          {/* Logo top-left */}
+          <div className="absolute top-6 left-6 flex items-center gap-2 z-10">
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
+              <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" />
             </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-[#0D1F3C] leading-[1.08] mb-6" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              The banking app<br />
-              built for{" "}
-              <span className="text-[#C97B22]">the<br />Global Filipino.</span>
+            <div>
+              <div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Kinnect<span className="text-[#C97B22]">Fi</span>
+              </div>
+              <div className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Neobank</div>
+            </div>
+          </div>
+
+          {/* Hero text bottom-left */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12 z-10">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Ang pera mo,{" "}
+              <span className="text-[#C97B22]">konektado</span>{" "}
+              sa puso mo.
             </h1>
-            <p className="text-lg text-[#0D1F3C]/70 leading-relaxed mb-8 max-w-md">
-              One powerful app that lets you hold funds, send <em>padala</em> home instantly at the true exchange rate, and grow your wealth — zero hidden fees, zero FX spread.
+            <p className="text-white/80 text-base mb-6 max-w-sm">
+              Your money, connected to your heart.<br />Bridging the distance with trust and community.
             </p>
-            {/* Email waitlist */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-5">
-              <input
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 bg-white border border-[#e8dece] rounded-xl px-5 py-3.5 text-[#0D1F3C] placeholder-gray-400 outline-none focus:border-[#C97B22] transition-colors shadow-sm text-sm"
-              />
-              <button
-                onClick={() => { if (email) alert(`You're on the waitlist! We'll reach out to ${email} soon.`); }}
-                className="bg-[#C97B22] hover:bg-[#b36a1a] text-white font-bold rounded-xl px-6 py-3.5 flex items-center gap-2 text-sm transition-colors shadow-md whitespace-nowrap"
-              >
-                Join Waitlist <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 mb-6">14,204 ahead of you</p>
-            {/* Trust pills */}
-            <div className="flex flex-wrap gap-3 mb-8">
-              <span className="flex items-center gap-1.5 text-xs text-[#0D1F3C]/70 font-semibold">
-                <CheckCircle className="w-4 h-4 text-[#C97B22]" /> Bank-grade Security
-              </span>
-              <span className="flex items-center gap-1.5 text-xs text-[#0D1F3C]/70 font-semibold">
-                <CheckCircle className="w-4 h-4 text-[#C97B22]" /> No Hidden Fees
-              </span>
-            </div>
             {/* Social proof */}
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2">
@@ -224,17 +252,120 @@ export default function Home() {
                   "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/d889dd544_i_pravatar_cc_100_70a8a187.png",
                   "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/994bcae68_i_pravatar_cc_100_22c8e547.png",
                 ].map((src, i) => (
-                  <img key={i} src={src} className="w-8 h-8 rounded-full border-2 border-[#F5EFE3] object-cover" />
+                  <img key={i} src={src} className="w-8 h-8 rounded-full border-2 border-white/30 object-cover" />
                 ))}
               </div>
-              <p className="text-sm text-[#0D1F3C]/70">
-                Trusted by <span className="font-black text-[#C97B22]">14,204</span> Filipinos across 4 continents
-              </p>
+              <div>
+                <div className="flex gap-0.5 mb-0.5">
+                  {[...Array(5)].map((_, i) => <span key={i} className="text-[#C97B22] text-xs">★</span>)}
+                </div>
+                <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">Trusted by 10,000+ Filipinos worldwide</p>
+              </div>
             </div>
           </div>
-          {/* Right — App Mockup */}
-          <div className="flex-shrink-0 w-full max-w-xs sm:max-w-sm lg:max-w-xs xl:max-w-sm">
-            <AppMockup />
+        </div>
+
+        {/* RIGHT — dark panel */}
+        <div
+          className="flex-shrink-0 w-full lg:w-[420px] flex flex-col justify-between relative"
+          style={{ background: darkHero ? "#0D1F3C" : "#F5EFE3" }}
+        >
+          <div className="flex-1 flex flex-col justify-center px-8 py-12 lg:py-16">
+            {/* Slide illustration */}
+            <div className="w-full mb-6 flex justify-center">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={slideIdx}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-48 h-48 rounded-2xl overflow-hidden shadow-2xl"
+                >
+                  <img src={slide.img} className="w-full h-full object-cover" />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Slide text */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`text-${slideIdx}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35 }}
+                className="text-center mb-8"
+              >
+                <h2
+                  className="text-2xl font-black mb-3 leading-tight"
+                  style={{ color: darkHero ? "#fff" : "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                >
+                  {slide.title}
+                </h2>
+                <p className="text-sm leading-relaxed" style={{ color: darkHero ? "rgba(255,255,255,0.6)" : "rgba(13,31,60,0.6)" }}>
+                  {slide.desc}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* CTA */}
+            <Link
+              to="/auth"
+              className="flex items-center justify-center gap-2 font-bold rounded-xl py-4 px-6 text-base mb-3 transition-colors"
+              style={{ background: "#C97B22", color: "#fff" }}
+            >
+              Get Started <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-center text-xs mb-6" style={{ color: darkHero ? "rgba(255,255,255,0.5)" : "rgba(13,31,60,0.5)" }}>
+              <Link to="/auth" className="underline underline-offset-2">Already have an account? Maligayang pagbabalik!</Link>
+            </p>
+
+            {/* Slide dots + dark/light toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex gap-2">
+                {HERO_SLIDES.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSlideIdx(i)}
+                    className="h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      width: i === slideIdx ? 28 : 8,
+                      background: i === slideIdx ? "#C97B22" : (darkHero ? "rgba(255,255,255,0.25)" : "rgba(13,31,60,0.2)"),
+                    }}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={() => setDarkHero(!darkHero)}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                style={{
+                  background: darkHero ? "rgba(255,255,255,0.1)" : "rgba(13,31,60,0.08)",
+                  color: darkHero ? "rgba(255,255,255,0.7)" : "rgba(13,31,60,0.7)",
+                }}
+              >
+                {darkHero ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {darkHero ? "Light" : "Dark"}
+              </button>
+            </div>
+          </div>
+
+          {/* Bottom status bar */}
+          <div
+            className="px-6 py-3 flex items-center justify-between border-t text-xs"
+            style={{
+              borderColor: darkHero ? "rgba(255,255,255,0.08)" : "rgba(13,31,60,0.08)",
+              background: darkHero ? "rgba(0,0,0,0.2)" : "rgba(13,31,60,0.05)",
+            }}
+          >
+            <div className="flex items-center gap-1.5" style={{ color: darkHero ? "rgba(255,255,255,0.5)" : "rgba(13,31,60,0.5)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+              <span className="font-semibold uppercase tracking-wider">Secured by 256-bit Encryption</span>
+            </div>
+            <div className="flex items-center gap-3" style={{ color: darkHero ? "rgba(255,255,255,0.5)" : "rgba(13,31,60,0.5)" }}>
+              <span>PHP/USD <span className="font-bold" style={{ color: "#C97B22" }}>₱56.24</span></span>
+              <span>Padala Fee <span className="font-bold" style={{ color: "#C97B22" }}>$0 Today</span></span>
+            </div>
           </div>
         </div>
       </section>
