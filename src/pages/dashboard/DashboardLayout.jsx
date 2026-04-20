@@ -1,0 +1,114 @@
+import { useState } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X } from "lucide-react";
+
+const NAV = [
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { label: "Insights & Wealth", icon: TrendingUp, path: "/dashboard/insights" },
+  { label: "Pay", icon: Send, path: "/dashboard/pay" },
+  { label: "Cards", icon: CreditCard, path: "/dashboard/cards" },
+  { label: "Profile", icon: User, path: "/dashboard/profile" },
+];
+
+export default function DashboardLayout() {
+  const location = useLocation();
+  const [darkMode, setDarkMode] = useState(true);
+  const [taglish, setTaglish] = useState(false);
+  const [bahay, setBahay] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const bgMain = darkMode ? "bg-[#0a0f1a]" : "bg-[#f5efe6]";
+  const bgSidebar = darkMode ? "bg-[#0d1526]" : "bg-[#1a2a4a]";
+  const bgContent = darkMode ? "bg-[#111827]" : "bg-white";
+  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
+  const textMuted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
+  const activeClass = darkMode ? "bg-primary/20 text-primary" : "bg-primary/20 text-primary";
+  const inactiveClass = darkMode ? "text-white/60 hover:text-white hover:bg-white/5" : "text-[#1a2a4a]/60 hover:text-[#1a2a4a] hover:bg-black/5";
+
+  return (
+    <div className={`min-h-screen flex ${bgMain}`}>
+      {/* Sidebar */}
+      <aside className={`${bgSidebar} w-56 flex-shrink-0 flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
+        {/* Logo */}
+        <div className="p-5 pb-8">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
+            <div><div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></div><div className="text-white/30 text-[8px] uppercase tracking-widest">Cross-Border Neobank</div></div>
+          </Link>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 space-y-1">
+          {NAV.map(({ label, icon: NavIcon, path }) => {
+            const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
+            return (
+              <Link key={path} to={path} onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? activeClass : inactiveClass}`}>
+                <NavIcon className="w-4 h-4 flex-shrink-0" />
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom toggles */}
+        <div className="p-4 space-y-3 border-t border-white/10">
+          <div className="flex items-center justify-between">
+            <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Taglish Mode</span>
+            <button onClick={() => setTaglish(!taglish)} className={`w-10 h-5 rounded-full transition-all ${taglish ? "bg-primary" : "bg-white/20"} relative`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${taglish ? "left-5" : "left-0.5"}`} />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1"><span className="text-[10px]">🏠</span><span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Bahay Mode</span></div>
+            <button onClick={() => setBahay(!bahay)} className={`w-10 h-5 rounded-full transition-all ${bahay ? "bg-primary" : "bg-white/20"} relative`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${bahay ? "left-5" : "left-0.5"}`} />
+            </button>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <Shield className="w-3 h-3 text-primary" />
+            <span className="text-white/30 text-[9px] uppercase tracking-widest">Bank-Grade Trust</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile overlay */}
+      {mobileOpen && <div className="fixed inset-0 bg-black/60 z-30 sm:hidden" onClick={() => setMobileOpen(false)} />}
+
+      {/* Main */}
+      <div className="flex-1 sm:ml-56 flex flex-col min-h-screen">
+        {/* Top bar */}
+        <header className={`${bgContent} border-b ${darkMode ? "border-white/5" : "border-black/5"} px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
+          <button className="sm:hidden text-white/60 hover:text-white" onClick={() => setMobileOpen(!mobileOpen)}>
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          <div className="hidden sm:flex items-center gap-2 text-white/20 text-sm">
+            <span className="w-4 h-4 border border-white/20 rounded flex items-center justify-center text-xs">□</span>
+          </div>
+          <div className="flex items-center gap-3 ml-auto">
+            <button className="relative w-8 h-8 flex items-center justify-center">
+              <Bell className={`w-4 h-4 ${textMuted}`} />
+              <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center">2</span>
+            </button>
+            <button onClick={() => setDarkMode(!darkMode)} className={`w-8 h-8 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
+              {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </button>
+            <div className={`flex items-center gap-1.5 text-xs ${textMuted}`}>
+              <Shield className="w-3 h-3 text-emerald-400" />
+              <span>Secured</span>
+            </div>
+          </div>
+        </header>
+
+        <main className={`flex-1 p-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
+          <Outlet context={{ darkMode, taglish }} />
+        </main>
+
+        <footer className={`px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} flex justify-between`}>
+          <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>
+          <span>© 2026 KinnectFi. All rights reserved.</span>
+        </footer>
+      </div>
+    </div>
+  );
+}

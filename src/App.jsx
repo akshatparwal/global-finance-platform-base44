@@ -8,6 +8,13 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import HowItWorks from './pages/HowItWorks';
 import Layout from './components/Layout';
+import Auth from './pages/Auth';
+import DashboardLayout from './pages/dashboard/DashboardLayout';
+import Dashboard from './pages/dashboard/Dashboard';
+import Insights from './pages/dashboard/Insights';
+import Pay from './pages/dashboard/Pay';
+import Cards from './pages/dashboard/Cards';
+import Profile from './pages/dashboard/Profile';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -36,6 +43,14 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/HowItWorks" element={<HowItWorks />} />
         {/* Add your page Route elements here */}
+      </Route>
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="insights" element={<Insights />} />
+        <Route path="pay" element={<Pay />} />
+        <Route path="cards" element={<Cards />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

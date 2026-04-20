@@ -56,13 +56,13 @@ export default function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden sm:flex items-center gap-4">
-          <a href="#" className={`text-sm font-semibold transition-colors hover:text-primary ${textColor}`}>Sign In</a>
-          <button
+          <Link to="/auth" className={`text-sm font-semibold transition-colors hover:text-primary ${textColor}`}>Sign In</Link>
+          <Link to="/auth"
             className="relative overflow-hidden bg-primary text-primary-foreground font-bold rounded-full py-2.5 px-6 text-sm flex items-center gap-2 hover:scale-[1.03] hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 active:scale-95"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_100%]" />
             Get Started <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
 
         {/* Mobile menu */}
@@ -95,13 +95,13 @@ export default function Header() {
               </nav>
 
               <div className="mt-auto space-y-4 pt-8">
-                <a href="#" className="flex items-center justify-center w-full border-2 border-border text-foreground font-bold py-3.5 rounded-full hover:bg-muted transition-colors">Sign In</a>
-                <button
+                <Link to="/auth" className="flex items-center justify-center w-full border-2 border-border text-foreground font-bold py-3.5 rounded-full hover:bg-muted transition-colors">Sign In</Link>
+                <Link to="/auth"
                   className="relative overflow-hidden w-full bg-primary text-primary-foreground font-bold rounded-full py-3.5 flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-95"
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_100%]" />
                   Get Started <ArrowRight className="w-4 h-4" />
-                </button>
+                </Link>
               </div>
             </div>
           </SheetContent>
