@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
+import { AnimatePresence, motion } from "framer-motion";
 
 const NAV = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -102,8 +103,18 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
-          <Outlet context={{ darkMode, taglish, bahay }} />
+        <main className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-hidden`}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              initial={{ x: 40, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -40, opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+            >
+              <Outlet context={{ darkMode, taglish, bahay }} />
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         <BottomNav />

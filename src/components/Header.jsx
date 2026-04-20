@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, ArrowRight } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, ArrowRight, ArrowLeft } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const showBackButton = location.pathname !== "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -24,6 +26,16 @@ export default function Header() {
       style={{ paddingTop: "env(safe-area-inset-top)", paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}
     >
       <div className="w-full mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Mobile back button */}
+        {showBackButton && (
+          <button
+            onClick={() => navigate(-1)}
+            className="sm:hidden mr-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-muted transition-colors flex-shrink-0"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+        )}
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 flex-shrink-0 group">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center relative overflow-hidden bg-primary/10 transition-transform group-hover:scale-105">

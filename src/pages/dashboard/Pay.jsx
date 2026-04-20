@@ -42,21 +42,39 @@ export default function Pay() {
     const amt = parseFloat(sendAmount);
     if (!amt || amt <= 0) return;
     setSending(true);
+
+    // Optimistic entry — shown immediately
+    const optimisticId = `optimistic-${Date.now()}`;
+    const optimisticTransfer = {
+      id: optimisticId,
+      amount_usd: amt,
+      amount_php: parseFloat(receive),
+      recipient_name: selectedRecipient?.label || "Family",
+      recipient_bank: selectedRecipient?.bank || "GCash",
+      status: "pending",
+      created_date: new Date().toISOString(),
+    };
+    setTransfers(prev => [optimisticTransfer, ...prev]);
+    setSendAmount("");
+    setSelectedRecipient(null);
+
     try {
-      const newTransfer = await base44.entities.Transfer.create({
+      const saved = await base44.entities.Transfer.create({
         amount_usd: amt,
         amount_php: parseFloat(receive),
-        recipient_name: selectedRecipient?.label || "Family",
-        recipient_bank: selectedRecipient?.bank || "GCash",
+        recipient_name: optimisticTransfer.recipient_name,
+        recipient_bank: optimisticTransfer.recipient_bank,
         status: "completed",
         rate,
         fee: 2.99,
       });
-      setTransfers(prev => [newTransfer, ...prev]);
-      setSendAmount("");
-      setSelectedRecipient(null);
-      alert(`✅ Transfer of $${amt} (₱${receive}) sent successfully to ${selectedRecipient?.label || "Family"}!\n\nArrival: ~30 seconds`);
+      // Replace optimistic entry with real one
+      setTransfers(prev => prev.map(t => t.id === optimisticId ? { ...saved, status: "completed" } : t));
+      alert(`✅ Transfer of $${amt} (₱${receive}) sent successfully to ${optimisticTransfer.recipient_name}!\n\nArrival: ~30 seconds`);
     } catch {
+      // Roll back optimistic entry on failure
+      setTransfers(prev => prev.filter(t => t.id !== optimisticId));
+      setSendAmount(String(amt));
       alert("Transfer failed. Please try again.");
     } finally {
       setSending(false);
