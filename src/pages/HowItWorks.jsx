@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -206,13 +207,12 @@ export default function HowItWorks() {
               Ready to send your first padala?
             </h2>
             <p className="text-primary-foreground/80 mb-8">Sign up free and send your first transfer with zero fees. It takes less than 10 minutes.</p>
-            <button
+            <Link to="/auth"
               className="relative overflow-hidden bg-primary-foreground text-primary font-bold rounded-xl py-4 px-10 text-base flex items-center gap-2 mx-auto hover:scale-[1.03] hover:shadow-xl transition-all duration-300"
-              onClick={() => {}}
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_100%]" />
               Start Sending Now <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
             <div className="flex items-center justify-center gap-4 mt-6">
               {["Free to join", "No monthly fees", "Cancel anytime"].map((t, i) => (
                 <div key={i} className="flex items-center gap-1 text-primary-foreground/60 text-xs">

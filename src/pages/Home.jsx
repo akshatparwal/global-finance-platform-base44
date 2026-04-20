@@ -132,16 +132,17 @@ function HeroSection() {
           </p>
 
           {/* Primary Action Button */}
-          <button
+          <Link
+            to="/auth"
             className="relative w-full overflow-hidden bg-primary text-primary-foreground font-bold rounded-xl py-4 flex items-center justify-center gap-2 text-base shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98]"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_ease-in-out_infinite] bg-[length:200%_100%]" />
             Get Started <ArrowRight className="w-4 h-4 ml-1" />
-          </button>
+          </Link>
           
-          <a href="#" className="mt-5 text-[13px] font-medium text-muted-foreground underline underline-offset-4 decoration-muted-foreground/30 hover:text-primary transition-colors">
+          <Link to="/auth" className="mt-5 text-[13px] font-medium text-muted-foreground underline underline-offset-4 decoration-muted-foreground/30 hover:text-primary transition-colors">
             Already have an account? Maligayang pagbabalik!
-          </a>
+          </Link>
 
           {/* Controls Row (Dots & Theme) */}
           <div className="flex items-center justify-between w-full mt-10 mb-12">
@@ -438,12 +439,12 @@ function CtaSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-            <button
+            <Link to="/auth"
               className="relative w-full sm:w-auto overflow-hidden bg-primary text-primary-foreground font-bold rounded-full py-5 px-10 text-lg flex items-center justify-center gap-3 hover:scale-[1.03] shadow-[0_20px_40px_-15px_rgba(201,160,80,0.5)] transition-all duration-300 active:scale-95"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2.5s_ease-in-out_infinite] bg-[length:200%_100%]" />
               Get Started Free <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
             <Link
               to="/HowItWorks"
               className="w-full sm:w-auto bg-transparent border-2 border-muted text-foreground font-bold rounded-full py-5 px-10 text-lg flex items-center justify-center gap-2 hover:bg-muted hover:border-border transition-all duration-300 active:scale-95"
