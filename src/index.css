@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 
@@ -62,10 +61,49 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    overscroll-behavior: none;
   }
 
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    /* Disable text selection app-wide (re-enable in content areas) */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Re-enable text selection for readable content */
+  p, span, h1, h2, h3, h4, h5, h6, li, td, input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Minimum 44px touch targets for mobile */
+  @media (max-width: 640px) {
+    button, a[href], [role="button"] {
+      min-height: 44px;
+    }
+  }
+
+  /* System dark mode preference */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --background: 222 47% 8%;
+      --foreground: 210 40% 96%;
+      --card: 222 47% 10%;
+      --card-foreground: 210 40% 96%;
+      --popover: 222 47% 10%;
+      --popover-foreground: 210 40% 96%;
+      --muted: 217 33% 17%;
+      --muted-foreground: 215 20% 65%;
+      --border: 217 33% 20%;
+      --input: 217 33% 17%;
+    }
   }
 }
 

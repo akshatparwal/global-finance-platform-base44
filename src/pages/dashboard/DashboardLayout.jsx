@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X } from "lucide-react";
+import BottomNav from "@/components/dashboard/BottomNav";
 
 const NAV = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -101,9 +102,11 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className={`flex-1 p-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
+        <main className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
           <Outlet context={{ darkMode, taglish, bahay }} />
         </main>
+
+        <BottomNav />
 
         <footer className={`px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} flex justify-between`}>
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>

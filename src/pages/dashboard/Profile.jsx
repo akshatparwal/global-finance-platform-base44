@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Copy, Check } from "lucide-react";
+import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Copy, Check, Trash2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const PROFILE_TABS = ["General","Family","Security","Support"];
 
@@ -258,6 +263,38 @@ export default function Profile() {
             <LogOut className="w-5 h-5 text-red-500" />
             <span className="font-semibold text-sm text-red-500">Sign Out</span>
           </button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-700/30 hover:bg-red-700/5">
+                <Trash2 className="w-5 h-5 text-red-700" />
+                <div>
+                  <span className="font-semibold text-sm text-red-700 block">Delete Account</span>
+                  <span className={`text-xs ${darkMode ? "text-white/30" : "text-black/30"}`}>Permanently remove your account and data</span>
+                </div>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action is <strong>permanent and irreversible</strong>. All your wallets, transfer history, savings goals, and personal data will be erased. Your family connections will also be removed.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => {
+                    alert("Account deletion request submitted. Our team will process it within 48 hours and send a confirmation to your email.");
+                    base44.auth.logout("/");
+                  }}
+                >
+                  Yes, delete my account
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </div>

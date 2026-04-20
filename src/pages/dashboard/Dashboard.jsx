@@ -1,7 +1,8 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { TrendingUp, Calendar, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { TrendingUp, Calendar, Plus, RefreshCw } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -19,11 +20,20 @@ export default function Dashboard() {
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
 
-  useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-    base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
-    base44.entities.Transfer.list("-created_date", 5).then(setTransfers).catch(() => {});
+  const fetchData = useCallback(async () => {
+    const [u, w, t] = await Promise.all([
+      base44.auth.me().catch(() => null),
+      base44.entities.WalletBalance.list().catch(() => []),
+      base44.entities.Transfer.list("-created_date", 5).catch(() => []),
+    ]);
+    if (u) setUser(u);
+    setWallets(w);
+    setTransfers(t);
   }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const { containerRef, pulling, pullY, refreshing } = usePullToRefresh(fetchData);
 
   const totalUSD = wallets.find(w => w.currency_code === "USD")?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
@@ -45,7 +55,17 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div ref={containerRef} className="max-w-4xl mx-auto space-y-6 overflow-y-auto">
+      {/* Pull-to-refresh indicator */}
+      {(pulling || refreshing) && (
+        <div
+          className="flex items-center justify-center gap-2 text-primary text-xs font-bold uppercase tracking-wider transition-all"
+          style={{ height: Math.min(pullY, 56), opacity: pullY > 20 ? 1 : 0 }}
+        >
+          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+          {refreshing ? "Refreshing..." : pullY >= 70 ? "Release to refresh" : "Pull to refresh"}
+        </div>
+      )}
       {/* Banner */}
       <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-black/5"}`}>
         <div className="flex items-center gap-3">

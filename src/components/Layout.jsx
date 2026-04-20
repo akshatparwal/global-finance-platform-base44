@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       <Header />
-      <main>
+      <main style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <Outlet />
       </main>
       <Footer />
