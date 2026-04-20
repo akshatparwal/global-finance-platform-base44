@@ -58,25 +58,19 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-8">
-          <Link
-            to="/HowItWorks"
-            className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${location.pathname === '/HowItWorks' ? 'text-primary' : textColor}`}
-          >
-            How It Works
-          </Link>
-          <a href="#features" onClick={e => { e.preventDefault(); document.querySelector('.py-32.bg-secondary')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Features</a>
-          <a href="#rates" onClick={e => { e.preventDefault(); document.querySelector('.py-24.bg-primary')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Rates</a>
-          <a href="#about" onClick={e => { e.preventDefault(); document.querySelector('.py-32.bg-muted')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>About</a>
+          <Link to="/HowItWorks" className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${location.pathname === '/HowItWorks' ? 'text-primary' : textColor}`}>How It Works</Link>
+          <a href="#features" onClick={e => { e.preventDefault(); document.querySelector('.py-24.bg-white')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Features</a>
+          <a href="#pricing" onClick={e => { e.preventDefault(); document.getElementById('pricing')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Pricing</a>
+          <a href="#about" onClick={e => { e.preventDefault(); document.querySelectorAll('section')[6]?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>About Us</a>
         </nav>
 
         {/* Desktop CTA */}
         <div className="hidden sm:flex items-center gap-4">
           <Link to="/auth" className={`text-sm font-semibold transition-colors hover:text-primary ${textColor}`}>Sign In</Link>
           <Link to="/auth"
-            className="relative overflow-hidden bg-primary text-primary-foreground font-bold rounded-full py-2.5 px-6 text-sm flex items-center gap-2 hover:scale-[1.03] hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 active:scale-95"
+            className="bg-primary text-primary-foreground font-bold rounded-full py-2.5 px-6 text-sm flex items-center gap-2 hover:bg-primary/90 transition-all duration-300"
           >
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/20 to-transparent animate-[shimmer_3s_ease-in-out_infinite] bg-[length:200%_100%]" />
-            Get Started <ArrowRight className="w-4 h-4" />
+            Tell us more <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
