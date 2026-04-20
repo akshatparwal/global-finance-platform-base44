@@ -90,32 +90,32 @@ export default function Dashboard() {
       <div ref={containerRef} className="space-y-6 overflow-y-auto">
       {/* Banner */}
       <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
-        <div className="flex items-center gap-3">
-          <span className="text-primary text-lg">🙏</span>
-          <div>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-primary text-lg flex-shrink-0">🙏</span>
+          <div className="min-w-0">
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
             <span className={`text-sm font-semibold ${textMain}`}>Semana Santa</span>
-            <span className={`text-sm ${muted}`}> · {taglish ? "Banal na Linggo" : "Reflecting during the Holy Week"}</span>
+            <span className={`text-sm ${muted} hidden sm:inline`}> · {taglish ? "Banal na Linggo" : "Reflecting during the Holy Week"}</span>
           </div>
         </div>
-        <Calendar className={`w-4 h-4 ${muted}`} />
+        <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
       </div>
 
       {/* Net Worth Card */}
       <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           <p className="text-white/40 text-xs uppercase tracking-widest mb-2">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-5xl font-black text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-3xl sm:text-5xl font-black text-white mb-1 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {primaryAmount}
               </p>
               <p className="text-white/60 text-sm">{secondaryAmount}</p>
               <p className="text-white/40 text-xs mt-1">
-                {ratesLoading ? "Fetching live rate..." : `Live rate ₱${liveRate.toFixed(2)}/USD · Dual Display`}
+                {ratesLoading ? "Fetching live rate..." : `₱${liveRate.toFixed(2)}/USD · Live`}
               </p>
             </div>
-            <div className="bg-primary/20 border border-primary/30 rounded-full px-3 py-1 flex items-center gap-1">
+            <div className="bg-primary/20 border border-primary/30 rounded-full px-3 py-1 flex items-center gap-1 flex-shrink-0">
               <TrendingUp className="w-3 h-3 text-primary" />
               <span className="text-primary text-xs font-bold">+2.34%</span>
             </div>

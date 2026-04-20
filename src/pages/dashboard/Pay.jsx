@@ -85,7 +85,7 @@ export default function Pay() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {taglish ? "Magpadala" : "Send Money"}
@@ -94,7 +94,7 @@ export default function Pay() {
         </div>
         <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1.5">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-          <span className="text-primary text-xs font-bold">NEXT SWELDO DAY: APR 30</span>
+          <span className="text-primary text-xs font-bold">APR 30</span>
         </div>
       </div>
 
@@ -122,9 +122,9 @@ export default function Pay() {
             className="flex-1 bg-transparent outline-none text-sm" />
         </div>
 
-        <div className="flex items-center gap-3 mb-6">
-          <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
-          <div className="flex gap-2">
+        <div className="flex items-center gap-3 mb-6 overflow-x-auto">
+          <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {RECENT.map((r,i) => (
               <button key={i} onClick={() => setSelectedRecipient(r === selectedRecipient ? null : r)}
                 className="flex flex-col items-center gap-1 group">
@@ -146,7 +146,7 @@ export default function Pay() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label className={`text-xs font-bold uppercase tracking-wider ${muted} mb-2 block`}>{taglish ? "Ipadala" : "You Send"}</label>
             <div className="flex items-center gap-2">
@@ -198,10 +198,18 @@ export default function Pay() {
       </div>
 
       {/* Tabs */}
-      <div className={`flex gap-1 p-1 rounded-xl mb-4 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
-        {PAY_TABS.map(t => (
-          <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${activeTab === t ? "bg-primary text-secondary" : muted}`}>{t}</button>
+      <div className={`flex gap-1 p-1 rounded-xl mb-4 overflow-x-auto ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
+        {[
+          { key: "Transfer History", short: "History" },
+          { key: "Tools", short: "Tools" },
+          { key: "Protection", short: "Protect" },
+          { key: "Shipments", short: "Shipments" },
+        ].map(({ key, short }) => (
+          <button key={key} onClick={() => setActiveTab(key)}
+            className={`flex-shrink-0 flex-1 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap px-2 ${activeTab === key ? "bg-primary text-secondary" : muted}`}>
+            <span className="sm:hidden">{short}</span>
+            <span className="hidden sm:inline">{key}</span>
+          </button>
         ))}
       </div>
 

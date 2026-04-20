@@ -25,12 +25,13 @@ export default function BottomNav({ onNavigate }) {
           <button
             key={path}
             onClick={() => go(path)}
-            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[60px] transition-colors relative ${
               active ? "text-primary" : "text-white/40"
             }`}
           >
+            {active && <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />}
             <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 1.8} />
-            <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider leading-none">{label}</span>
           </button>
         );
       })}

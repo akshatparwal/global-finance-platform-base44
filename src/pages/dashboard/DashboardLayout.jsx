@@ -91,23 +91,28 @@ export default function DashboardLayout() {
       {/* Main */}
       <div className="flex-1 sm:ml-56 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className={`${bgContent} border-b ${darkMode ? "border-white/5" : "border-black/5"} px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
-          <button className="sm:hidden text-white/60 hover:text-white" onClick={() => setMobileOpen(!mobileOpen)}>
+        <header className={`${bgContent} border-b ${darkMode ? "border-white/5" : "border-black/5"} px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
+          <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
+          {/* Logo shown in mobile header */}
+          <div className="sm:hidden flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
+            <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></span>
+          </div>
           <div className="hidden sm:flex items-center gap-2 text-white/20 text-sm">
             <span className="w-4 h-4 border border-white/20 rounded flex items-center justify-center text-xs">□</span>
           </div>
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-2 ml-auto">
             <button onClick={() => alert("Notifications:\n\n🔔 Rate alert: PHP/USD hit ₱56.42 — best time to send!\n🔔 Your transfer to Nanay was delivered successfully.")}
-              className="relative w-8 h-8 flex items-center justify-center hover:opacity-70 transition-opacity">
+              className="relative w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity">
               <Bell className={`w-4 h-4 ${textMuted}`} />
               <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center">2</span>
             </button>
-            <button onClick={() => setDarkMode(!darkMode)} className={`w-8 h-8 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
+            <button onClick={() => setDarkMode(!darkMode)} className={`w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
               {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
-            <div className={`flex items-center gap-1.5 text-xs ${textMuted}`}>
+            <div className={`hidden sm:flex items-center gap-1.5 text-xs ${textMuted}`}>
               <Shield className="w-3 h-3 text-emerald-400" />
               <span>Secured</span>
             </div>
@@ -117,7 +122,7 @@ export default function DashboardLayout() {
         <main
           ref={mainRef}
           onScroll={() => { scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0; }}
-          className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
+          className={`flex-1 p-4 sm:p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -139,7 +144,7 @@ export default function DashboardLayout() {
 
         <BottomNav onNavigate={navigateTab} />
 
-        <footer className={`px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} flex justify-between`}>
+        <footer className={`hidden sm:flex px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} justify-between`}>
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>
           <span>© 2026 KinnectFi. All rights reserved.</span>
         </footer>

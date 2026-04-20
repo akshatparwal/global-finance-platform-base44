@@ -101,7 +101,7 @@ export default function Profile() {
           <div className={`flex items-center justify-between p-4 rounded-xl border ${card}`}>
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-primary" />
-              <div><p className="font-semibold text-sm">IDENTITY VERIFIED</p><p className={`text-xs ${muted}`}>Full institutional access active</p></div>
+              <div><p className={`font-semibold text-sm ${textMain}`}>IDENTITY VERIFIED</p><p className={`text-xs ${muted}`}>Full institutional access active</p></div>
             </div>
             <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center text-primary text-xs">✓</div>
           </div>
@@ -211,11 +211,11 @@ export default function Profile() {
               ))}
               <div className="w-10 h-10 rounded-full bg-[#1a2a4a] flex items-center justify-center text-white text-lg">👤</div>
             </div>
-            <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-3 gap-2 mt-4">
               {[{icon:"📍",label:"Reach",val:"4 Family Members"},{icon:"📈",label:"Total Sent",val:"₱2.3M"},{icon:"❤️",label:"Loyalty",val:"12 month streak"}].map((s,i) => (
                 <div key={i} className="text-center">
-                  <p className={`text-xs ${muted} mb-1`}><span className="text-primary">{s.icon}</span> {s.label}</p>
-                  <p className="font-bold text-sm">{s.val}</p>
+                  <p className={`text-[10px] sm:text-xs ${muted} mb-1`}><span className="text-primary">{s.icon}</span> {s.label}</p>
+                  <p className={`font-bold text-xs sm:text-sm ${textMain}`}>{s.val}</p>
                 </div>
               ))}
             </div>

@@ -84,7 +84,7 @@ export default function Insights() {
       <div className={`flex gap-1 p-1 rounded-xl mb-6 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
         {TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === t ? "bg-primary text-secondary" : `${muted} hover:text-current`}`}>
+            className={`flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${activeTab === t ? "bg-primary text-secondary" : `${muted} hover:text-current`}`}>
             {t === "Activity" && "⚡ "}{t === "Goals" && "◎ "}{t === "Analytics" && "↗ "}{t === "Markets" && "📊 "}{t}
           </button>
         ))}
@@ -165,9 +165,9 @@ export default function Insights() {
         <div className="space-y-6">
           <div className={`border rounded-2xl p-6 ${card}`}>
             <div className="flex items-center gap-2 mb-4"><span>👨‍👩‍👧</span><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Family Financial Health</h3></div>
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
               {[{ label: "Total Family Support", val: "₱82,400" },{ label: "Health Coverage", val: "95%" },{ label: "Shared Progress", val: "₱142,000" }].map((s,i) => (
-                <div key={i}><p className={`text-xs ${muted} mb-1`}>{s.label}</p><p className="font-black text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.val}</p></div>
+                <div key={i}><p className={`text-[10px] sm:text-xs ${muted} mb-1`}>{s.label}</p><p className={`font-black text-base sm:text-lg ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.val}</p></div>
               ))}
             </div>
             <div className="flex justify-between items-center mb-3">
@@ -243,7 +243,7 @@ export default function Insights() {
               <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-gray-400/40" /><span className={muted}>Budget</span></div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className={`border rounded-2xl p-5 ${card}`}>
               <h4 className={`font-bold mb-1 ${text}`}>Spending Prediction</h4>
               <p className={`text-2xl font-black mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$1,580 <span className="text-emerald-500 text-sm">ON TRACK</span></p>
@@ -264,7 +264,7 @@ export default function Insights() {
           <div className={`border rounded-2xl p-6 ${card}`}>
             <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Stay Connected to the Homeland</h3>
             <p className={`text-sm ${muted} mb-4`}>Monitoring the Philippine economy helps you time your transfers and investments perfectly.</p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {[
                 { label: "🇵🇭 PSEI INDEX", val: "6,847.30", change: "+0.38% · Today" },
                 { label: "🇺🇸 USD / PHP", val: ratesLoading ? "Loading..." : `₱${liveRate.toFixed(2)}`, change: rateChange >= 0 ? `↑ +${rateChange.toFixed(2)}% · Live` : `↓ ${rateChange.toFixed(2)}% · Live` }
@@ -277,7 +277,7 @@ export default function Insights() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className={`border rounded-2xl p-5 ${card}`}>
               <div className="flex justify-between mb-2"><p className={`text-xs ${muted} uppercase tracking-wider`}>PHP Exchange Rate</p><span className={`text-xs font-bold ${ratesLoading ? muted : "text-emerald-500"}`}>{ratesLoading ? "FETCHING..." : "LIVE"}</span></div>
               <p className={`text-xs ${muted}`}>USD to PHP · Interbank Rate</p>
