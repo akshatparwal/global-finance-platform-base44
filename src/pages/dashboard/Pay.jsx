@@ -125,7 +125,12 @@ export default function Pay() {
           </div>
         </div>
 
-        <button className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
+        <button
+          onClick={() => {
+            if (!sendAmount || parseFloat(sendAmount) <= 0) return;
+            alert(`Transfer of $${sendAmount} (₱${receive}) initiated!\n\nFee: $2.99\nArrival: ~30 seconds\n\nFull transfer flow coming soon.`);
+          }}
+          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
           CONTINUE →
         </button>
       </div>

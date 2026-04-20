@@ -1,5 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import { TrendingUp, Calendar, Plus, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 
 const WALLETS = [
   { flag: "🇺🇸", code: "USD", name: "US Dollar", balance: "$150.00", yield_: "5.1%", dark: true },
@@ -20,8 +22,13 @@ const COMMUNITY = [
 
 export default function Dashboard() {
   const { darkMode } = useOutletContext() || {};
+  const [user, setUser] = useState(null);
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -53,7 +60,7 @@ export default function Dashboard() {
               <span className="text-primary text-xs font-bold">+2.34%</span>
             </div>
           </div>
-          <p className="text-white/70 text-sm mt-4">Good afternoon, <span className="font-bold text-white">Test</span></p>
+          <p className="text-white/70 text-sm mt-4">Good afternoon, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || "OFW"}</span></p>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Globe, HelpCircle } from "lucide-react";
+import { ArrowLeft, HelpCircle, Eye, EyeOff } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const LANGUAGES = [
@@ -14,21 +14,19 @@ const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_nam
 
 export default function Auth() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState("signup"); // "signin" | "signup"
+  const [tab, setTab] = useState("signup");
   const [step, setStep] = useState(STEPS.LANGUAGE);
   const [lang, setLang] = useState("en");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const progress = {
-    [STEPS.LANGUAGE]: tab === "signin" ? 1 : 1,
-    [STEPS.SIGNIN]: 2,
-    [STEPS.SIGNUP_NAME]: 2,
-    [STEPS.SIGNUP_EMAIL]: 3,
-    [STEPS.SIGNUP_PASSWORD]: 4,
+    [STEPS.LANGUAGE]: 1, [STEPS.SIGNIN]: 2,
+    [STEPS.SIGNUP_NAME]: 2, [STEPS.SIGNUP_EMAIL]: 3, [STEPS.SIGNUP_PASSWORD]: 4,
   };
   const totalSteps = tab === "signin" ? 2 : 4;
 
@@ -45,16 +43,34 @@ export default function Auth() {
     else if (step === STEPS.SIGNUP_PASSWORD) setStep(STEPS.SIGNUP_EMAIL);
   };
 
-  const handleSignIn = async () => {
-    setLoading(true); setError("");
+  const handleGoogleAuth = () => {
     base44.auth.redirectToLogin("/dashboard");
-    setLoading(false);
+  };
+
+  const handleSignIn = async () => {
+    if (!email || !password) { setError("Please fill in all fields."); return; }
+    setLoading(true); setError("");
+    try {
+      await base44.auth.loginWithEmailAndPassword(email, password);
+      navigate("/dashboard");
+    } catch (e) {
+      setError(e?.message || "Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignUp = async () => {
+    if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
     setLoading(true); setError("");
-    base44.auth.redirectToLogin("/dashboard");
-    setLoading(false);
+    try {
+      await base44.auth.registerWithEmailAndPassword(email, password, { full_name: name });
+      navigate("/dashboard");
+    } catch (e) {
+      setError(e?.message || "Could not create account. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderStep = () => {
@@ -80,6 +96,7 @@ export default function Auth() {
             </button>
           </>
         );
+
       case STEPS.SIGNUP_NAME:
         return (
           <>
@@ -87,6 +104,7 @@ export default function Auth() {
             <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
             <label className="text-white/70 text-sm mb-2 block">What should we call you?</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Maria Santos"
+              onKeyDown={e => e.key === "Enter" && name.trim() && setStep(STEPS.SIGNUP_EMAIL)}
               className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary" />
             <button onClick={() => name.trim() && setStep(STEPS.SIGNUP_EMAIL)} disabled={!name.trim()}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
@@ -94,6 +112,7 @@ export default function Auth() {
             </button>
           </>
         );
+
       case STEPS.SIGNUP_EMAIL:
         return (
           <>
@@ -101,6 +120,7 @@ export default function Auth() {
             <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
             <label className="text-white/70 text-sm mb-2 block">Your primary email</label>
             <input value={email} onChange={e => setEmail(e.target.value)} placeholder="maria@email.com" type="email"
+              onKeyDown={e => e.key === "Enter" && email.trim() && setStep(STEPS.SIGNUP_PASSWORD)}
               className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary" />
             <button onClick={() => email.trim() && setStep(STEPS.SIGNUP_PASSWORD)} disabled={!email.trim()}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
@@ -108,27 +128,37 @@ export default function Auth() {
             </button>
           </>
         );
+
       case STEPS.SIGNUP_PASSWORD:
         return (
           <>
             <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Secure it</h1>
             <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
             <label className="text-white/70 text-sm mb-2 block">Create a secure password</label>
-            <input value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" type="password"
-              className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary" />
+            <div className="relative mb-4">
+              <input value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="Min. 6 characters" type={showPassword ? "text" : "password"}
+                onKeyDown={e => e.key === "Enter" && password.length >= 6 && handleSignUp()}
+                className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-primary" />
+              <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-white/40 hover:text-white">
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleSignUp} disabled={password.length < 6 || loading}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
-              {loading ? "Creating account..." : "Continue"}
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </>
         );
+
       case STEPS.SIGNIN:
         return (
           <>
             <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Maligayang pagbabalik!</h1>
             <p className="text-white/50 text-sm mb-6">Welcome back to your financial home.</p>
-            <button className="w-full flex items-center justify-center gap-2 bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl mb-4 hover:bg-white/15 transition-colors">
+            <button onClick={handleGoogleAuth}
+              className="w-full flex items-center justify-center gap-2 bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl mb-4 hover:bg-white/15 transition-colors">
               <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
               Continue with Google
             </button>
@@ -138,10 +168,17 @@ export default function Auth() {
               className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-3 focus:outline-none focus:border-primary" />
             <div className="flex justify-between items-center mb-2">
               <label className="text-white/70 text-sm">Password</label>
-              <button className="text-primary text-xs hover:underline">Forgot password?</button>
+              <button className="text-primary text-xs hover:underline" onClick={handleGoogleAuth}>Forgot password?</button>
             </div>
-            <input value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" type="password"
-              className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary" />
+            <div className="relative mb-4">
+              <input value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••" type={showPassword ? "text" : "password"}
+                onKeyDown={e => e.key === "Enter" && handleSignIn()}
+                className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-primary" />
+              <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-white/40 hover:text-white">
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleSignIn} disabled={loading}
               className="w-full bg-white text-secondary font-bold py-3.5 rounded-xl hover:bg-white/90 transition-colors disabled:opacity-40">
@@ -201,10 +238,10 @@ export default function Auth() {
         </div>
 
         <div className="max-w-sm w-full">
-          {/* Google button for signup steps (not signin — it has its own) */}
+          {/* Google button for signup (non-language steps) */}
           {tab === "signup" && step !== STEPS.LANGUAGE && (
             <>
-              <button className="w-full flex items-center justify-center gap-2 bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl mb-4 hover:bg-white/15 transition-colors">
+              <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 bg-white/10 border border-white/10 text-white font-semibold py-3 rounded-xl mb-4 hover:bg-white/15 transition-colors">
                 <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Continue with Google
               </button>

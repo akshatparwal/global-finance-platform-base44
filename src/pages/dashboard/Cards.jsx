@@ -107,8 +107,12 @@ export default function Cards() {
 
       {activeTab === "My Card" && (
         <div className="space-y-3">
-          {[{ icon: Snowflake, label: "Freeze", color: "text-blue-400" },{ icon: Eye, label: "Show Details", color: "text-purple-400" },{ icon: CardIcon, label: "Physical Card", color: "text-primary" }].map((a,i) => (
-            <button key={i} className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border font-semibold text-sm transition-colors ${darkMode ? "border-white/10 hover:bg-white/5 text-white" : "border-black/10 hover:bg-black/5 text-[#1a2a4a]"}`}>
+          {[
+            { icon: Snowflake, label: "Freeze Card", color: "text-blue-400", action: () => alert("Card frozen! All transactions temporarily disabled.") },
+            { icon: Eye, label: "Show Details", color: "text-purple-400", action: () => alert("Card Number: 4582 •••• •••• 7291\nExpiry: 12/28\nCVV: 493\nPIN: Sent to your registered phone.") },
+            { icon: CardIcon, label: "Order Physical Card", color: "text-primary", action: () => alert("Physical card request submitted! Delivery in 5–10 business days to your registered address.") }
+          ].map((a,i) => (
+            <button key={i} onClick={a.action} className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border font-semibold text-sm transition-colors ${darkMode ? "border-white/10 hover:bg-white/5 text-white" : "border-black/10 hover:bg-black/5 text-[#1a2a4a]"}`}>
               <a.icon className={`w-4 h-4 ${a.color}`} />{a.label}
             </button>
           ))}
