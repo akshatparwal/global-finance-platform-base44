@@ -9,9 +9,10 @@ const NAV = [
   { label: "Profile", icon: User, path: "/dashboard/profile" },
 ];
 
-export default function BottomNav() {
+export default function BottomNav({ onNavigate }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const go = onNavigate ?? navigate;
 
   return (
     <nav
@@ -23,7 +24,7 @@ export default function BottomNav() {
         return (
           <button
             key={path}
-            onClick={() => navigate(path)}
+            onClick={() => go(path)}
             className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${
               active ? "text-primary" : "text-white/40"
             }`}

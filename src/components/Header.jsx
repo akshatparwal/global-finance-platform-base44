@@ -8,7 +8,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const showBackButton = location.pathname !== "/";
+  // Show back button on mobile on any non-root page, but only if there's history to go back to
+  const showBackButton = location.pathname !== "/" && window.history.length > 1;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);

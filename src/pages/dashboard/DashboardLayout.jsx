@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { useState, useRef, useCallback } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
+
+// Per-tab scroll position registry — persists across tab switches
+const scrollRegistry = {};
 
 const NAV = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -14,10 +17,18 @@ const NAV = [
 
 export default function DashboardLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const mainRef = useRef(null);
   const [darkMode, setDarkMode] = useState(true);
   const [taglish, setTaglish] = useState(false);
   const [bahay, setBahay] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Save current tab scroll before navigating away
+  const navigateTab = useCallback((path) => {
+    scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0;
+    navigate(path);
+  }, [location.pathname, navigate]);
 
   const bgMain = darkMode ? "bg-[#0a0f1a]" : "bg-[#f5efe6]";
   const bgSidebar = darkMode ? "bg-[#0d1526]" : "bg-[#1a2a4a]";
@@ -103,7 +114,11 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-hidden`}>
+        <main
+          ref={mainRef}
+          onScroll={() => { scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0; }}
+          className={`flex-1 p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={location.pathname}
@@ -111,13 +126,18 @@ export default function DashboardLayout() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -40, opacity: 0 }}
               transition={{ duration: 0.22, ease: "easeInOut" }}
+              onAnimationComplete={() => {
+                if (mainRef.current) {
+                  mainRef.current.scrollTop = scrollRegistry[location.pathname] ?? 0;
+                }
+              }}
             >
               <Outlet context={{ darkMode, taglish, bahay }} />
             </motion.div>
           </AnimatePresence>
         </main>
 
-        <BottomNav />
+        <BottomNav onNavigate={navigateTab} />
 
         <footer className={`px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} flex justify-between`}>
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>

@@ -1,5 +1,5 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { TrendingUp, Calendar, Plus, RefreshCw } from "lucide-react";
+import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
@@ -33,7 +33,9 @@ export default function Dashboard() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const { containerRef, pulling, pullY, refreshing } = usePullToRefresh(fetchData);
+  const { containerRef, pullY, phase } = usePullToRefresh(fetchData);
+  const pulling = phase === "pulling" || phase === "ready";
+  const refreshing = phase === "refreshing";
 
   const totalUSD = wallets.find(w => w.currency_code === "USD")?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
@@ -55,17 +57,30 @@ export default function Dashboard() {
   ];
 
   return (
-    <div ref={containerRef} className="max-w-4xl mx-auto space-y-6 overflow-y-auto">
-      {/* Pull-to-refresh indicator */}
-      {(pulling || refreshing) && (
+    <div className="relative max-w-4xl mx-auto">
+      {/* Pull-to-refresh indicator — sits above scroll content, never clipped */}
+      <div
+        className="sticky top-0 z-10 flex items-center justify-center gap-2 text-primary text-xs font-bold uppercase tracking-wider overflow-hidden transition-all duration-200 pointer-events-none"
+        style={{
+          height: refreshing ? 44 : pulling ? Math.max(pullY * 0.7, 0) : 0,
+          opacity: refreshing ? 1 : pullY > 15 ? Math.min((pullY - 15) / 40, 1) : 0,
+        }}
+      >
         <div
-          className="flex items-center justify-center gap-2 text-primary text-xs font-bold uppercase tracking-wider transition-all"
-          style={{ height: Math.min(pullY, 56), opacity: pullY > 20 ? 1 : 0 }}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${phase === "ready" ? "bg-primary text-secondary" : "bg-primary/10 text-primary"} transition-colors`}
         >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-          {refreshing ? "Refreshing..." : pullY >= 70 ? "Release to refresh" : "Pull to refresh"}
+          {refreshing ? (
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <ArrowDown
+              className="w-3.5 h-3.5 transition-transform duration-200"
+              style={{ transform: phase === "ready" ? "rotate(180deg)" : "rotate(0deg)" }}
+            />
+          )}
+          <span>{refreshing ? "Refreshing..." : phase === "ready" ? "Release to refresh" : "Pull to refresh"}</span>
         </div>
-      )}
+      </div>
+      <div ref={containerRef} className="space-y-6 overflow-y-auto">
       {/* Banner */}
       <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-black/5"}`}>
         <div className="flex items-center gap-3">
@@ -224,6 +239,7 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+      </div>{/* end containerRef */}
     </div>
   );
 }
