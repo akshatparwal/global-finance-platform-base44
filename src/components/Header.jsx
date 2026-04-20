@@ -49,9 +49,9 @@ export default function Header() {
           >
             How It Works
           </Link>
-          <a href="#" className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Features</a>
-          <a href="#" className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Rates</a>
-          <a href="#" className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>About</a>
+          <a href="#features" onClick={e => { e.preventDefault(); document.querySelector('.py-32.bg-secondary')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Features</a>
+          <a href="#rates" onClick={e => { e.preventDefault(); document.querySelector('.py-24.bg-primary')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>Rates</a>
+          <a href="#about" onClick={e => { e.preventDefault(); document.querySelector('.py-32.bg-muted')?.scrollIntoView({behavior:'smooth'}); }} className={`text-sm font-semibold transition-colors duration-200 hover:text-primary ${textColor}`}>About</a>
         </nav>
 
         {/* Desktop CTA */}
@@ -89,9 +89,9 @@ export default function Header() {
               <nav className="flex flex-col gap-2">
                 <Link to="/" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">Home</Link>
                 <Link to="/HowItWorks" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">How It Works</Link>
-                <a href="#" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">Features</a>
-                <a href="#" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">Rates</a>
-                <a href="#" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">About</a>
+                <a href="/#features" onClick={() => { document.querySelector('.py-32.bg-secondary')?.scrollIntoView({behavior:'smooth'}); }} className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">Features</a>
+                <a href="/#rates" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">Rates</a>
+                <a href="/#about" className="text-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors">About</a>
               </nav>
 
               <div className="mt-auto space-y-4 pt-8">

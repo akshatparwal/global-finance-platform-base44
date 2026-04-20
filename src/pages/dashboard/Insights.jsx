@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar, ChevronDown, ChevronUp, Info } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const padalaData = [
   { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
@@ -36,12 +37,32 @@ const STOCKS = [
 const TABS = ["Activity", "Goals", "Analytics", "Markets"];
 
 export default function Insights() {
-  const { darkMode } = useOutletContext() || {};
+  const { darkMode, taglish } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("Activity");
   const [insightsOpen, setInsightsOpen] = useState(true);
+  const [goals, setGoals] = useState([]);
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
+
+  useEffect(() => {
+    base44.entities.SavingsGoal.list().then(setGoals).catch(() => {});
+  }, []);
+
+  const handleCreateGoal = async () => {
+    const label = prompt("Goal name (e.g. New Laptop, Vacation Fund):");
+    if (!label) return;
+    const target = prompt("Target amount in USD:");
+    if (!target || isNaN(target)) return;
+    const emoji = prompt("Choose an emoji for your goal (e.g. 🏠 ✈️ 💻):", "🎯");
+    try {
+      const newGoal = await base44.entities.SavingsGoal.create({
+        emoji: emoji || "🎯", label, description: "Personal savings goal",
+        target_amount: parseFloat(target), current_amount: 0
+      });
+      setGoals(prev => [...prev, newGoal]);
+    } catch { alert("Could not create goal. Please try again."); }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -171,7 +192,8 @@ export default function Insights() {
                 <div className="text-right"><p className="font-bold text-sm">{m.amount}</p><p className={`text-xs ${muted}`}>{m.ago}</p></div>
               </div>
             ))}
-            <button className={`w-full mt-4 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 ${darkMode ? "border-white/20 text-white hover:bg-white/5" : "border-black/20 text-[#1a2a4a] hover:bg-black/5"} transition-colors`}>
+            <button onClick={() => alert("Full Family Audit — detailed breakdown of all family transactions and health metrics coming soon!")}
+              className={`w-full mt-4 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 ${darkMode ? "border-white/20 text-white hover:bg-white/5" : "border-black/20 text-[#1a2a4a] hover:bg-black/5"} transition-colors`}>
               FULL FAMILY AUDIT ↗
             </button>
           </div>
@@ -194,16 +216,21 @@ export default function Insights() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button className="text-primary text-sm font-bold">+ Create Goal</button></div>
+          <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Ipon na Layunin" : "Savings Goals"}</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ {taglish ? "Gumawa ng Layunin" : "Create Goal"}</button></div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {GOALS.map((g,i) => (
-              <div key={i} className={`border rounded-2xl p-5 ${card}`}>
+            {goals.map((g,i) => {
+              const pct = g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0;
+              return (
+              <div key={g.id || i} className={`border rounded-2xl p-5 ${card}`}>
                 <span className="text-3xl mb-3 block">{g.emoji}</span>
                 <h4 className="font-bold mb-1">{g.label}</h4>
-                <p className={`text-xs ${muted} mb-3`}>{g.sub}</p>
-                <p className="font-black text-xl text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{g.amount}</p>
+                <p className={`text-xs ${muted} mb-3`}>{g.description}</p>
+                <p className="font-black text-xl text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>${g.current_amount.toLocaleString()}</p>
+                <p className={`text-xs ${muted}`}>of ${g.target_amount.toLocaleString()} goal</p>
+                <div className={`w-full h-1.5 rounded-full mt-2 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

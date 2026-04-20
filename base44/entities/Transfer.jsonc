@@ -1,0 +1,37 @@
+{
+  "name": "Transfer",
+  "type": "object",
+  "properties": {
+    "amount_usd": {
+      "type": "number"
+    },
+    "amount_php": {
+      "type": "number"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "recipient_bank": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "failed"
+      ],
+      "default": "completed"
+    },
+    "rate": {
+      "type": "number"
+    },
+    "fee": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "amount_usd",
+    "recipient_name"
+  ]
+}

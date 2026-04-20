@@ -1,0 +1,25 @@
+{
+  "name": "WalletBalance",
+  "type": "object",
+  "properties": {
+    "currency_code": {
+      "type": "string"
+    },
+    "currency_name": {
+      "type": "string"
+    },
+    "flag": {
+      "type": "string"
+    },
+    "balance": {
+      "type": "number"
+    },
+    "yield_pct": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "currency_code",
+    "balance"
+  ]
+}

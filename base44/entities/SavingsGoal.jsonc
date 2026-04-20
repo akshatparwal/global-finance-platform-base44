@@ -1,0 +1,25 @@
+{
+  "name": "SavingsGoal",
+  "type": "object",
+  "properties": {
+    "emoji": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "target_amount": {
+      "type": "number"
+    },
+    "current_amount": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "label",
+    "target_amount"
+  ]
+}

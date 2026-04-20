@@ -86,7 +86,8 @@ export default function DashboardLayout() {
             <span className="w-4 h-4 border border-white/20 rounded flex items-center justify-center text-xs">□</span>
           </div>
           <div className="flex items-center gap-3 ml-auto">
-            <button className="relative w-8 h-8 flex items-center justify-center">
+            <button onClick={() => alert("Notifications:\n\n🔔 Rate alert: PHP/USD hit ₱56.42 — best time to send!\n🔔 Your transfer to Nanay was delivered successfully.")}
+              className="relative w-8 h-8 flex items-center justify-center hover:opacity-70 transition-opacity">
               <Bell className={`w-4 h-4 ${textMuted}`} />
               <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center">2</span>
             </button>
@@ -101,7 +102,7 @@ export default function DashboardLayout() {
         </header>
 
         <main className={`flex-1 p-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
-          <Outlet context={{ darkMode, taglish }} />
+          <Outlet context={{ darkMode, taglish, bahay }} />
         </main>
 
         <footer className={`px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} flex justify-between`}>

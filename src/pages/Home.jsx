@@ -151,7 +151,8 @@ function HeroSection() {
               <div className="w-6 h-1.5 rounded-full bg-primary transition-all shadow-[0_0_10px_rgba(201,160,80,0.5)]"></div>
               <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 transition-all"></div>
             </div>
-            <button className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-border text-[11px] font-bold text-foreground hover:bg-muted transition-colors">
+            <button onClick={() => document.documentElement.classList.toggle("dark")}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-border text-[11px] font-bold text-foreground hover:bg-muted transition-colors">
               <Moon className="w-3.5 h-3.5" /> Dark
             </button>
           </div>
@@ -179,7 +180,8 @@ function HeroSection() {
         </div>
 
         {/* Floating Action Button */}
-        <button className="absolute bottom-6 right-6 w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-xl flex items-center justify-center hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-20">
+        <button onClick={() => window.location.href="/HowItWorks"}
+          className="absolute bottom-6 right-6 w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-xl flex items-center justify-center hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-20">
           <HelpCircle className="w-6 h-6" />
         </button>
       </motion.div>
