@@ -222,7 +222,7 @@ export default function Home() {
         {/* ── LEFT: full-bleed photo ── */}
         <div className="relative flex-1 overflow-hidden min-h-[50vh] lg:min-h-0">
           <img
-            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=90"
+            src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=1400&q=90"
             alt="Filipino family celebration"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />

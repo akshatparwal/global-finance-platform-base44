@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Calendar, ChevronDown, ChevronUp, Info } from "lucide-react";
+import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useLiveRates } from "@/hooks/useLiveRates";
+import RateAlertsPanel from "@/components/dashboard/RateAlertsPanel";
+import AIInsights from "@/components/dashboard/AIInsights";
 
 const padalaData = [
   { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
@@ -37,16 +40,22 @@ const STOCKS = [
 const TABS = ["Activity", "Goals", "Analytics", "Markets"];
 
 export default function Insights() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode, taglish, bahay } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("Activity");
-  const [insightsOpen, setInsightsOpen] = useState(true);
   const [goals, setGoals] = useState([]);
+  const [wallets, setWallets] = useState([]);
+  const [transfers, setTransfers] = useState([]);
+  const { rates, loading: ratesLoading } = useLiveRates();
+  const liveRate = rates?.USDPHP || 56.24;
+  const rateChange = rates?.USDPHP_change_pct || 0;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   useEffect(() => {
     base44.entities.SavingsGoal.list().then(setGoals).catch(() => {});
+    base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
+    base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
   }, []);
 
   const handleCreateGoal = async () => {
@@ -115,7 +124,7 @@ export default function Insights() {
             <ResponsiveContainer width="100%" height={160}>
               <AreaChart data={padalaData}>
                 <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: darkMode ? "rgba(255,255,255,0.4)" : "rgba(26,42,74,0.5)" }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: "#1a2332", border: "none", borderRadius: 8, color: "white" }} />
                 <Area type="monotone" dataKey="rate" stroke="hsl(var(--primary))" fill="url(#rg)" strokeWidth={2} />
               </AreaChart>
@@ -147,28 +156,8 @@ export default function Insights() {
             })}
           </div>
 
-          <button onClick={() => setInsightsOpen(!insightsOpen)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-primary/30 bg-primary/5">
-            <div className="flex items-center gap-2">
-              <span className="text-primary">✦</span>
-              <span className="text-primary font-bold text-sm uppercase tracking-wider">Intelligent Insights</span>
-              <span className="bg-primary text-secondary text-xs font-black w-5 h-5 rounded-full flex items-center justify-center">4</span>
-            </div>
-            {insightsOpen ? <ChevronUp className="w-4 h-4 text-primary" /> : <ChevronDown className="w-4 h-4 text-primary" />}
-          </button>
-          {insightsOpen && (
-            <div className="space-y-2">
-              {[
-                { icon: "✦", title: "Your Money, Working Hard", sub: "Smart Yield is actively growing your idle balance at 5.1% APY — beating most US savings accounts." },
-                { icon: "⚡", title: "Budget Status: Healthy", sub: "Keep up the momentum. You're tracking well against your monthly targets." },
-              ].map((ins, i) => (
-                <div key={i} className={`flex items-start gap-3 p-4 rounded-xl border ${card}`}>
-                  <span className="text-primary mt-0.5">{ins.icon}</span>
-                  <div><p className="font-bold text-sm">{ins.title}</p><p className={`text-xs ${muted} mt-0.5`}>{ins.sub}</p></div>
-                </div>
-              ))}
-            </div>
-          )}
+          <AIInsights darkMode={darkMode} wallets={wallets} transfers={transfers} goals={goals} />
+          <RateAlertsPanel darkMode={darkMode} currentRate={liveRate} />
         </div>
       )}
 
@@ -188,8 +177,8 @@ export default function Insights() {
             {[{ emoji: "👩", name: "Maria (Nanay)", sub: "Insured · Active", amount: "₱12,400", ago: "2h ago" },{ emoji: "👴", name: "Jose (Tatay)", sub: "Active Card", amount: "₱5,200", ago: "1d ago" }].map((m,i) => (
               <div key={i} className={`flex items-center gap-3 py-3 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
                 <span className="text-2xl">{m.emoji}</span>
-                <div className="flex-1"><p className="font-semibold text-sm">{m.name}</p><p className={`text-xs ${muted}`}>{m.sub}</p></div>
-                <div className="text-right"><p className="font-bold text-sm">{m.amount}</p><p className={`text-xs ${muted}`}>{m.ago}</p></div>
+                <div className="flex-1"><p className={`font-semibold text-sm ${text}`}>{m.name}</p><p className={`text-xs ${muted}`}>{m.sub}</p></div>
+                <div className="text-right"><p className={`font-bold text-sm ${text}`}>{m.amount}</p><p className={`text-xs ${muted}`}>{m.ago}</p></div>
               </div>
             ))}
             <button onClick={() => alert("Full Family Audit — detailed breakdown of all family transactions and health metrics coming soon!")}
@@ -275,22 +264,29 @@ export default function Insights() {
             <h3 className="font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Stay Connected to the Homeland</h3>
             <p className={`text-sm ${muted} mb-4`}>Monitoring the Philippine economy helps you time your transfers and investments perfectly.</p>
             <div className="grid grid-cols-2 gap-4">
-              {[{ label: "🇵🇭 PSEI INDEX", val: "6,847.30", change: "+0.38% · Today" },{ label: "🇺🇸 USD / PHP", val: "₱56.24", change: "+0.12% · Midmarket" }].map((m,i) => (
+              {[
+                { label: "🇵🇭 PSEI INDEX", val: "6,847.30", change: "+0.38% · Today" },
+                { label: "🇺🇸 USD / PHP", val: ratesLoading ? "Loading..." : `₱${liveRate.toFixed(2)}`, change: rateChange >= 0 ? `↑ +${rateChange.toFixed(2)}% · Live` : `↓ ${rateChange.toFixed(2)}% · Live` }
+              ].map((m,i) => (
                 <div key={i} className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
                   <p className={`text-xs ${muted} mb-1`}>{m.label}</p>
-                  <p className="font-black text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{m.val}</p>
-                  <p className="text-emerald-500 text-xs mt-1">{m.change}</p>
+                  <p className={`font-black text-xl ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{m.val}</p>
+                  <p className={`text-xs mt-1 ${rateChange >= 0 ? "text-emerald-500" : "text-red-400"}`}>{m.change}</p>
                 </div>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className={`border rounded-2xl p-5 ${card}`}>
-              <div className="flex justify-between mb-2"><p className={`text-xs ${muted} uppercase tracking-wider`}>PHP Exchange Rate</p><span className="text-emerald-500 text-xs font-bold">LIVE</span></div>
+              <div className="flex justify-between mb-2"><p className={`text-xs ${muted} uppercase tracking-wider`}>PHP Exchange Rate</p><span className={`text-xs font-bold ${ratesLoading ? muted : "text-emerald-500"}`}>{ratesLoading ? "FETCHING..." : "LIVE"}</span></div>
               <p className={`text-xs ${muted}`}>USD to PHP · Interbank Rate</p>
-              <p className="text-3xl font-black my-2 text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₱56.24</p>
-              <p className="text-emerald-500 text-xs mb-3">↑ +0.12%</p>
-              <div className="bg-primary/10 rounded-lg p-2"><p className="text-primary text-xs">✦ Best time to send: Now. Rates are 1.2% higher than the 30-day average.</p></div>
+              <p className="text-3xl font-black my-2 text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {ratesLoading ? "₱—.——" : `₱${liveRate.toFixed(2)}`}
+              </p>
+              <p className={`text-xs mb-3 ${rateChange >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+                {rateChange >= 0 ? `↑ +${rateChange.toFixed(2)}%` : `↓ ${rateChange.toFixed(2)}%`} · 24h
+              </p>
+              <div className="bg-primary/10 rounded-lg p-2"><p className="text-primary text-xs">✦ Best time to send: Now. Compare with your rate alerts below.</p></div>
             </div>
             <div className={`border rounded-2xl p-5 ${card}`}>
               <p className={`text-xs ${muted} uppercase tracking-wider mb-1`}>PSEI (Manila)</p>

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Copy, Check, Trash2 } from "lucide-react";
+import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import ReferralPanel from "@/components/dashboard/ReferralPanel";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -14,25 +15,18 @@ export default function Profile() {
   const { darkMode } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("General");
   const [user, setUser] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [activeLang, setActiveLang] = useState("EN");
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
+  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(u => { setUser(u); setLoadingUser(false); }).catch(() => setLoadingUser(false));
   }, []);
 
   const handleSignOut = () => {
     base44.auth.logout("/");
-  };
-
-  const handleCopyReferral = () => {
-    const code = user?.email?.split("@")[0] || "user";
-    navigator.clipboard.writeText(`kinnect.fi/join/${code}`).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
   };
 
   const handleUploadDocument = () => {
@@ -65,20 +59,31 @@ export default function Profile() {
 
       {/* User card */}
       <div className={`border rounded-2xl p-5 mb-6 flex items-center gap-4 ${card}`}>
-        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-secondary font-black text-xl">{initials}</div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {user?.full_name || "Loading..."}
-            </h2>
-            <span className="text-primary">✓</span>
+        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-secondary font-black text-xl flex-shrink-0">{initials}</div>
+        {loadingUser ? (
+          <div className="flex-1 space-y-2 animate-pulse">
+            <div className={`h-5 rounded-lg w-36 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+            <div className={`h-3.5 rounded-lg w-48 ${darkMode ? "bg-white/5" : "bg-black/5"}`} />
+            <div className="flex gap-2 mt-2">
+              <div className={`h-4 rounded-full w-20 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+              <div className={`h-4 rounded-full w-14 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+            </div>
           </div>
-          <p className={`text-sm ${muted}`}>{user?.email || ""}</p>
-          <div className="flex gap-2 mt-2">
-            <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
-            <span className={`${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"} text-[10px] font-bold px-2 py-0.5 rounded-full`}>BAYANI</span>
+        ) : (
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {user?.full_name || "KinnectFi User"}
+              </h2>
+              <span className="text-primary">✓</span>
+            </div>
+            <p className={`text-sm ${muted}`}>{user?.email || ""}</p>
+            <div className="flex gap-2 mt-2">
+              <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
+              <span className={`${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"} text-[10px] font-bold px-2 py-0.5 rounded-full`}>BAYANI</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -116,35 +121,20 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-2xl">🎁</span>
-                <span className="text-primary text-[10px] font-bold uppercase bg-primary/10 px-2 py-0.5 rounded-full">REWARDS</span>
-              </div>
-              <p className="text-3xl font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>2,450</p>
-              <p className={`text-xs ${muted} mb-3`}>Kinnect Points Balance</p>
-              <button
-                onClick={() => alert("Redeeming points — coming soon! You have 2,450 points (~$2.45 value).")}
-                className={`w-full flex items-center justify-between py-2.5 px-3 rounded-xl border text-sm font-semibold ${darkMode ? "border-white/10 hover:bg-white/5" : "border-black/10 hover:bg-black/5"} transition-colors`}>
-                Redeem for Cash/Fees <ChevronRight className="w-3 h-3" />
-              </button>
+          <div className={`border rounded-2xl p-5 ${card}`}>
+            <div className="flex justify-between items-start mb-2">
+              <span className="text-2xl">🎁</span>
+              <span className="text-primary text-[10px] font-bold uppercase bg-primary/10 px-2 py-0.5 rounded-full">REWARDS</span>
             </div>
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">👨‍👩‍👧</span>
-                <span className="text-primary text-[10px] font-bold uppercase">INVITE FAMILY & FRIENDS</span>
-              </div>
-              <p className={`text-xs ${muted} mb-3`}>Invite your family and friends. You both earn <span className="text-primary font-bold">500 Kinnect Points</span> — that's a free padala fee!</p>
-              <button onClick={handleCopyReferral} className="flex items-center gap-2 bg-black/10 rounded-lg px-3 py-2 w-full hover:bg-black/20 transition-colors">
-                <span className="text-xs font-mono flex-1 truncate">
-                  kinnect.fi/join/{user?.email?.split("@")[0] || "user"}
-                </span>
-                {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-primary" />}
-              </button>
-              <p className={`text-xs ${muted} mt-2`}>You've invited 3 family members. <span className="text-primary">2 have joined!</span></p>
-            </div>
+            <p className={`text-3xl font-black ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>2,450</p>
+            <p className={`text-xs ${muted} mb-3`}>Kinnect Points Balance</p>
+            <button
+              onClick={() => alert("Redeeming points — coming soon! You have 2,450 points (~$2.45 value).")}
+              className={`w-full flex items-center justify-between py-2.5 px-3 rounded-xl border text-sm font-semibold ${textMain} ${darkMode ? "border-white/10 hover:bg-white/5" : "border-black/10 hover:bg-black/5"} transition-colors`}>
+              Redeem for Cash/Fees <ChevronRight className="w-3 h-3" />
+            </button>
           </div>
+          <ReferralPanel darkMode={darkMode} />
 
           {/* KYC */}
           <div className={`border rounded-2xl p-5 ${card}`}>

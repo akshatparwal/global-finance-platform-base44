@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useLiveRates } from "@/hooks/useLiveRates";
 
 const RECENT = [
   { initials: "NM", label: "Nanay", color: "bg-purple-500", bank: "GCash" },
@@ -28,7 +29,8 @@ export default function Pay() {
   const [transfers, setTransfers] = useState([]);
   const [sending, setSending] = useState(false);
   const [activeTab, setActiveTab] = useState("Transfer History");
-  const rate = 56.24;
+  const { rates, loading: ratesLoading } = useLiveRates();
+  const rate = rates?.USDPHP || 56.24;
   const receive = sendAmount ? (parseFloat(sendAmount) * rate).toFixed(2) : "0.00";
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
@@ -168,10 +170,10 @@ export default function Pay() {
 
         <div className={`flex items-center justify-between py-3 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-4`}>
           <div className="flex items-center gap-2">
-            <RefreshCw className="w-3 h-3 text-primary" />
+            <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>{taglish ? "Live na Palitan" : "Live Exchange Rate"}</span>
           </div>
-          <span className="font-bold text-sm">1 USD = {rate} PHP</span>
+          <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>1 USD = {ratesLoading ? "..." : `${rate.toFixed(2)}`} PHP</span>
         </div>
 
         <div className={`rounded-xl p-4 mb-4 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>

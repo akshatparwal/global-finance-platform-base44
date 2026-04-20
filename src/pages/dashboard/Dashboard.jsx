@@ -3,6 +3,7 @@ import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { useLiveRates } from "@/hooks/useLiveRates";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -12,13 +13,16 @@ const COMMUNITY = [
 ];
 
 export default function Dashboard() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode, taglish, bahay } = useOutletContext() || {};
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
+  const { rates, loading: ratesLoading } = useLiveRates();
+  const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
+  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   const fetchData = useCallback(async () => {
     const [u, w, t] = await Promise.all([
@@ -39,7 +43,10 @@ export default function Dashboard() {
 
   const totalUSD = wallets.find(w => w.currency_code === "USD")?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
-  const netWorth = totalUSD + (totalPHP / 56.24);
+  const netWorth = totalUSD + (totalPHP / liveRate);
+  // Bahay mode: PHP-centric display
+  const primaryAmount = bahay ? `₱ ${(netWorth * liveRate).toLocaleString("en-PH", { minimumFractionDigits: 2 })}` : `$ ${netWorth.toFixed(2)}`;
+  const secondaryAmount = bahay ? `$ ${netWorth.toFixed(2)}` : `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -82,12 +89,12 @@ export default function Dashboard() {
       </div>
       <div ref={containerRef} className="space-y-6 overflow-y-auto">
       {/* Banner */}
-      <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-black/5"}`}>
+      <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
         <div className="flex items-center gap-3">
           <span className="text-primary text-lg">🙏</span>
           <div>
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
-            <span className={`text-sm font-semibold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Semana Santa</span>
+            <span className={`text-sm font-semibold ${textMain}`}>Semana Santa</span>
             <span className={`text-sm ${muted}`}> · {taglish ? "Banal na Linggo" : "Reflecting during the Holy Week"}</span>
           </div>
         </div>
@@ -101,10 +108,12 @@ export default function Dashboard() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-5xl font-black text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                $ {netWorth.toFixed(2)}
+                {primaryAmount}
               </p>
-              <p className="text-white/60 text-sm">₱ {totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}</p>
-              <p className="text-white/40 text-xs mt-1">vs. 24h ago · Dual Display</p>
+              <p className="text-white/60 text-sm">{secondaryAmount}</p>
+              <p className="text-white/40 text-xs mt-1">
+                {ratesLoading ? "Fetching live rate..." : `Live rate ₱${liveRate.toFixed(2)}/USD · Dual Display`}
+              </p>
             </div>
             <div className="bg-primary/20 border border-primary/30 rounded-full px-3 py-1 flex items-center gap-1">
               <TrendingUp className="w-3 h-3 text-primary" />
@@ -118,13 +127,13 @@ export default function Dashboard() {
       {/* Wallets */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <h2 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
+          <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
           <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-xs font-bold uppercase tracking-wider hover:opacity-70">
             {taglish ? "MAGPADALA →" : "SEND MONEY →"}
           </button>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {wallets.length > 0 ? wallets.map(w => (
+          {wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
             <div key={w.currency_code} className="rounded-2xl p-5 relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform"
               style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
               onClick={() => navigate("/dashboard/pay")}>
@@ -140,10 +149,12 @@ export default function Dashboard() {
                 <div className="text-white font-black text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {w.currency_code === "USD" ? `$${w.balance.toFixed(2)}` : `₱${w.balance.toLocaleString("en-PH", {minimumFractionDigits: 2})}`}
                 </div>
+                {bahay && w.currency_code === "USD" && (
+                  <div className="text-white/40 text-xs mt-1">≈ ₱{(w.balance * liveRate).toLocaleString("en-PH", {maximumFractionDigits: 0})}</div>
+                )}
               </div>
             </div>
           )) : (
-            // Fallback while loading
             ["USD","PHP"].map(code => (
               <div key={code} className="rounded-2xl p-5 animate-pulse h-32" style={{ background: "linear-gradient(135deg, #1a2a4a, #3d2e00)" }} />
             ))
@@ -153,7 +164,7 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <h2 className="font-extrabold text-lg mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
+        <h2 className={`font-extrabold text-lg mb-4 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {QUICK_SEND.map((p, i) => (
             <button key={i} onClick={() => navigate("/dashboard/pay")}
@@ -171,7 +182,7 @@ export default function Dashboard() {
       {/* Activity Feed */}
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity Feed"}</h2>
+          <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity Feed"}</h2>
           <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-xs font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
         </div>
 
@@ -184,7 +195,7 @@ export default function Dashboard() {
                   {t.recipient_name?.[0] || "?"}
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
+                  <p className={`text-sm font-semibold ${textMain}`}>
                     Sent to {t.recipient_name}
                   </p>
                   <p className={`text-[10px] uppercase tracking-wider font-bold ${muted}`}>
@@ -201,7 +212,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
               <span className="text-primary">⚡</span>
-              <h3 className="font-bold">{taglish ? "Mga Kwento ng Komunidad" : "Community Stories"}</h3>
+              <h3 className={`font-bold ${textMain}`}>{taglish ? "Mga Kwento ng Komunidad" : "Community Stories"}</h3>
             </div>
             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"}`}>HIGHLIGHTS</span>
           </div>
@@ -210,7 +221,7 @@ export default function Dashboard() {
               <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${c.highlight ? "border-primary/20 bg-primary/5" : `${darkMode ? "border-white/5" : "border-black/5"}`}`}>
                 <span className="text-xl flex-shrink-0">{c.emoji}</span>
                 <div className="flex-1">
-                  <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{c.label}</p>
+                  <p className={`text-sm font-semibold ${textMain}`}>{c.label}</p>
                   <p className={`text-[10px] uppercase tracking-wider font-bold ${muted}`}>{c.sub}</p>
                 </div>
                 {c.highlight && <span className="text-primary text-xs">★</span>}
