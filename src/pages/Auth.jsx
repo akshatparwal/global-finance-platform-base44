@@ -195,7 +195,7 @@ export default function Auth() {
   return (
     <div className="h-screen flex bg-secondary overflow-hidden">
       {/* Left panel */}
-      <div className="hidden sm:flex relative w-1/2 flex-col justify-end p-12 overflow-hidden">
+      <div className="hidden sm:flex relative flex-1 flex-col justify-end p-12 overflow-hidden">
         <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/052538e80_akshatparwal37--kinnectfi-frontend-fastapi-app_modal_run_filipino_family_remittance_2641e1b7.png"
           alt="Filipino family" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
@@ -224,7 +224,7 @@ export default function Auth() {
       </div>
 
       {/* Right panel */}
-      <div className="w-full sm:w-1/2 bg-[#0f1a2e] flex flex-col justify-center px-8 sm:px-16 py-10 relative overflow-y-auto">
+      <div className="w-full sm:w-[400px] xl:w-[440px] flex-shrink-0 bg-[#0f1a2e] flex flex-col justify-center px-8 sm:px-16 py-10 relative overflow-y-auto">
         <button onClick={handleBack} className="absolute top-6 right-8 flex items-center gap-1 text-white/50 hover:text-white text-sm transition-colors">
           <ArrowLeft className="w-3 h-3" /> Back
         </button>
