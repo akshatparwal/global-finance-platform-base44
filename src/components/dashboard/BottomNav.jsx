@@ -1,12 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, User, Users } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, User, BellRing } from "lucide-react";
 
 const NAV = [
-  { label: "Home", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Insights", icon: TrendingUp, path: "/dashboard/insights" },
-  { label: "Pay", icon: Send, path: "/dashboard/pay" },
-  { label: "Refer", icon: Users, path: "/dashboard/referrals" },
-  { label: "Profile", icon: User, path: "/dashboard/profile" },
+  { label: "Home",    icon: LayoutDashboard, path: "/dashboard" },
+  { label: "Insights",icon: TrendingUp,       path: "/dashboard/insights" },
+  { label: "Pay",     icon: Send,             path: "/dashboard/pay" },
+  { label: "Alerts",  icon: BellRing,         path: "/dashboard/rate-alerts" },
+  { label: "Profile", icon: User,             path: "/dashboard/profile" },
 ];
 
 export default function BottomNav({ onNavigate }) {
