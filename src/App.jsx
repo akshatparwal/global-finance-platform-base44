@@ -15,8 +15,7 @@ import Insights from './pages/dashboard/Insights';
 import Pay from './pages/dashboard/Pay';
 import Cards from './pages/dashboard/Cards';
 import Profile from './pages/dashboard/Profile';
-import Referrals from './pages/dashboard/Referrals';
-import RateAlerts from './pages/dashboard/RateAlerts';
+
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -53,8 +52,7 @@ const AuthenticatedApp = () => {
         <Route path="pay" element={<Pay />} />
         <Route path="cards" element={<Cards />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="referrals" element={<Referrals />} />
-        <Route path="rate-alerts" element={<RateAlerts />} />
+
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

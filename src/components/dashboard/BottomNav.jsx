@@ -1,11 +1,11 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, User, BellRing } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, User, CreditCard } from "lucide-react";
 
 const NAV = [
   { label: "Home",    icon: LayoutDashboard, path: "/dashboard" },
   { label: "Insights",icon: TrendingUp,       path: "/dashboard/insights" },
   { label: "Pay",     icon: Send,             path: "/dashboard/pay" },
-  { label: "Alerts",  icon: BellRing,         path: "/dashboard/rate-alerts" },
+  { label: "Cards",   icon: CreditCard,       path: "/dashboard/cards" },
   { label: "Profile", icon: User,             path: "/dashboard/profile" },
 ];
 
