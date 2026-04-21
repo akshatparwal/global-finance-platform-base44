@@ -6,8 +6,6 @@ import { base44 } from "@/api/base44Client";
 const LANGUAGES = [
   { code: "en", label: "English", sub: "English", flag: "🇺🇸" },
   { code: "tg", label: "Taglish", sub: "Filipino", flag: "🇵🇭" },
-  { code: "ceb", label: "Cebuano", sub: "Bisaya", flag: "🇵🇭" },
-  { code: "ilo", label: "Ilocano", sub: "Ilokano", flag: "🇵🇭" },
 ];
 
 const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_name", SIGNUP_EMAIL: "signup_email", SIGNUP_PASSWORD: "signup_password" };
