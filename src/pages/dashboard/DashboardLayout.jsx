@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, Users, BellRing } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -25,6 +26,7 @@ export default function DashboardLayout() {
   const [taglish, setTaglish] = useState(false);
   const [bahay, setBahay] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { toast } = useToast();
 
   // Save current tab scroll before navigating away
   const navigateTab = useCallback((path) => {
@@ -106,7 +108,10 @@ export default function DashboardLayout() {
             <span className="w-4 h-4 border border-white/20 rounded flex items-center justify-center text-xs">□</span>
           </div>
           <div className="flex items-center gap-2 ml-auto">
-            <button onClick={() => alert("Notifications:\n\n🔔 Rate alert: PHP/USD hit ₱56.42 — best time to send!\n🔔 Your transfer to Nanay was delivered successfully.")}
+            <button onClick={() => {
+                toast({ title: "🔔 Rate Alert", description: "PHP/USD hit ₱56.42 — best time to send!" });
+                setTimeout(() => toast({ title: "✅ Transfer Delivered", description: "Your transfer to Nanay was delivered successfully." }), 400);
+              }}
               className="relative w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity">
               <Bell className={`w-4 h-4 ${textMuted}`} />
               <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center">2</span>
