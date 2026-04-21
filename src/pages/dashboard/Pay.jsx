@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
+import TransferEstimator from "@/components/dashboard/TransferEstimator";
 
 const RECENT = [
   { initials: "NM", label: "Nanay", color: "bg-purple-500", bank: "GCash" },
@@ -176,19 +177,8 @@ export default function Pay() {
           <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>1 USD = {ratesLoading ? "..." : `${rate.toFixed(2)}`} PHP</span>
         </div>
 
-        <div className={`rounded-xl p-4 mb-4 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <Shield className="w-3 h-3 text-primary" />
-              <span className="text-xs font-bold uppercase tracking-wider">Zero Spread Guarantee</span>
-            </div>
-            <span className="text-primary text-xs font-bold">🔒 INSURED TRANSFER</span>
-          </div>
-          <div className="space-y-1.5 text-sm">
-            <div className="flex justify-between"><span className={muted}>Kinnect Transfer fee</span><span className="font-bold">$2.99</span></div>
-            <div className="flex justify-between"><span className={muted}>FX Markup</span><span className="text-primary font-bold">COMMISSION FREE</span></div>
-            <div className="flex justify-between"><span className={muted}>Arrival time</span><span className="text-primary font-bold">Instant (~30s)</span></div>
-          </div>
+        <div className="mb-4">
+          <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
         </div>
 
         <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
