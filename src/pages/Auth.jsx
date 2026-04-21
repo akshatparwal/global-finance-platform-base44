@@ -8,7 +8,7 @@ const LANGUAGES = [
   { code: "tg", label: "Taglish", sub: "Filipino", flag: "🇵🇭" },
 ];
 
-const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_name", SIGNUP_EMAIL: "signup_email", SIGNUP_PASSWORD: "signup_password" };
+const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_name", SIGNUP_EMAIL: "signup_email", SIGNUP_PASSWORD: "signup_password", VERIFY_EMAIL: "verify_email" };
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -21,12 +21,14 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const progress = {
     [STEPS.LANGUAGE]: 1, [STEPS.SIGNIN]: 2,
-    [STEPS.SIGNUP_NAME]: 2, [STEPS.SIGNUP_EMAIL]: 3, [STEPS.SIGNUP_PASSWORD]: 4,
+    [STEPS.SIGNUP_NAME]: 2, [STEPS.SIGNUP_EMAIL]: 3, [STEPS.SIGNUP_PASSWORD]: 4, [STEPS.VERIFY_EMAIL]: 5,
   };
-  const totalSteps = tab === "signin" ? 2 : 4;
+  const totalSteps = tab === "signin" ? 2 : 5;
 
   const handleTabSwitch = (t) => {
     setTab(t);
@@ -39,6 +41,7 @@ export default function Auth() {
     else if (step === STEPS.SIGNUP_NAME) setStep(STEPS.LANGUAGE);
     else if (step === STEPS.SIGNUP_EMAIL) setStep(STEPS.SIGNUP_NAME);
     else if (step === STEPS.SIGNUP_PASSWORD) setStep(STEPS.SIGNUP_EMAIL);
+    else if (step === STEPS.VERIFY_EMAIL) setStep(STEPS.SIGNUP_PASSWORD);
   };
 
   const handleForgotPassword = () => {
@@ -63,12 +66,36 @@ export default function Auth() {
     setLoading(true); setError("");
     try {
       await base44.auth.register({ email, password });
-      await base44.auth.loginViaEmailPassword(email, password);
-      navigate("/dashboard");
+      setStep(STEPS.VERIFY_EMAIL);
     } catch (e) {
       setError(e?.message || "Could not create account. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode || otpCode.length < 4) { setError("Please enter the verification code."); return; }
+    setLoading(true); setError("");
+    try {
+      await base44.auth.verifyOtp({ email, otpCode });
+      await base44.auth.loginViaEmailPassword(email, password);
+      navigate("/dashboard");
+    } catch (e) {
+      setError(e?.message || "Invalid or expired code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      await base44.auth.resendOtp(email);
+      setResendCooldown(60);
+      const t = setInterval(() => setResendCooldown(c => { if (c <= 1) { clearInterval(t); return 0; } return c - 1; }), 1000);
+    } catch (e) {
+      setError(e?.message || "Could not resend code.");
     }
   };
 
@@ -151,6 +178,33 @@ export default function Auth() {
             <button onClick={handleSignUp} disabled={password.length < 6 || loading}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
               {loading ? "Creating account..." : "Create Account"}
+            </button>
+          </>
+        );
+
+      case STEPS.VERIFY_EMAIL:
+        return (
+          <>
+            <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Check your email</h1>
+            <p className="text-white/50 text-sm mb-2">We sent a verification code to</p>
+            <p className="text-primary font-bold text-sm mb-6">{email}</p>
+            <label className="text-white/70 text-sm mb-2 block">Verification Code</label>
+            <input
+              value={otpCode}
+              onChange={e => setOtpCode(e.target.value.replace(/\D/g, ""))}
+              placeholder="123456"
+              maxLength={6}
+              onKeyDown={e => e.key === "Enter" && handleVerifyOtp()}
+              className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 text-center text-2xl font-bold tracking-widest focus:outline-none focus:border-primary"
+            />
+            {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+            <button onClick={handleVerifyOtp} disabled={otpCode.length < 4 || loading}
+              className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40 mb-3">
+              {loading ? "Verifying..." : "Verify & Continue →"}
+            </button>
+            <button onClick={handleResendOtp} disabled={resendCooldown > 0}
+              className="w-full text-white/40 text-sm hover:text-white/70 transition-colors disabled:opacity-40">
+              {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Didn't receive it? Resend code"}
             </button>
           </>
         );
