@@ -19,16 +19,16 @@ const spendingData = [
 ];
 
 const BUDGETS = [
-  { icon: "❤️", label: "Padala (Remittance)", spent: 850, total: 1000, color: "bg-primary" },
+  { icon: "❤️", label: "Remittances", spent: 850, total: 1000, color: "bg-primary" },
   { icon: "👨‍👩‍👧", label: "Family Support", spent: 150, total: 300, color: "bg-emerald-500" },
-  { icon: "📦", label: "Balikbayan Box", spent: 45, total: 200, color: "bg-emerald-500" },
+  { icon: "📦", label: "Shipping & Boxes", spent: 45, total: 200, color: "bg-emerald-500" },
   { icon: "📈", label: "Savings & Investments", spent: 420, total: 500, color: "bg-primary" },
 ];
 
 const GOALS = [
-  { emoji: "🏠", label: "Bahay sa Pilipinas", sub: "Save for your dream home back home", amount: "$12,500" },
-  { emoji: "🎓", label: "Edukasyon ng mga Anak", sub: "Invest in the next generation", amount: "$8,000" },
-  { emoji: "🛡️", label: "Pondo sa Emergency", sub: "6 months of expenses, ready", amount: "$6,500" },
+  { emoji: "🏠", label: "Dream Home", sub: "Save for your dream home back home", amount: "$12,500" },
+  { emoji: "🎓", label: "Children's Education", sub: "Invest in the next generation", amount: "$8,000" },
+  { emoji: "🛡️", label: "Emergency Fund", sub: "6 months of expenses, ready", amount: "$6,500" },
 ];
 
 const STOCKS = [
@@ -114,7 +114,7 @@ export default function Insights() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-primary" />
-                <h3 className="font-bold">Padala Trends</h3>
+                <h3 className="font-bold">Transfer Trends</h3>
                 <span className={`text-xs ${muted}`}>Historical performance of the PHP/USD exchange rate.</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-primary border border-primary/30 px-2 py-1 rounded-lg">
@@ -174,7 +174,7 @@ export default function Insights() {
               <h4 className="font-bold text-sm">PH Family Connectivity</h4>
               <span className="text-primary text-xs font-bold">REAL-TIME SYNC</span>
             </div>
-            {[{ emoji: "👩", name: "Maria (Nanay)", sub: "Insured · Active", amount: "₱12,400", ago: "2h ago" },{ emoji: "👴", name: "Jose (Tatay)", sub: "Active Card", amount: "₱5,200", ago: "1d ago" }].map((m,i) => (
+            {[{ emoji: "👩", name: "Maria (Mother)", sub: "Insured · Active", amount: "₱12,400", ago: "2h ago" },{ emoji: "👴", name: "Jose (Father)", sub: "Active Card", amount: "₱5,200", ago: "1d ago" }].map((m,i) => (
               <div key={i} className={`flex items-center gap-3 py-3 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
                 <span className="text-2xl">{m.emoji}</span>
                 <div className="flex-1"><p className={`font-semibold text-sm ${text}`}>{m.name}</p><p className={`text-xs ${muted}`}>{m.sub}</p></div>
@@ -189,10 +189,10 @@ export default function Insights() {
 
           <div className={`border rounded-2xl p-6 ${darkMode ? "bg-[#0d1526] border-white/10" : "bg-[#0d1526] border-white/10"}`}>
             <p className="text-primary/60 text-xs uppercase tracking-wider mb-1">Dream Goal</p>
-            <h3 className="text-white font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Bahay Tracking</h3>
+            <h3 className="text-white font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Home Construction</h3>
             <p className="text-white/50 text-sm mb-4">Your dream home in Antipolo is becoming a reality.</p>
             <div className="flex gap-2 mb-4 text-[10px] uppercase tracking-wider">
-              {["Lupa","Foundation","Walls","Roofing","Finished"].map((s,i) => (
+              {["Land","Foundation","Walls","Roofing","Finished"].map((s,i) => (
                 <span key={s} className={`flex-1 text-center py-1 rounded ${i <= 2 ? "text-primary border-b-2 border-primary" : "text-white/30"}`}>{s}</span>
               ))}
             </div>
@@ -205,7 +205,7 @@ export default function Insights() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Ipon na Layunin" : "Savings Goals"}</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ {taglish ? "Gumawa ng Layunin" : "Create Goal"}</button></div>
+          <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ Create Goal</button></div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {goals.map((g,i) => {
               const pct = g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0;
@@ -262,7 +262,7 @@ export default function Insights() {
       {activeTab === "Markets" && (
         <div className="space-y-4">
           <div className={`border rounded-2xl p-6 ${card}`}>
-            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Stay Connected to the Homeland</h3>
+            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Philippine Market Overview</h3>
             <p className={`text-sm ${muted} mb-4`}>Monitoring the Philippine economy helps you time your transfers and investments perfectly.</p>
             <div className="grid grid-cols-2 gap-3">
               {[
