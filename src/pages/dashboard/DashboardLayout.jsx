@@ -44,6 +44,7 @@ export default function DashboardLayout() {
   // Save current tab scroll before navigating away
   const navigateTab = useCallback((path) => {
     scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0;
+    setMobileOpen(false);
     navigate(path);
   }, [location.pathname, navigate]);
 
@@ -131,7 +132,7 @@ export default function DashboardLayout() {
               </button>
 
               {notifOpen && (
-                <div className={`absolute right-0 top-11 w-80 rounded-2xl shadow-2xl border z-50 overflow-hidden ${darkMode ? "bg-[#1a2332] border-white/10" : "bg-white border-black/10"}`}>
+                <div className={`absolute right-0 top-11 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl shadow-2xl border z-50 overflow-hidden ${darkMode ? "bg-[#1a2332] border-white/10" : "bg-white border-black/10"}`}>
                   <div className={`flex items-center justify-between px-4 py-3 border-b ${darkMode ? "border-white/10" : "border-black/10"}`}>
                     <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Notifications</span>
                     {notifications.length > 0 && (
@@ -179,7 +180,7 @@ export default function DashboardLayout() {
         <main
           ref={mainRef}
           onScroll={() => { scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0; }}
-          className={`flex-1 p-4 sm:p-6 pb-24 sm:pb-6 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
+          className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div

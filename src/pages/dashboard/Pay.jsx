@@ -141,12 +141,12 @@ export default function Pay() {
       });
       // Replace optimistic entry with real one
       setTransfers(prev => prev.map(t => t.id === optimisticId ? { ...saved, status: "completed" } : t));
-      alert(`✅ Transfer of $${amt} (₱${receive}) sent successfully to ${optimisticTransfer.recipient_name}!\n\nArrival: ~30 seconds`);
+      toast({ title: `✅ Transfer sent!`, description: `$${amt} (₱${receive}) sent to ${optimisticTransfer.recipient_name}. Arrival: ~30 seconds.` });
     } catch {
       // Roll back optimistic entry on failure
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
       setSendAmount(String(amt));
-      alert("Transfer failed. Please try again.");
+      toast({ title: "Transfer failed", description: "Please try again.", variant: "destructive" });
     } finally {
       setSending(false);
     }
@@ -220,7 +220,7 @@ export default function Pay() {
             <label className={`text-xs font-bold uppercase tracking-wider ${muted} mb-2 block`}>{taglish ? "Ipadala" : "You Send"}</label>
             <div className="flex items-center gap-2">
               <input value={sendAmount} onChange={e => setSendAmount(e.target.value.replace(/[^0-9.]/g,""))}
-                placeholder="$ 0.00" className={`flex-1 border rounded-xl px-4 py-3 text-lg font-bold outline-none focus:border-primary transition-colors ${inputBg}`} />
+                placeholder="$ 0.00" inputMode="decimal" className={`flex-1 border rounded-xl px-4 py-3 text-lg font-bold outline-none focus:border-primary transition-colors ${inputBg}`} />
               <div className="bg-[#0d1526] text-white rounded-xl px-3 py-3 flex items-center gap-1 flex-shrink-0">
                 <span>🇺🇸</span><span className="text-sm font-bold">USD</span>
               </div>
@@ -256,7 +256,7 @@ export default function Pay() {
       </div>
 
       {/* Tabs */}
-      <div className={`flex gap-1 p-1 rounded-xl mb-4 overflow-x-auto ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
+      <div className={`flex gap-1 p-1 rounded-xl mb-4 overflow-x-auto ${darkMode ? "bg-white/5" : "bg-black/5"}`} style={{ WebkitOverflowScrolling: "touch" }}>
         {[
           { key: "Transfer History", short: "History" },
           { key: "Rate Alerts", short: "Alerts" },
@@ -362,7 +362,7 @@ export default function Pay() {
               </div>
               <div className={`flex items-center gap-2 border rounded-xl px-4 py-3 mb-3 ${inputBg}`}>
                 <span className="text-lg font-bold opacity-50">₱</span>
-                <input type="number" value={alertTargetRate} onChange={e => setAlertTargetRate(e.target.value)} placeholder={`e.g. ${(rate + (alertDirection === "above" ? 0.5 : -0.5)).toFixed(2)}`} className="flex-1 bg-transparent outline-none text-lg font-bold" step="0.01" />
+                <input type="number" inputMode="decimal" value={alertTargetRate} onChange={e => setAlertTargetRate(e.target.value)} placeholder={`e.g. ${(rate + (alertDirection === "above" ? 0.5 : -0.5)).toFixed(2)}`} className="flex-1 bg-transparent outline-none text-lg font-bold" step="0.01" />
                 <span className="text-xs font-bold opacity-50">/ USD</span>
               </div>
               <div className="flex gap-2">

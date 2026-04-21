@@ -101,6 +101,7 @@ export default function RateAlertsPanel({ darkMode, currentRate }) {
             <span className={`text-sm font-bold ${muted}`}>₱</span>
             <input
               type="number"
+              inputMode="decimal"
               value={targetRate}
               onChange={e => setTargetRate(e.target.value)}
               placeholder="56.50"

@@ -147,10 +147,10 @@ export default function Profile() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6">
+      <div className="flex gap-1 mb-6 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
         {PROFILE_TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-1 py-2 text-xs font-semibold border-b-2 transition-colors ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
+            className={`flex-shrink-0 flex-1 min-w-[64px] py-3 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
             {t}
           </button>
         ))}
