@@ -154,37 +154,34 @@ export default function Pay() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {taglish ? "Magpadala" : "Send Money"}
           </h1>
-          <p className={`text-sm ${muted}`}>{taglish ? "Mabilis at ligtas na padala" : "Fast, secure cross-border transfers"}</p>
+          <p className={`text-xs ${muted}`}>{taglish ? "Mabilis at ligtas na padala" : "Fast, secure cross-border transfers"}</p>
         </div>
-        <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1.5">
+        <div className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-1">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-          <span className="text-primary text-xs font-bold">APR 30</span>
+          <span className="text-primary text-[10px] font-bold">APR 30</span>
         </div>
       </div>
 
-      {/* Best time banner */}
-      <div className={`border rounded-2xl p-4 mb-6 flex items-start justify-between ${card}`}>
-        <div className="flex items-start gap-3">
-          <span className="text-primary text-xl">🕐</span>
-          <div>
-            <h3 className="font-bold text-sm">{taglish ? "Pinakamabuting Oras Magpadala" : "Best Time to Send"}</h3>
-            <p className={`text-xs ${muted} mb-1`}>The current rate of ₱56.42 is in the top 5% of the last 30 days. Send now for maximum value!</p>
-            <div className="flex gap-3 text-xs">
-              <span className="text-primary">↑ +₱0.42 vs. last week</span>
-              <span className={muted}>⏱ Rate may dip in 4h</span>
-            </div>
+      {/* Best time banner — compact single line */}
+      <div className={`border rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-2 ${card}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-primary text-base flex-shrink-0">🕐</span>
+          <div className="min-w-0">
+            <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{taglish ? "Pinakamabuting Oras" : "Best Time to Send"} </span>
+            <span className="text-primary text-xs font-bold">↑ +₱0.42</span>
+            <span className={`text-xs ${muted}`}> vs. last week</span>
           </div>
         </div>
-        <span className="bg-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase px-2 py-1 rounded-full">HIGHLY OPTIMAL</span>
+        <span className="bg-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0">OPTIMAL</span>
       </div>
 
       {/* Send form */}
-      <div className={`border rounded-2xl p-6 mb-6 ${card}`}>
+      <div className={`border rounded-2xl p-4 mb-4 ${card}`}>
         <div className={`flex items-center gap-3 border rounded-xl px-4 py-3 mb-5 ${inputBg}`}>
           <Search className="w-4 h-4 opacity-40" />
           <input placeholder={taglish ? "Hanapin ang tatanggap..." : "Search by email or name..."}
@@ -215,24 +212,24 @@ export default function Pay() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div className="space-y-3 mb-4">
           <div>
-            <label className={`text-xs font-bold uppercase tracking-wider ${muted} mb-2 block`}>{taglish ? "Ipadala" : "You Send"}</label>
-            <div className="flex items-center gap-2">
-              <input value={sendAmount} onChange={e => setSendAmount(e.target.value.replace(/[^0-9.]/g,""))}
-                placeholder="$ 0.00" inputMode="decimal" className={`flex-1 border rounded-xl px-4 py-3 text-lg font-bold outline-none focus:border-primary transition-colors ${inputBg}`} />
-              <div className="bg-[#0d1526] text-white rounded-xl px-3 py-3 flex items-center gap-1 flex-shrink-0">
-                <span>🇺🇸</span><span className="text-sm font-bold">USD</span>
+            <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Ipadala" : "You Send"}</label>
+            <div className={`flex items-center border rounded-xl overflow-hidden ${inputBg}`}>
+              <div className="bg-[#0d1526] text-white px-3 h-12 flex items-center gap-1 flex-shrink-0 border-r border-white/10">
+                <span>🇺🇸</span><span className="text-xs font-bold">USD</span>
               </div>
+              <input value={sendAmount} onChange={e => setSendAmount(e.target.value.replace(/[^0-9.]/g,""))}
+                placeholder="0.00" inputMode="decimal" className="flex-1 bg-transparent px-4 h-12 text-xl font-black outline-none" />
             </div>
           </div>
           <div>
-            <label className={`text-xs font-bold uppercase tracking-wider ${muted} mb-2 block`}>{taglish ? "Matatanggap" : "They Receive"}</label>
-            <div className="flex items-center gap-2">
-              <div className={`flex-1 border rounded-xl px-4 py-3 text-lg font-bold ${inputBg}`}>₱ {receive}</div>
-              <div className="bg-primary text-secondary rounded-xl px-3 py-3 flex items-center gap-1 flex-shrink-0">
-                <span>🇵🇭</span><span className="text-sm font-bold">PHP</span>
+            <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Matatanggap" : "They Receive"}</label>
+            <div className={`flex items-center border rounded-xl overflow-hidden ${inputBg}`}>
+              <div className="bg-primary text-secondary px-3 h-12 flex items-center gap-1 flex-shrink-0 border-r border-primary/30">
+                <span>🇵🇭</span><span className="text-xs font-bold">PHP</span>
               </div>
+              <div className="flex-1 px-4 h-12 flex items-center text-xl font-black">₱{receive}</div>
             </div>
           </div>
         </div>

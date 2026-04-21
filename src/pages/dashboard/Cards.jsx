@@ -83,9 +83,9 @@ export default function Cards() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Kard" : "Cards"}</h1>
-        <p className={`text-sm ${muted}`}>{taglish ? "Pamahalaan ang iyong mga panandaliang susi" : "Manage your financial keys"}</p>
+      <div className="mb-4">
+        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Kard" : "Cards"}</h1>
+        <p className={`text-xs ${muted}`}>{taglish ? "Pamahalaan ang iyong mga panandaliang susi" : "Manage your financial keys"}</p>
       </div>
 
       {/* Success toast */}

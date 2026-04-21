@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "amount_sent": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "Testimonial"
+}

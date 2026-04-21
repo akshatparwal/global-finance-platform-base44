@@ -75,17 +75,17 @@ export default function Insights() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Insights & Wealth</h1>
-        <p className={`text-sm ${muted}`}>Budgets, spending intelligence & wealth building</p>
+      <div className="mb-4">
+        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Insights & Wealth</h1>
+        <p className={`text-xs ${muted}`}>Budgets, spending intelligence & wealth building</p>
       </div>
 
       {/* Tab bar */}
-      <div className={`flex gap-1 p-1 rounded-xl mb-6 overflow-x-auto ${darkMode ? "bg-white/5" : "bg-black/5"}`} style={{ WebkitOverflowScrolling: "touch" }}>
+      <div className={`flex gap-1 p-1 rounded-xl mb-4 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
         {TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-shrink-0 flex-1 min-w-[72px] py-3 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${activeTab === t ? "bg-primary text-secondary" : `${muted} hover:text-current`}`}>
-            {t === "Activity" && "⚡ "}{t === "Goals" && "◎ "}{t === "Analytics" && "↗ "}{t === "Markets" && "📊 "}{t}
+            className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${activeTab === t ? "bg-primary text-secondary" : `${muted} hover:text-current`}`}>
+            {t === "Activity" && "⚡"}{t === "Goals" && "◎"}{t === "Analytics" && "↗"}{t === "Markets" && "📊"}{" "}{t}
           </button>
         ))}
       </div>
@@ -121,7 +121,7 @@ export default function Insights() {
                 <Calendar className="w-3 h-3" /> LAST 30 DAYS
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={160}>
+            <ResponsiveContainer width="100%" height={120}>
               <AreaChart data={padalaData}>
                 <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: darkMode ? "rgba(255,255,255,0.4)" : "rgba(26,42,74,0.5)" }} axisLine={false} tickLine={false} />
@@ -206,17 +206,17 @@ export default function Insights() {
           </div>
 
           <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ Create Goal</button></div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {goals.map((g,i) => {
               const pct = g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0;
               return (
-              <div key={g.id || i} className={`border rounded-2xl p-5 ${card}`}>
-                <span className="text-3xl mb-3 block">{g.emoji}</span>
-                <h4 className="font-bold mb-1">{g.label}</h4>
-                <p className={`text-xs ${muted} mb-3`}>{g.description}</p>
-                <p className="font-black text-xl text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>${g.current_amount.toLocaleString()}</p>
-                <p className={`text-xs ${muted}`}>of ${g.target_amount.toLocaleString()} goal</p>
-                <div className={`w-full h-1.5 rounded-full mt-2 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
+              <div key={g.id || i} className={`border rounded-xl p-4 flex items-center gap-4 ${card}`}>
+                <span className="text-3xl flex-shrink-0">{g.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-sm mb-0.5">{g.label}</h4>
+                  <div className={`w-full h-1.5 rounded-full mb-1 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
+                  <p className={`text-xs ${muted}`}>{pct}% · ${g.current_amount.toLocaleString()} of ${g.target_amount.toLocaleString()}</p>
+                </div>
               </div>
               );
             })}
@@ -229,7 +229,7 @@ export default function Insights() {
           <div className={`border rounded-2xl p-6 ${card}`}>
             <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Spending Trends</h3>
             <p className={`text-sm ${muted} mb-4`}>Your monthly spending compared to your established budget</p>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={160}>
               <BarChart data={spendingData} barGap={2}>
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: "rgba(100,100,100,0.8)" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: "rgba(100,100,100,0.6)" }} axisLine={false} tickLine={false} />

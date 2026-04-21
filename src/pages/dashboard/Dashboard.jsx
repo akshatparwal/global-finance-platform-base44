@@ -87,7 +87,7 @@ export default function Dashboard() {
           <span>{refreshing ? "Refreshing..." : phase === "ready" ? "Release to refresh" : "Pull to refresh"}</span>
         </div>
       </div>
-      <div ref={containerRef} className="space-y-6 overflow-y-auto">
+      <div ref={containerRef} className="space-y-4 overflow-y-auto">
       {/* Banner */}
       <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
         <div className="flex items-center gap-3 min-w-0">
@@ -103,51 +103,58 @@ export default function Dashboard() {
 
       {/* Net Worth Card */}
       <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
-        <div className="p-5 sm:p-8">
-          <p className="text-white/40 text-xs uppercase tracking-widest mb-2">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
+        <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
+          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-3xl sm:text-5xl font-black text-white mb-1 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p className="text-3xl sm:text-5xl font-black text-white mb-0.5 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {primaryAmount}
               </p>
-              <p className="text-white/60 text-sm">{secondaryAmount}</p>
-              <p className="text-white/40 text-xs mt-1">
-                {ratesLoading ? "Fetching live rate..." : `₱${liveRate.toFixed(2)}/USD · Live`}
+              <p className="text-white/50 text-xs">{secondaryAmount}</p>
+              <p className="text-white/30 text-[10px] mt-0.5">
+                {ratesLoading ? "Fetching rate..." : `₱${liveRate.toFixed(2)}/USD · Live`}
               </p>
             </div>
-            <div className="bg-primary/20 border border-primary/30 rounded-full px-3 py-1 flex items-center gap-1 flex-shrink-0">
-              <TrendingUp className="w-3 h-3 text-primary" />
-              <span className="text-primary text-xs font-bold">+2.34%</span>
+            <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">
+              <TrendingUp className="w-3 h-3 text-emerald-400" />
+              <span className="text-emerald-400 text-xs font-bold">+2.34%</span>
             </div>
           </div>
-          <p className="text-white/70 text-sm mt-4">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || (user === null ? "..." : "OFW")}</span></p>
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+            <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || (user === null ? "..." : "OFW")}</span> 👋</p>
+            <button onClick={() => navigate("/dashboard/pay")}
+              className="bg-primary text-secondary text-[10px] font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform">
+              {taglish ? "MAGPADALA" : "SEND"} →
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Wallets */}
       <div>
-        <div className="flex justify-between items-center mb-3">
-          <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
-          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-xs font-bold uppercase tracking-wider hover:opacity-70">
-            {taglish ? "MAGPADALA →" : "SEND MONEY →"}
+        <div className="flex justify-between items-center mb-2">
+          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
+          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
+            {taglish ? "Padala →" : "Send →"}
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
-            <div key={w.currency_code} className="rounded-2xl p-5 relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform"
+            <div key={w.currency_code} className="rounded-2xl p-4 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
               style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
               onClick={() => navigate("/dashboard/pay")}>
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-2">
-                  <span>{w.flag}</span>
-                  <div><div className="text-white font-bold text-sm">{w.currency_code}</div><div className="text-white/40 text-xs">{w.currency_name}</div></div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-base">{w.flag}</span>
+                  <div><div className="text-white font-bold text-xs">{w.currency_code}</div><div className="text-white/40 text-[9px]">{w.currency_name}</div></div>
                 </div>
-                <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">⚡ Yield {w.yield_pct}</span>
+                <span className="bg-primary/20 text-primary text-[9px] font-bold px-1.5 py-0.5 rounded-full">⚡{w.yield_pct}</span>
               </div>
               <div>
-                <div className="text-white/40 text-[10px] uppercase tracking-wider mb-1">{taglish ? "Balanse" : "Balance"}</div>
-                <div className="text-white font-black text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  {w.currency_code === "USD" ? `$${w.balance.toFixed(2)}` : `₱${w.balance.toLocaleString("en-PH", {minimumFractionDigits: 2})}`}
+                <div className="text-white/40 text-[9px] uppercase tracking-wider mb-0.5">{taglish ? "Balanse" : "Balance"}</div>
+                <div className="text-white font-black text-lg leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  {w.currency_code === "USD" ? `$${w.balance.toFixed(2)}` : `₱${w.balance.toLocaleString("en-PH", {minimumFractionDigits: 0})}`}
                 </div>
                 {bahay && w.currency_code === "USD" && (
                   <div className="text-white/40 text-xs mt-1">≈ ₱{(w.balance * liveRate).toLocaleString("en-PH", {maximumFractionDigits: 0})}</div>
@@ -164,26 +171,29 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <h2 className={`font-extrabold text-lg mb-4 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {QUICK_SEND.map((p, i) => (
-            <button key={i} onClick={() => navigate("/dashboard/pay")}
-              className="flex flex-col items-center gap-2 flex-shrink-0 group">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-transform group-hover:scale-110 ${p.isAdd ? `border-2 border-dashed ${darkMode ? "border-white/20" : "border-black/20"}` : `${darkMode ? "bg-white/10" : "bg-black/10"}`}`}>
-                {p.isAdd ? <Plus className="w-4 h-4 opacity-40" /> : p.emoji}
-              </div>
-              <span className={`text-[10px] font-semibold ${muted}`}>{p.label}</span>
-              {!p.isAdd && <span className="text-[9px] text-primary uppercase">{taglish ? "PADALA" : "SEND"}</span>}
-            </button>
-          ))}
+        <h2 className={`font-bold text-sm mb-3 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
+        <div className="relative">
+          <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+            {QUICK_SEND.map((p, i) => (
+              <button key={i} onClick={() => navigate("/dashboard/pay")}
+                className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow ${p.isAdd ? `border-2 border-dashed ${darkMode ? "border-white/20" : "border-black/20"}` : `${darkMode ? "bg-white/10" : "bg-black/10"}`}`}>
+                  {p.isAdd ? <Plus className="w-5 h-5 opacity-40" /> : p.emoji}
+                </div>
+                <span className={`text-[10px] font-semibold ${muted}`}>{p.label}</span>
+                {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">{taglish ? "PADALA" : "SEND"}</span>}
+              </button>
+            ))}
+          </div>
+          <div className={`absolute right-0 top-0 bottom-0 w-10 pointer-events-none ${darkMode ? "bg-gradient-to-l from-[#0a0f1a]" : "bg-gradient-to-l from-[#f5efe6]"}`} />
         </div>
       </div>
 
       {/* Activity Feed */}
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity Feed"}</h2>
-          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-xs font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity"}</h2>
+          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
         </div>
 
         {/* Recent Transfers */}
@@ -231,22 +241,17 @@ export default function Dashboard() {
         </div>
 
         {/* Family invite */}
-        <div className="rounded-2xl p-8 text-center bg-[#f5efe6]">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
-            <span className="text-primary text-lg">❤️</span>
+        <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
+          <span className="text-4xl flex-shrink-0">❤️</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-white font-extrabold text-base mb-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              {taglish ? "Isama ang pamilya!" : "Invite your family!"}
+            </h3>
+            <p className="text-white/70 text-xs">You both earn <span className="font-black text-white">500 pts</span></p>
           </div>
-          <span className="bg-primary text-secondary text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-            {taglish ? "Pamilya Network" : "Family Network"}
-          </span>
-          <h3 className="text-[#1a2a4a] font-extrabold text-xl mt-3 mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {taglish ? "Isama mo ang pamilya!" : "Invite your family!"}
-          </h3>
-          <p className="text-[#1a2a4a]/60 text-sm mb-4">
-            {taglish ? "Imbitahan ang pamilya at kaibigan mo sa KinnectFi." : "Invite your family and friends to KinnectFi."} You both earn <span className="text-primary font-bold">500 Kinnect Points</span>!
-          </p>
           <button onClick={() => navigate("/dashboard/profile")}
-            className="bg-primary text-secondary font-bold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors">
-            {taglish ? "Imbitahan ang Pamilya" : "Invite Family & Friends"}
+            className="bg-white text-[#c97a20] font-black px-4 py-2 rounded-full text-xs flex-shrink-0 active:scale-95 transition-transform">
+            {taglish ? "Imbitahan" : "Invite →"}
           </button>
         </div>
       </div>

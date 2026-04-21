@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "badge": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "Feature"
+}

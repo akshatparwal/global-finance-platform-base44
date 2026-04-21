@@ -112,45 +112,41 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Profile</h1>
-        <p className={`text-sm ${muted}`}>Account Settings</p>
+      <div className="mb-4">
+        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Profile</h1>
+        <p className={`text-xs ${muted}`}>Account Settings</p>
       </div>
 
       {/* User card */}
-      <div className={`border rounded-2xl p-5 mb-6 flex items-center gap-4 ${card}`}>
-        <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-secondary font-black text-xl flex-shrink-0">{initials}</div>
+      <div className={`border rounded-2xl p-4 mb-4 flex items-center gap-3 ${card}`}>
+        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-secondary font-black text-lg flex-shrink-0">{initials}</div>
         {loadingUser ? (
-          <div className="flex-1 space-y-2 animate-pulse">
-            <div className={`h-5 rounded-lg w-36 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
-            <div className={`h-3.5 rounded-lg w-48 ${darkMode ? "bg-white/5" : "bg-black/5"}`} />
-            <div className="flex gap-2 mt-2">
-              <div className={`h-4 rounded-full w-20 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
-              <div className={`h-4 rounded-full w-14 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
-            </div>
+          <div className="flex-1 space-y-1.5 animate-pulse">
+            <div className={`h-4 rounded-lg w-32 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+            <div className={`h-3 rounded-lg w-44 ${darkMode ? "bg-white/5" : "bg-black/5"}`} />
           </div>
         ) : (
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className={`font-extrabold text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <h2 className={`font-extrabold text-base truncate ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {user?.full_name || "KinnectFi User"}
               </h2>
-              <span className="text-primary">✓</span>
+              <span className="text-primary text-sm flex-shrink-0">✓</span>
             </div>
-            <p className={`text-sm ${muted}`}>{user?.email || ""}</p>
-            <div className="flex gap-2 mt-2">
-              <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
-              <span className={`${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"} text-[10px] font-bold px-2 py-0.5 rounded-full`}>BAYANI</span>
+            <p className={`text-xs ${muted} truncate`}>{user?.email || ""}</p>
+            <div className="flex gap-1.5 mt-1.5">
+              <span className="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
+              <span className={`${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"} text-[9px] font-bold px-2 py-0.5 rounded-full`}>BAYANI</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
+      <div className="flex gap-1 mb-4 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
         {PROFILE_TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-shrink-0 flex-1 min-w-[64px] py-3 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
+            className={`flex-shrink-0 flex-1 min-w-[56px] py-2 text-[10px] font-bold border-b-2 transition-colors whitespace-nowrap ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
             {t}
           </button>
         ))}
