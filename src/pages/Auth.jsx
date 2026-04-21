@@ -204,9 +204,9 @@ export default function Auth() {
             <div><div className="font-extrabold text-white text-lg leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></div><div className="text-white/40 text-[9px] tracking-widest uppercase">Cross-Border Neobank</div></div>
           </Link>
           <h1 className="text-5xl font-extrabold text-white leading-tight mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Ang pera mo,<br /><span className="text-primary">konektado</span> sa puso<br />mo.
+            Your money,<br /><span className="text-primary">connected</span> to your<br />heart.
           </h1>
-          <p className="text-white/70 text-lg mb-8">Your money, connected to your heart.<br />Bridging the distance with trust and community.</p>
+          <p className="text-white/70 text-lg mb-8">Bridging the distance with trust and community.<br />Send money home instantly, with zero fees.</p>
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
               {["https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/98148142a_i_pravatar_cc_100_c2961a44.png","https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/d889dd544_i_pravatar_cc_100_70a8a187.png","https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/994bcae68_i_pravatar_cc_100_22c8e547.png"].map((s,i) => (
