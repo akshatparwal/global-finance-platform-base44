@@ -117,9 +117,7 @@ export default function DashboardLayout() {
             <div className="w-7 h-7 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
             <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></span>
           </div>
-          <div className="hidden sm:flex items-center gap-2 text-white/20 text-sm">
-            <span className="w-4 h-4 border border-white/20 rounded flex items-center justify-center text-xs">□</span>
-          </div>
+
           <div className="flex items-center gap-2 ml-auto">
             <div className="relative" ref={notifRef}>
               <button onClick={() => setNotifOpen(!notifOpen)}
