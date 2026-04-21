@@ -59,7 +59,7 @@ export default function Home() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 38%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.08) 100%)" }} />
 
           {/* Logo */}
-          <div className="absolute top-7 left-7 flex items-center gap-2.5 z-10">
+          <div className="absolute top-7 left-7 flex items-center gap-2.5 z-10 bg-black/40 backdrop-blur-sm rounded-2xl px-3 py-2">
             <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/15 backdrop-blur-sm flex items-center justify-center">
               <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" />
             </div>
