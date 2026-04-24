@@ -3,11 +3,9 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, History, MessageCircle } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
-
-const NOTIFICATIONS = [
-  { id: 1, icon: "🔔", title: "Rate Alert", desc: "PHP/USD hit ₱56.42 — best time to send!", time: "Just now" },
-  { id: 2, icon: "✅", title: "Transfer Delivered", desc: "Your transfer to Nanay was delivered successfully.", time: "2h ago" },
-];
+import { useNotifications } from "@/hooks/useNotifications";
+import NotificationPanel from "@/components/notifications/NotificationPanel";
+import NotificationToast from "@/components/notifications/NotificationToast";
 
 // Per-tab scroll position registry — persists across tab switches
 const scrollRegistry = {};
@@ -31,8 +29,8 @@ export default function DashboardLayout() {
   const [bahay, setBahay] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
   const notifRef = useRef(null);
+  const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -123,51 +121,28 @@ export default function DashboardLayout() {
 
           <div className="flex items-center gap-2 ml-auto">
             <div className="relative" ref={notifRef}>
-              <button onClick={() => setNotifOpen(!notifOpen)}
+              <button onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markAllRead(); }}
                 className="relative w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity">
                 <Bell className={`w-4 h-4 ${textMuted}`} />
-                {notifications.length > 0 && (
-                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center">
-                    {notifications.length}
+                {unreadCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
+                    {unreadCount}
                   </span>
                 )}
               </button>
 
-              {notifOpen && (
-                <div className={`absolute right-0 top-11 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-2xl shadow-2xl border z-50 overflow-hidden ${darkMode ? "bg-[#1a2332] border-white/10" : "bg-white border-black/10"}`}>
-                  <div className={`flex items-center justify-between px-4 py-3 border-b ${darkMode ? "border-white/10" : "border-black/10"}`}>
-                    <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Notifications</span>
-                    {notifications.length > 0 && (
-                      <button onClick={() => setNotifications([])} className="text-primary text-xs font-bold hover:underline">
-                        Clear all
-                      </button>
-                    )}
-                  </div>
-                  {notifications.length === 0 ? (
-                    <div className="px-4 py-8 text-center">
-                      <Bell className={`w-6 h-6 mx-auto mb-2 ${darkMode ? "text-white/20" : "text-black/20"}`} />
-                      <p className={`text-sm ${darkMode ? "text-white/40" : "text-black/40"}`}>No notifications</p>
-                    </div>
-                  ) : (
-                    <div>
-                      {notifications.map((n) => (
-                        <div key={n.id} className={`flex items-start gap-3 px-4 py-3 border-b last:border-0 ${darkMode ? "border-white/5 hover:bg-white/5" : "border-black/5 hover:bg-black/5"} transition-colors`}>
-                          <span className="text-xl flex-shrink-0 mt-0.5">{n.icon}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{n.title}</p>
-                            <p className={`text-xs ${darkMode ? "text-white/50" : "text-black/50"} mt-0.5`}>{n.desc}</p>
-                            <p className="text-primary text-[10px] font-bold mt-1">{n.time}</p>
-                          </div>
-                          <button onClick={() => setNotifications(prev => prev.filter(x => x.id !== n.id))}
-                            className={`flex-shrink-0 p-1 rounded-lg hover:bg-red-500/10 transition-colors ${darkMode ? "text-white/30 hover:text-red-400" : "text-black/30 hover:text-red-400"}`}>
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              <AnimatePresence>
+                {notifOpen && (
+                  <NotificationPanel
+                    notifications={notifications}
+                    onDismiss={dismiss}
+                    onMarkAllRead={markAllRead}
+                    onClearAll={clearAll}
+                    onClose={() => setNotifOpen(false)}
+                    darkMode={darkMode}
+                  />
+                )}
+              </AnimatePresence>
             </div>
             <button onClick={() => setDarkMode(!darkMode)} className={`w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
               {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -203,6 +178,13 @@ export default function DashboardLayout() {
         </main>
 
         <BottomNav onNavigate={navigateTab} />
+
+        {/* Global push toast banner */}
+        <AnimatePresence>
+          {toast && (
+            <NotificationToast toast={toast} onDismiss={dismissToast} darkMode={darkMode} />
+          )}
+        </AnimatePresence>
 
         <footer className={`hidden sm:flex px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} justify-between`}>
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>
