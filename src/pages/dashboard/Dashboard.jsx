@@ -7,6 +7,7 @@ import { useLiveRates } from "@/hooks/useLiveRates";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
+import CommunityStories from "@/components/dashboard/CommunityStories";
 import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
 
@@ -275,27 +276,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-primary">⚡</span>
-              <h3 className={`font-bold ${textMain}`}>{taglish ? "Mga Kwento ng Komunidad" : "Community Stories"}</h3>
-            </div>
-            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full ${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"}`}>HIGHLIGHTS</span>
-          </div>
-          <div className="space-y-2">
-            {COMMUNITY.map((c, i) => (
-              <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${c.highlight ? "border-primary/20 bg-primary/5" : `${darkMode ? "border-white/5" : "border-black/5"}`}`}>
-                <span className="text-xl flex-shrink-0">{c.emoji}</span>
-                <div className="flex-1">
-                  <p className={`text-sm font-semibold ${textMain}`}>{c.label}</p>
-                  <p className={`text-[10px] uppercase tracking-wider font-bold ${muted}`}>{c.sub}</p>
-                </div>
-                {c.highlight && <span className="text-primary text-xs">★</span>}
-              </div>
-            ))}
-          </div>
-        </div>
+        <CommunityStories darkMode={darkMode} taglish={taglish} />
 
         {/* Family invite */}
         <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>

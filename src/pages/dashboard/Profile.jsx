@@ -4,6 +4,7 @@ import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useOutletContext } from "react-router-dom";
 import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
 import SecurityHub from "@/components/security/SecurityHub";
+import PointsRedemption from "@/components/dashboard/PointsRedemption";
 import { base44 } from "@/api/base44Client";
 
 const TIERS = [
@@ -55,6 +56,7 @@ export default function Profile() {
   };
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showRedemption, setShowRedemption] = useState(false);
 
   const handleUploadDocument = () => {
     setShowOnboarding(true);
@@ -104,6 +106,15 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <AnimatePresence>
+        {showRedemption && (
+          <PointsRedemption
+            points={2450}
+            darkMode={darkMode}
+            onClose={() => setShowRedemption(false)}
+          />
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showOnboarding && user && (
           <OnboardingModal
@@ -186,7 +197,7 @@ export default function Profile() {
             <p className={`text-3xl font-black ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>2,450</p>
             <p className={`text-xs ${muted} mb-3`}>Kinnect Points Balance</p>
             <button
-              onClick={() => alert("Redeeming points — coming soon! You have 2,450 points (~$2.45 value).")}
+              onClick={() => setShowRedemption(true)}
               className={`w-full flex items-center justify-between py-2.5 px-3 rounded-xl border text-sm font-semibold ${textMain} ${darkMode ? "border-white/10 hover:bg-white/5" : "border-black/10 hover:bg-black/5"} transition-colors`}>
               Redeem for Cash/Fees <ChevronRight className="w-3 h-3" />
             </button>

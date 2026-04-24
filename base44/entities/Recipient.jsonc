@@ -1,0 +1,50 @@
+{
+  "name": "Recipient",
+  "type": "object",
+  "properties": {
+    "nickname": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string",
+      "default": "\ud83d\udc64"
+    },
+    "bank": {
+      "type": "string"
+    },
+    "account_number": {
+      "type": "string"
+    },
+    "relationship": {
+      "type": "string",
+      "enum": [
+        "mother",
+        "father",
+        "sibling",
+        "spouse",
+        "child",
+        "friend",
+        "other"
+      ],
+      "default": "other"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "total_sent_usd": {
+      "type": "number",
+      "default": 0
+    },
+    "transfer_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "nickname",
+    "bank"
+  ]
+}

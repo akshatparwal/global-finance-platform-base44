@@ -8,6 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import RateAlertsPanel from "@/components/dashboard/RateAlertsPanel";
 import AIInsights from "@/components/dashboard/AIInsights";
+import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
 
@@ -278,38 +279,7 @@ export default function Insights() {
       )}
 
       {activeTab === "Analytics" && (
-        <div className="space-y-6">
-          <div className={`border rounded-2xl p-6 ${card}`}>
-            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Spending Trends</h3>
-            <p className={`text-sm ${muted} mb-4`}>Your monthly spending compared to your established budget</p>
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={spendingData} barGap={2}>
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "rgba(100,100,100,0.8)" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "rgba(100,100,100,0.6)" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: "#1a2332", border: "none", borderRadius: 8, color: "white" }} />
-                <Bar dataKey="spending" fill="hsl(var(--primary))" radius={[4,4,0,0]} />
-                <Bar dataKey="budget" fill="rgba(150,150,150,0.3)" radius={[4,4,0,0]} />
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="flex gap-4 mt-2 justify-center text-xs">
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-primary" /><span className={muted}>Spending</span></div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-sm bg-gray-400/40" /><span className={muted}>Budget</span></div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <h4 className={`font-bold mb-1 ${text}`}>Spending Prediction</h4>
-              <p className={`text-2xl font-black mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$1,580 <span className="text-emerald-500 text-sm">ON TRACK</span></p>
-              <p className={`text-xs ${muted}`}>Based on your current habits, you are projected to finish the month $20 under budget.</p>
-            </div>
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <h4 className={`font-bold mb-1 ${text}`}>Savings Potential</h4>
-              <p className={`text-2xl font-black mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$450 <span className={`text-sm font-normal ${muted}`}>per month</span></p>
-              <p className={`text-xs ${muted}`}>If you maintain your transport savings, you could reach your House Deposit goal 2 months early.</p>
-
-            </div>
-          </div>
-        </div>
+        <SpendAnalytics transfers={transfers} darkMode={darkMode} />
       )}
 
       {activeTab === "Markets" && (

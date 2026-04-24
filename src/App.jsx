@@ -17,6 +17,7 @@ import Cards from './pages/dashboard/Cards.jsx';
 import Profile from './pages/dashboard/Profile';
 import Transactions from './pages/dashboard/Transactions';
 import Support from './pages/dashboard/Support';
+import Recipients from './pages/dashboard/Recipients';
 
 // Add page imports here
 
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="transactions" element={<Transactions />} />
         <Route path="support" element={<Support />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="recipients" element={<Recipients />} />
 
       </Route>
       <Route path="*" element={<PageNotFound />} />
