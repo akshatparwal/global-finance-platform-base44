@@ -2,13 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0D1F3C" />
+
+    <!-- Primary SEO -->
+    <title>KinnectFi — Zero-Fee Cross-Border Neobank for Filipino Families</title>
+    <meta name="description" content="Send money home to the Philippines instantly with zero hidden fees. The cross-border neobank built for OFWs — live exchange rates, savings goals, virtual cards, and more." />
+    <meta name="keywords" content="OFW remittance, send money Philippines, zero fee transfer, Filipino neobank, padala, GCash, BDO transfer, USD to PHP" />
+    <meta name="author" content="KinnectFi" />
+    <link rel="canonical" href="https://kinnectfi.com/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kinnectfi.com/" />
+    <meta property="og:title" content="KinnectFi — Zero-Fee Cross-Border Neobank for Filipino Families" />
+    <meta property="og:description" content="Send money home to the Philippines instantly with zero hidden fees. Built by Filipinos, for the world." />
+    <meta property="og:image" content="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/449dd6e54_generated_image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="tl_PH" />
+    <meta property="og:site_name" content="KinnectFi" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@kinnectfi" />
+    <meta name="twitter:title" content="KinnectFi — Zero-Fee Padala for OFWs" />
+    <meta name="twitter:description" content="Send money home instantly with no hidden fees. Live PHP/USD rates, savings goals, and virtual cards for Filipinos worldwide." />
+    <meta name="twitter:image" content="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/449dd6e54_generated_image.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="KinnectFi" />
+    <link rel="apple-touch-icon" href="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialService",
+      "name": "KinnectFi",
+      "description": "Zero-fee cross-border neobank for Filipino families and OFWs",
+      "url": "https://kinnectfi.com",
+      "logo": "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg",
+      "areaServed": ["PH","US","GB","CA","AU","AE","SA","SG"],
+      "currenciesAccepted": "USD, PHP",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "description": "Zero-fee remittance" }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
   </head>
   <body>
     <div id="root"></div>

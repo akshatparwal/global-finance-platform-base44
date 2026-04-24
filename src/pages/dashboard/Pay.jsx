@@ -5,6 +5,8 @@ import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import TransferEstimator from "@/components/dashboard/TransferEstimator";
 import { useToast } from "@/components/ui/use-toast";
+import { haptic } from "@/utils/haptic";
+import { sfx } from "@/utils/sounds";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
 const RATE_HISTORY = [
@@ -141,11 +143,15 @@ export default function Pay() {
       });
       // Replace optimistic entry with real one
       setTransfers(prev => prev.map(t => t.id === optimisticId ? { ...saved, status: "completed" } : t));
+      haptic.success();
+      sfx.success();
       toast({ title: `✅ Transfer sent!`, description: `$${amt} (₱${receive}) sent to ${optimisticTransfer.recipient_name}. Arrival: ~30 seconds.` });
     } catch {
       // Roll back optimistic entry on failure
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
       setSendAmount(String(amt));
+      haptic.error();
+      sfx.error();
       toast({ title: "Transfer failed", description: "Please try again.", variant: "destructive" });
     } finally {
       setSending(false);
@@ -246,7 +252,8 @@ export default function Pay() {
           <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
         </div>
 
-        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
+        <button onClick={() => { haptic.medium(); sfx.click(); handleSend(); }} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
+          aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
           className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
           {sending ? "SENDING..." : taglish ? "MAGPADALA →" : "SEND NOW →"}
         </button>

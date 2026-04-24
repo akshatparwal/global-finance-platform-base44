@@ -10,6 +10,8 @@ import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
 import CommunityStories from "@/components/dashboard/CommunityStories";
 import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
+import SpendingPulse from "@/components/dashboard/SpendingPulse";
+import { fetchWithCache } from "@/utils/offlineCache";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -32,19 +34,22 @@ export default function Dashboard() {
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
 
+  const [offline, setOffline] = useState(false);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [u, w, t] = await Promise.all([
+    const [u, walletsResult, transfersResult] = await Promise.all([
       base44.auth.me().catch(() => null),
-      base44.entities.WalletBalance.list().catch(() => []),
-      base44.entities.Transfer.list("-created_date", 5).catch(() => []),
+      fetchWithCache("wallets", () => base44.entities.WalletBalance.list()).catch(() => ({ data: [], fromCache: false })),
+      fetchWithCache("transfers_dash", () => base44.entities.Transfer.list("-created_date", 5)).catch(() => ({ data: [], fromCache: false })),
     ]);
     if (u) {
       setUser(u);
       if (!u.onboarding_completed) setShowOnboarding(true);
     }
-    setWallets(w);
-    setTransfers(t);
+    setWallets(walletsResult.data || []);
+    setTransfers(transfersResult.data || []);
+    setOffline(walletsResult.fromCache || transfersResult.fromCache);
     setLoading(false);
   }, []);
 
@@ -228,6 +233,19 @@ export default function Dashboard() {
           <div className={`absolute right-0 top-0 bottom-0 w-10 pointer-events-none ${darkMode ? "bg-gradient-to-l from-[#0a0f1a]" : "bg-gradient-to-l from-[#f5efe6]"}`} />
         </div>
       </div>
+
+      {/* Offline banner */}
+      {offline && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/20" role="alert" aria-live="polite">
+          <span className="text-yellow-400 text-base">📶</span>
+          <p className="text-yellow-400 text-xs font-semibold">Showing cached data — you appear to be offline</p>
+        </div>
+      )}
+
+      {/* Spending Pulse */}
+      {!loading && transfers.length > 0 && (
+        <SpendingPulse transfers={transfers} darkMode={darkMode} />
+      )}
 
       {/* Activity Feed */}
       <div>

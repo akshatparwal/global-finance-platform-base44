@@ -1,0 +1,34 @@
+{
+  "name": "KinnectFi — Cross-Border Neobank",
+  "short_name": "KinnectFi",
+  "description": "Zero-fee padala for Filipino families worldwide. Send money home instantly.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1F3C",
+  "theme_color": "#C97B22",
+  "lang": "en",
+  "categories": ["finance", "utilities"],
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/449dd6e54_generated_image.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "label": "KinnectFi Dashboard — Send money home instantly"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Send Money", "short_name": "Send", "url": "/dashboard/pay", "description": "Send money to Philippines" },
+    { "name": "Check Rate", "short_name": "Rate", "url": "/dashboard/insights", "description": "Live PHP/USD rate" }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

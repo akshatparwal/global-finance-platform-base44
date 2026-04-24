@@ -6,6 +6,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Zap, RefreshCw, ChevronDown, Check, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import confetti from "canvas-confetti";
+import { haptic } from "@/utils/haptic";
+import { sfx } from "@/utils/sounds";
 
 const QUICK_AMOUNTS = [10, 25, 50, 100, 250];
 const FREQ_LABELS = {
@@ -62,10 +65,21 @@ export default function AddFundsModal({ goal, onClose, onUpdated, darkMode }) {
 
     setSaving(false);
     setSuccess(true);
+    haptic.success();
+    sfx.coin();
+
+    // Confetti burst if goal is reached or crossed 100%
+    if (pct >= 100) {
+      setTimeout(() => {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, colors: ["#C97B22", "#1a2a4a", "#ffffff", "#f5efe6"] });
+        sfx.success();
+      }, 200);
+    }
+
     setTimeout(() => {
       onUpdated({ ...goal, current_amount: newTotal, auto_save_enabled: autoSave, auto_save_amount: parseFloat(autoAmount) || 0, auto_save_frequency: autoFreq, round_up_enabled: roundUp, contributions });
       onClose();
-    }, 1200);
+    }, pct >= 100 ? 2200 : 1200);
   };
 
   const handleSaveRules = async () => {

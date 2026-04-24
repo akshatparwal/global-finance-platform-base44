@@ -198,13 +198,14 @@ export default function Home() {
 
             <Link
               to="/auth"
+              aria-label={taglish ? "Magsimula na sa KinnectFi" : "Get started with KinnectFi — create your free account"}
               className="flex items-center justify-center gap-2 font-bold rounded-xl py-4 px-6 text-base mb-3 hover:opacity-90 transition-opacity"
               style={{ background: "#C97B22", color: "#fff" }}
             >
               {taglish ? "Magsimula Na →" : "Get Started →"}
             </Link>
             <p className="text-center text-[11px] mb-7" style={{ color: panelMuted }}>
-              <Link to="/auth" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
+              <Link to="/auth" aria-label="Sign in to your existing KinnectFi account" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
                 {taglish ? "May account ka na? Maligayang pagbabalik!" : "Already have an account? Welcome back!"}
               </Link>
             </p>
