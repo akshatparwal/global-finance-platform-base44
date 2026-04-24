@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useOutletContext, useNavigate } from "react-router-dom";
+import AddFundsModal from "@/components/savings/AddFundsModal";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -46,6 +48,7 @@ export default function Insights() {
   const [activeTab, setActiveTab] = useState("Activity");
   const [goals, setGoals] = useState([]);
   const [goalsLoading, setGoalsLoading] = useState(true);
+  const [addFundsGoal, setAddFundsGoal] = useState(null);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
   const { rates, loading: ratesLoading } = useLiveRates();
@@ -64,6 +67,10 @@ export default function Insights() {
     base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
   }, []);
+
+  const handleGoalUpdated = (updatedGoal) => {
+    setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));
+  };
 
   const handleCreateGoal = async () => {
     const label = prompt("Goal name (e.g. New Laptop, Vacation Fund):");
@@ -168,6 +175,17 @@ export default function Insights() {
         </div>
       )}
 
+      <AnimatePresence>
+        {addFundsGoal && (
+          <AddFundsModal
+            goal={addFundsGoal}
+            onClose={() => setAddFundsGoal(null)}
+            onUpdated={handleGoalUpdated}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
+
       {activeTab === "Goals" && (
         <div className="space-y-6">
           <div className={`border rounded-2xl p-6 ${card}`}>
@@ -230,15 +248,27 @@ export default function Insights() {
           ) : (
           <div className="grid grid-cols-1 gap-3">
             {goals.map((g,i) => {
-              const pct = g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0;
+              const pct = g.target_amount > 0 ? Math.round(((g.current_amount || 0) / g.target_amount) * 100) : 0;
               return (
               <div key={g.id || i} className={`border rounded-xl p-4 flex items-center gap-4 ${card}`}>
                 <span className="text-3xl flex-shrink-0">{g.emoji}</span>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-sm mb-0.5">{g.label}</h4>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <h4 className="font-bold text-sm">{g.label}</h4>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {g.auto_save_enabled && <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">⚡ AUTO</span>}
+                      {g.round_up_enabled && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">↑ ROUND-UP</span>}
+                    </div>
+                  </div>
                   <div className={`w-full h-1.5 rounded-full mb-1 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
-                  <p className={`text-xs ${muted}`}>{pct}% · ${g.current_amount.toLocaleString()} of ${g.target_amount.toLocaleString()}</p>
+                  <p className={`text-xs ${muted}`}>{pct}% · ${(g.current_amount || 0).toLocaleString()} of ${g.target_amount.toLocaleString()}</p>
                 </div>
+                <button
+                  onClick={() => setAddFundsGoal(g)}
+                  className="flex-shrink-0 bg-primary text-secondary text-xs font-black px-3 py-2 rounded-xl active:scale-95 transition-transform hover:opacity-90"
+                >
+                  + Add
+                </button>
               </div>
               );
             })}

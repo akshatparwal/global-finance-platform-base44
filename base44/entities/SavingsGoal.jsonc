@@ -16,6 +16,45 @@
     },
     "current_amount": {
       "type": "number"
+    },
+    "auto_save_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "auto_save_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "auto_save_frequency": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly",
+        "per_transfer"
+      ],
+      "default": "monthly"
+    },
+    "round_up_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "contributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
