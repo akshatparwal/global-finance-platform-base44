@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, History } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, History, MessageCircle } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -18,6 +18,7 @@ const NAV = [
   { label: "Pay", icon: Send, path: "/dashboard/pay" },
   { label: "History", icon: History, path: "/dashboard/transactions" },
   { label: "Cards", icon: CreditCard, path: "/dashboard/cards" },
+  { label: "Support", icon: MessageCircle, path: "/dashboard/support" },
   { label: "Profile", icon: User, path: "/dashboard/profile" },
 ];
 

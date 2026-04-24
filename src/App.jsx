@@ -16,6 +16,7 @@ import Pay from './pages/dashboard/Pay';
 import Cards from './pages/dashboard/Cards';
 import Profile from './pages/dashboard/Profile';
 import Transactions from './pages/dashboard/Transactions';
+import Support from './pages/dashboard/Support';
 
 // Add page imports here
 
@@ -53,6 +54,7 @@ const AuthenticatedApp = () => {
         <Route path="pay" element={<Pay />} />
         <Route path="cards" element={<Cards />} />
         <Route path="transactions" element={<Transactions />} />
+        <Route path="support" element={<Support />} />
         <Route path="profile" element={<Profile />} />
 
       </Route>
