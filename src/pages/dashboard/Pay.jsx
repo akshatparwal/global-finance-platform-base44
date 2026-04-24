@@ -8,6 +8,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { haptic } from "@/utils/haptic";
 import { sfx } from "@/utils/sounds";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { AnimatePresence } from "framer-motion";
+import TransferConfirmModal from "@/components/transfer/TransferConfirmModal";
+import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -44,6 +47,8 @@ export default function Pay() {
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [transfers, setTransfers] = useState([]);
   const [sending, setSending] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [completedTransfer, setCompletedTransfer] = useState(null);
   const [activeTab, setActiveTab] = useState("Transfer History");
   const { rates, loading: ratesLoading, refetch } = useLiveRates();
   const { toast } = useToast();
@@ -111,19 +116,30 @@ export default function Pay() {
     setRateAlerts(prev => prev.filter(a => a.id !== id));
   };
 
-  const handleSend = async () => {
+  // Step 1: open confirm modal
+  const handleSend = () => {
     const amt = parseFloat(sendAmount);
     if (!amt || amt <= 0) return;
-    setSending(true);
+    haptic.medium();
+    setShowConfirm(true);
+  };
 
-    // Optimistic entry — shown immediately
+  // Step 2: called after PIN confirmed
+  const handleConfirmedSend = async () => {
+    const amt = parseFloat(sendAmount);
+    setSending(true);
+    setShowConfirm(false);
+
+    const recipientName = selectedRecipient?.label || "Family";
+    const recipientBank = selectedRecipient?.bank || "GCash";
+
     const optimisticId = `optimistic-${Date.now()}`;
     const optimisticTransfer = {
       id: optimisticId,
       amount_usd: amt,
       amount_php: parseFloat(receive),
-      recipient_name: selectedRecipient?.label || "Family",
-      recipient_bank: selectedRecipient?.bank || "GCash",
+      recipient_name: recipientName,
+      recipient_bank: recipientBank,
       status: "pending",
       created_date: new Date().toISOString(),
     };
@@ -135,19 +151,19 @@ export default function Pay() {
       const saved = await base44.entities.Transfer.create({
         amount_usd: amt,
         amount_php: parseFloat(receive),
-        recipient_name: optimisticTransfer.recipient_name,
-        recipient_bank: optimisticTransfer.recipient_bank,
+        recipient_name: recipientName,
+        recipient_bank: recipientBank,
         status: "completed",
         rate,
-        fee: 2.99,
+        fee: 0,
       });
-      // Replace optimistic entry with real one
-      setTransfers(prev => prev.map(t => t.id === optimisticId ? { ...saved, status: "completed" } : t));
+      const finalTransfer = { ...saved, status: "completed" };
+      setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
       haptic.success();
       sfx.success();
-      toast({ title: `✅ Transfer sent!`, description: `$${amt} (₱${receive}) sent to ${optimisticTransfer.recipient_name}. Arrival: ~30 seconds.` });
+      // Show receipt
+      setCompletedTransfer(finalTransfer);
     } catch {
-      // Roll back optimistic entry on failure
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
       setSendAmount(String(amt));
       haptic.error();
@@ -252,10 +268,10 @@ export default function Pay() {
           <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
         </div>
 
-        <button onClick={() => { haptic.medium(); sfx.click(); handleSend(); }} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
+        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
-          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
-          {sending ? "SENDING..." : taglish ? "MAGPADALA →" : "SEND NOW →"}
+          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
+          {sending ? "SENDING..." : taglish ? "SURIIN AT MAGPADALA →" : "REVIEW & SEND →"}
         </button>
       </div>
 
@@ -487,6 +503,34 @@ export default function Pay() {
           </div>
         </div>
       )}
+      {/* Confirm modal */}
+      <AnimatePresence>
+        {showConfirm && (
+          <TransferConfirmModal
+            transfer={{
+              amount: sendAmount,
+              receive,
+              rate,
+              recipient: selectedRecipient?.label || "Family",
+              bank: selectedRecipient?.bank || "GCash",
+            }}
+            onConfirm={handleConfirmedSend}
+            onClose={() => setShowConfirm(false)}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Receipt modal */}
+      <AnimatePresence>
+        {completedTransfer && (
+          <TransactionReceipt
+            transfer={completedTransfer}
+            onClose={() => setCompletedTransfer(null)}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
