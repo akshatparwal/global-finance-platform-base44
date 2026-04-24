@@ -7,6 +7,63 @@
         "admin",
         "user"
       ]
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has completed the in-app KYC onboarding flow"
+    },
+    "onboarding_step": {
+      "type": "number",
+      "default": 0,
+      "description": "Last completed onboarding step index (0-4)"
+    },
+    "phone_number": {
+      "type": "string",
+      "description": "User's phone number for 2FA and alerts"
+    },
+    "phone_verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "kyc_doc_type": {
+      "type": "string",
+      "enum": [
+        "passport",
+        "drivers_license",
+        "national_id",
+        "philsys",
+        "umid"
+      ],
+      "description": "Type of KYC document uploaded"
+    },
+    "kyc_doc_url": {
+      "type": "string",
+      "description": "URL of uploaded KYC document"
+    },
+    "kyc_selfie_url": {
+      "type": "string",
+      "description": "URL of uploaded selfie for liveness check"
+    },
+    "kyc_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "not_started"
+    },
+    "first_recipient_name": {
+      "type": "string"
+    },
+    "first_recipient_bank": {
+      "type": "string"
+    },
+    "address_country": {
+      "type": "string",
+      "description": "Country of residence"
     }
   },
   "required": [

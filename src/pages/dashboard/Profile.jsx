@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useOutletContext } from "react-router-dom";
 import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -51,21 +53,10 @@ export default function Profile() {
     base44.auth.logout("/");
   };
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   const handleUploadDocument = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*,.pdf";
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        alert("Document uploaded successfully! Under review.");
-      } catch {
-        alert("Upload failed. Please try again.");
-      }
-    };
-    input.click();
+    setShowOnboarding(true);
   };
 
   const referralCode = user?.email?.split("@")[0] || "user";
@@ -112,6 +103,15 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <AnimatePresence>
+        {showOnboarding && user && (
+          <OnboardingModal
+            user={user}
+            onComplete={() => { setShowOnboarding(false); base44.auth.me().then(setUser).catch(() => {}); }}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
       <div className="mb-4">
         <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Profile</h1>
         <p className={`text-xs ${muted}`}>Account Settings</p>
@@ -192,17 +192,32 @@ export default function Profile() {
           </div>
           {/* KYC */}
           <div className={`border rounded-2xl p-5 ${card}`}>
-            <h3 className="font-bold mb-3">Identity Verification</h3>
-            <div className="flex gap-2 flex-wrap mb-4">
-              {["PhilSys","UMID","Passport","Driver's License","Voter's ID","SSS ID"].map(id => (
-                <span key={id} className={`text-[10px] font-bold px-2 py-1 rounded ${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"}`}>{id}</span>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold">Identity Verification</h3>
+              {user?.kyc_status === "pending" && (
+                <span className="bg-yellow-500/20 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded-full">UNDER REVIEW</span>
+              )}
+              {user?.kyc_status === "approved" && (
+                <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full">✓ APPROVED</span>
+              )}
+            </div>
+            <div className="space-y-2 mb-4">
+              {[
+                { label: "Document uploaded", done: !!user?.kyc_doc_url },
+                { label: "Selfie verified",   done: !!user?.kyc_selfie_url },
+                { label: "Phone secured",     done: !!user?.phone_verified },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.done ? "bg-emerald-500/10" : darkMode ? "bg-white/5" : "bg-black/5"}`}>
+                  <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${item.done ? "bg-emerald-500" : "border-2 border-current opacity-30"}`}>
+                    {item.done && <span className="text-white text-[8px] font-black">✓</span>}
+                  </div>
+                  <span className={`text-sm ${item.done ? (darkMode ? "text-white" : "text-[#1a2a4a]") : muted}`}>{item.label}</span>
+                </div>
               ))}
             </div>
-            <div className="text-center py-6">
-              <div className="w-10 h-10 rounded-full border-2 border-dashed border-current opacity-30 flex items-center justify-center mx-auto mb-2">⏱</div>
-              <p className={`text-sm ${muted} mb-3`}>No document uploaded<br /><span className="text-xs">Upload your ID to complete verification</span></p>
-              <button onClick={handleUploadDocument} className="bg-primary text-secondary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-colors">⬆ Upload Document</button>
-            </div>
+            <button onClick={handleUploadDocument} className="w-full bg-primary text-secondary font-bold px-5 py-3 rounded-xl text-sm hover:bg-primary/90 transition-colors">
+              {user?.kyc_doc_url ? "Continue KYC Setup →" : "⬆ Start Identity Verification"}
+            </button>
           </div>
 
           {/* Language & Theme */}

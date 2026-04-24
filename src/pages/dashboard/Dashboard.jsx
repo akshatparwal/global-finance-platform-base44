@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useLiveRates } from "@/hooks/useLiveRates";
+import { AnimatePresence } from "framer-motion";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
+import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -18,6 +21,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
@@ -30,7 +34,13 @@ export default function Dashboard() {
       base44.entities.WalletBalance.list().catch(() => []),
       base44.entities.Transfer.list("-created_date", 5).catch(() => []),
     ]);
-    if (u) setUser(u);
+    if (u) {
+      setUser(u);
+      // Show onboarding if not completed and this is a fresh session check
+      if (!u.onboarding_completed) {
+        setShowOnboarding(true);
+      }
+    }
     setWallets(w);
     setTransfers(t);
   }, []);
@@ -63,8 +73,25 @@ export default function Dashboard() {
     { emoji: "+", label: taglish ? "Bagong Padala" : "New Send", isAdd: true },
   ];
 
+  const handleOnboardingComplete = async () => {
+    setShowOnboarding(false);
+    // Refresh user to get latest onboarding state
+    const u = await base44.auth.me().catch(() => null);
+    if (u) setUser(u);
+  };
+
   return (
     <div className="relative max-w-4xl mx-auto">
+      {/* Onboarding modal */}
+      <AnimatePresence>
+        {showOnboarding && user && (
+          <OnboardingModal
+            user={user}
+            onComplete={handleOnboardingComplete}
+            darkMode={darkMode}
+          />
+        )}
+      </AnimatePresence>
       {/* Pull-to-refresh indicator — sits above scroll content, never clipped */}
       <div
         className="sticky top-0 z-10 flex items-center justify-center gap-2 text-primary text-xs font-bold uppercase tracking-wider overflow-hidden transition-all duration-200 pointer-events-none"
@@ -100,6 +127,15 @@ export default function Dashboard() {
         </div>
         <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
       </div>
+
+      {/* KYC Completion Banner — only if onboarding incomplete */}
+      {user && !user.onboarding_completed && (
+        <OnboardingBanner
+          user={user}
+          onOpen={() => setShowOnboarding(true)}
+          darkMode={darkMode}
+        />
+      )}
 
       {/* Net Worth Card */}
       <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
