@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, X, ChevronDown } from "lucide-react";
+import { Search, Filter, X } from "lucide-react";
 import TransactionDetailSheet from "./TransactionDetailSheet";
+import EmptyState from "@/components/ui/EmptyState";
+import { TransactionSkeleton } from "@/components/ui/SkeletonLoader";
 
 const CATEGORY_META = {
   remittance:    { label: "Remittance",    emoji: "💸", color: "bg-blue-500/15 text-blue-400",    dot: "bg-blue-400" },
@@ -184,19 +186,33 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
 
       {/* Loading skeleton */}
       {loading && (
-        <div className="space-y-2">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className={`h-16 rounded-xl animate-pulse ${darkMode ? "bg-white/5" : "bg-black/5"}`} />
-          ))}
+        <div className="space-y-3">
+          <TransactionSkeleton darkMode count={5} />
         </div>
       )}
 
       {/* Empty state */}
       {!loading && filtered.length === 0 && (
-        <div className={`border rounded-2xl p-10 text-center ${card}`}>
-          <p className="text-3xl mb-2">🔍</p>
-          <p className={`text-sm font-semibold ${text} mb-1`}>No transactions found</p>
-          <p className={`text-xs ${muted}`}>{search ? "Try a different search term" : "Your transactions will appear here"}</p>
+        <div className={`border rounded-2xl ${card}`}>
+          {search || categoryFilter !== "all" || dateFilter !== "all" ? (
+            <EmptyState
+              darkMode={darkMode}
+              illustration="🔍"
+              title="No results found"
+              description="Try adjusting your search or filters to find what you're looking for."
+              ctaLabel="Clear filters"
+              onCta={() => { setSearch(""); setCategoryFilter("all"); setDateFilter("all"); }}
+              size="md"
+            />
+          ) : (
+            <EmptyState
+              darkMode={darkMode}
+              illustration="💸"
+              title="No transactions yet"
+              description="Your first padala will appear here. Send money home to get started!"
+              size="md"
+            />
+          )}
         </div>
       )}
 

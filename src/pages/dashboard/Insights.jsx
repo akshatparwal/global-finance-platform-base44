@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import RateAlertsPanel from "@/components/dashboard/RateAlertsPanel";
 import AIInsights from "@/components/dashboard/AIInsights";
+import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
+import EmptyState from "@/components/ui/EmptyState";
 
 const padalaData = [
   { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
@@ -43,6 +45,7 @@ export default function Insights() {
   const { darkMode, taglish, bahay } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("Activity");
   const [goals, setGoals] = useState([]);
+  const [goalsLoading, setGoalsLoading] = useState(true);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
   const { rates, loading: ratesLoading } = useLiveRates();
@@ -52,8 +55,12 @@ export default function Insights() {
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    base44.entities.SavingsGoal.list().then(setGoals).catch(() => {});
+    base44.entities.SavingsGoal.list()
+      .then(g => { setGoals(g); setGoalsLoading(false); })
+      .catch(() => setGoalsLoading(false));
     base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
   }, []);
@@ -206,6 +213,21 @@ export default function Insights() {
           </div>
 
           <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ Create Goal</button></div>
+          {goalsLoading ? (
+            <GoalSkeleton darkMode={darkMode} count={3} />
+          ) : goals.length === 0 ? (
+            <div className={`border rounded-2xl ${card}`}>
+              <EmptyState
+                darkMode={darkMode}
+                illustration="🎯"
+                title="No savings goals yet"
+                description="Create your first goal — a dream home, tuition fund, or emergency savings."
+                ctaLabel="+ Create Goal"
+                onCta={handleCreateGoal}
+                size="md"
+              />
+            </div>
+          ) : (
           <div className="grid grid-cols-1 gap-3">
             {goals.map((g,i) => {
               const pct = g.target_amount > 0 ? Math.round((g.current_amount / g.target_amount) * 100) : 0;
@@ -221,6 +243,7 @@ export default function Insights() {
               );
             })}
           </div>
+          )}
         </div>
       )}
 

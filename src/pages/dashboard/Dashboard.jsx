@@ -7,6 +7,8 @@ import { useLiveRates } from "@/hooks/useLiveRates";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
+import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/components/ui/SkeletonLoader";
+import EmptyState from "@/components/ui/EmptyState";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -21,6 +23,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
@@ -29,6 +32,7 @@ export default function Dashboard() {
   const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     const [u, w, t] = await Promise.all([
       base44.auth.me().catch(() => null),
       base44.entities.WalletBalance.list().catch(() => []),
@@ -36,13 +40,11 @@ export default function Dashboard() {
     ]);
     if (u) {
       setUser(u);
-      // Show onboarding if not completed and this is a fresh session check
-      if (!u.onboarding_completed) {
-        setShowOnboarding(true);
-      }
+      if (!u.onboarding_completed) setShowOnboarding(true);
     }
     setWallets(w);
     setTransfers(t);
+    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -176,7 +178,12 @@ export default function Dashboard() {
           </button>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
+          {loading ? <WalletSkeleton darkMode={darkMode} /> : wallets.length === 0 ? (
+            <div className="col-span-2">
+              <EmptyState darkMode={darkMode} illustration="👛" title="No wallets yet" description="Your USD and PHP wallets will appear here." size="sm" />
+            </div>
+          ) : null}
+          {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
             <div key={w.currency_code} className="rounded-2xl p-4 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
               style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
               onClick={() => navigate("/dashboard/pay")}>
@@ -197,11 +204,7 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-          )) : (
-            ["USD","PHP"].map(code => (
-              <div key={code} className="rounded-2xl p-5 animate-pulse h-32" style={{ background: "linear-gradient(135deg, #1a2a4a, #3d2e00)" }} />
-            ))
-          )}
+          )) : null}
         </div>
       </div>
 
@@ -233,7 +236,25 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Transfers */}
-        {transfers.length > 0 && (
+        {loading && (
+          <div className="mb-4">
+            <TransactionSkeleton darkMode={darkMode} count={3} />
+          </div>
+        )}
+        {!loading && transfers.length === 0 && (
+          <div className={`border rounded-2xl mb-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+            <EmptyState
+              darkMode={darkMode}
+              illustration="📬"
+              title="No padala yet"
+              description="Send your first transfer to see your activity here."
+              ctaLabel="Send Now →"
+              onCta={() => navigate("/dashboard/pay")}
+              size="sm"
+            />
+          </div>
+        )}
+        {!loading && transfers.length > 0 && (
           <div className="space-y-2 mb-4">
             {transfers.map((t, i) => (
               <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${darkMode ? "border-white/5" : "border-black/5"}`}>
