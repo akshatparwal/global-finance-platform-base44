@@ -28,6 +28,32 @@
     },
     "fee": {
       "type": "number"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "remittance",
+        "bills",
+        "subscriptions",
+        "savings",
+        "other"
+      ],
+      "default": "remittance"
+    },
+    "merchant_name": {
+      "type": "string"
+    },
+    "merchant_emoji": {
+      "type": "string"
+    },
+    "merchant_color": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "reference_id": {
+      "type": "string"
     }
   },
   "required": [
