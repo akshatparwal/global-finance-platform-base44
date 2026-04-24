@@ -1,0 +1,78 @@
+{
+  "name": "VirtualCard",
+  "type": "object",
+  "properties": {
+    "card_number": {
+      "type": "string"
+    },
+    "last4": {
+      "type": "string"
+    },
+    "expiry": {
+      "type": "string"
+    },
+    "cvv": {
+      "type": "string"
+    },
+    "is_frozen": {
+      "type": "boolean",
+      "default": false
+    },
+    "contactless_enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "instant_settlement": {
+      "type": "boolean",
+      "default": false
+    },
+    "spending_limit": {
+      "type": "number",
+      "default": 5000
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "frozen",
+        "cancelled"
+      ],
+      "default": "active"
+    },
+    "physical_requested": {
+      "type": "boolean",
+      "default": false
+    },
+    "physical_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "processing",
+        "shipped",
+        "delivered"
+      ],
+      "default": "none"
+    },
+    "physical_address": {
+      "type": "string"
+    },
+    "physical_city": {
+      "type": "string"
+    },
+    "physical_state": {
+      "type": "string"
+    },
+    "physical_zip": {
+      "type": "string"
+    },
+    "physical_country": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "card_number",
+    "last4",
+    "expiry",
+    "cvv"
+  ]
+}

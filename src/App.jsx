@@ -13,7 +13,7 @@ import DashboardLayout from './pages/dashboard/DashboardLayout';
 import Dashboard from './pages/dashboard/Dashboard';
 import Insights from './pages/dashboard/Insights';
 import Pay from './pages/dashboard/Pay';
-import Cards from './pages/dashboard/Cards';
+import Cards from './pages/dashboard/Cards.jsx';
 import Profile from './pages/dashboard/Profile';
 import Transactions from './pages/dashboard/Transactions';
 import Support from './pages/dashboard/Support';
