@@ -3,6 +3,7 @@ import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useOutletContext } from "react-router-dom";
 import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
+import SecurityHub from "@/components/security/SecurityHub";
 import { base44 } from "@/api/base44Client";
 
 const TIERS = [
@@ -407,18 +408,7 @@ export default function Profile() {
       )}
 
       {activeTab === "Security" && (
-        <div className="space-y-3">
-          {[
-            { icon: Shield, label: "Security Hub", sub: "Sessions, 2FA, biometrics", action: () => alert("Security Hub — 2FA and biometrics coming soon!") },
-            { icon: Bell, label: "Notifications", sub: "Push, email, SMS alerts", action: () => alert("Notification preferences coming soon!") }
-          ].map((s,i) => (
-            <button key={i} onClick={s.action} className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${card} ${darkMode ? "hover:bg-white/5" : "hover:bg-black/5"}`}>
-              <s.icon className={`w-5 h-5 ${muted}`} />
-              <div className="flex-1"><p className="font-semibold text-sm">{s.label}</p><p className={`text-xs ${muted}`}>{s.sub}</p></div>
-              <ChevronRight className={`w-4 h-4 ${muted}`} />
-            </button>
-          ))}
-        </div>
+        <SecurityHub darkMode={darkMode} />
       )}
 
       {activeTab === "Support" && (
