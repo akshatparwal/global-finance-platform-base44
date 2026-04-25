@@ -174,13 +174,13 @@ export default function DashboardLayout() {
           <div className="flex items-center gap-2 ml-auto">
             {/* Support shortcut */}
             <Link to="/dashboard/support"
-              className={`hidden sm:flex w-9 h-9 items-center justify-center rounded-lg transition-colors ${darkMode ? "text-white/40 hover:text-white hover:bg-white/8" : "text-[#1a2a4a]/40 hover:bg-black/8"}`}>
-              <MessageCircle className="w-4 h-4" />
+              className={`hidden sm:flex w-11 h-11 items-center justify-center rounded-lg transition-colors ${darkMode ? "text-white/40 hover:text-white hover:bg-white/8" : "text-[#1a2a4a]/40 hover:bg-black/8"}`}>
+              <MessageCircle className="w-5 h-5" />
             </Link>
             <div className="relative" ref={notifRef}>
               <button onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markAllRead(); }}
-                className="relative w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity">
-                <Bell className={`w-4 h-4 ${textMuted}`} />
+                className="relative w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity">
+                <Bell className={`w-5 h-5 ${textMuted}`} />
                 {unreadCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
                     {unreadCount}
@@ -201,8 +201,8 @@ export default function DashboardLayout() {
                 )}
               </AnimatePresence>
             </div>
-            <button onClick={() => setDarkMode(!darkMode)} className={`w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
-              {darkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            <button onClick={() => setDarkMode(!darkMode)} className={`w-11 h-11 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
+              {darkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
             <div className={`hidden sm:flex items-center gap-1.5 text-xs ${textMuted}`}>
               <Shield className="w-3 h-3 text-emerald-400" />

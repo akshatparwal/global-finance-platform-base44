@@ -52,7 +52,7 @@ export default function Home() {
 
   return (
     <div style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
-      <section className="flex flex-col lg:flex-row" style={{ height: "100vh", minHeight: 600, maxHeight: 900 }}>
+      <section className="flex flex-col lg:flex-row" style={{ minHeight: "100vh", minHeight: 600, maxHeight: "none" }} className="min-h-screen lg:max-h-[900px]">
 
         {/* LEFT: full-bleed photo */}
         <div className="relative flex-1 overflow-hidden min-h-[50vh] lg:min-h-0">
@@ -140,7 +140,7 @@ export default function Home() {
         {/* RIGHT: info panel */}
         <div
           className="flex-shrink-0 w-full lg:w-[400px] xl:w-[440px] flex flex-col"
-          style={{ background: panelBg, transition: "background 0.4s" }}
+          style={{ background: panelBg, transition: "background 0.4s", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           {/* Top toolbar */}
           <div className="flex items-center justify-between px-7 pt-7 pb-2">

@@ -46,6 +46,7 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 300 }}
         className="w-full sm:max-w-sm bg-[#0d1526] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden"
+        style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4">
