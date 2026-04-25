@@ -195,7 +195,7 @@ export default function Dashboard() {
       )}
 
       {/* Net Worth Card */}
-      <div className="relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
+      <div className="kf-hero-card relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
         <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
           <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
@@ -250,7 +250,7 @@ export default function Dashboard() {
             </div>
           ) : null}
           {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
-            <div key={w.currency_code} className="rounded-2xl p-4 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
+            <div key={w.currency_code} className="kf-hero-card rounded-2xl p-4 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
               style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
               onClick={() => navigate("/dashboard/pay")}>
               <div className="flex justify-between items-start mb-4">
@@ -359,7 +359,7 @@ export default function Dashboard() {
         <CommunityStories darkMode={darkMode} taglish={taglish} />
 
         {/* Family invite */}
-        <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
+        <div className="kf-hero-card rounded-2xl p-5 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
           <span className="text-4xl flex-shrink-0">❤️</span>
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-extrabold text-base mb-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

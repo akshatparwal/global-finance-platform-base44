@@ -195,6 +195,42 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
   background-size: 200% auto;
 }
 
+/* ============================================================
+   KinnectFi — Card Highlight & Shadow System
+   Top-edge highlight streak + depth shadow = premium neobank feel.
+   Works in both dark mode and light mode.
+   ============================================================ */
+
+/* Gradient hero cards: net worth, wallet cards, invite banner */
+.kf-hero-card {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.16) inset,   /* top highlight streak */
+    0 -1px 0 0 rgba(0, 0, 0, 0.45) inset,          /* bottom depth edge */
+    0 0 0 1px rgba(201, 160, 80, 0.14) inset,       /* golden rim */
+    0 16px 48px 0 rgba(0, 0, 0, 0.40),              /* deep ambient shadow */
+    0 4px 16px 0 rgba(201, 160, 80, 0.12);          /* warm golden glow */
+}
+
+/* All rounded bordered cards — applies a top-edge highlight + depth shadow */
+.rounded-2xl.border,
+.rounded-xl.border {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.08) inset,   /* top highlight */
+    0 6px 24px 0 rgba(0, 0, 0, 0.22),             /* depth shadow */
+    0 1px 4px 0 rgba(0, 0, 0, 0.14);
+}
+
+/* Light-background content area: warm beige bg means cards need brighter highlights */
+.bg-\[#f5efe6\] .rounded-2xl.border,
+.bg-\[#f5efe6\] .rounded-xl.border,
+.bg-white .rounded-2xl.border,
+.bg-white .rounded-xl.border {
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.98) inset,   /* strong bright top highlight */
+    0 6px 20px 0 rgba(0, 0, 0, 0.07),
+    0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
