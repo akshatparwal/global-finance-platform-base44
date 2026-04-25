@@ -6,16 +6,18 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles } from "lucide-react";
 
-const CURRENT_VERSION = "2.4.0";
+const CURRENT_VERSION = "3.0.0";
 const LS_KEY = "kinnectfi_whats_new_seen";
 
 const CHANGES = [
-  { emoji: "✈️", title: "Transfer Animation", desc: "Watch your money fly to the Philippines with a beautiful send animation." },
-  { emoji: "📊", title: "Live Market Data", desc: "Real-time PSEI index and stock prices, refreshed on demand." },
-  { emoji: "🛡️", title: "Dispute Center", desc: "File a chargeback directly from any transaction detail." },
-  { emoji: "🏦", title: "Account Details", desc: "Your routing & account numbers are now visible in Profile." },
-  { emoji: "👨‍👩‍👧", title: "Real Family Network", desc: "Family tab now shows your actual saved recipients." },
-  { emoji: "🔖", title: "Category Editing", desc: "Re-tag any transaction category inline in its detail view." },
+  { emoji: "🔔", title: "Live Rate Alerts", desc: "Set a target USD/PHP rate and get notified instantly by email + in-app when it hits." },
+  { emoji: "📅", title: "Holiday Banners", desc: "Dashboard now surfaces upcoming Philippine holidays and OFW events automatically." },
+  { emoji: "⚡", title: "Real-time Balance", desc: "Your wallet balance updates instantly when you send — no refresh needed." },
+  { emoji: "📄", title: "CSV Export", desc: "Download your full transaction history as a CSV from the Transactions page." },
+  { emoji: "🏆", title: "Loyalty Tier Locks", desc: "Cards now shows locked/unlocked tiers clearly — reach Bayani, Datu, Lakan to unlock perks." },
+  { emoji: "💬", title: "Human Escalation", desc: "Support now has direct WhatsApp + email links to reach a human agent instantly." },
+  { emoji: "📊", title: "Spend Analytics", desc: "New deep-dive tab with 6-month bar chart, category breakdown, and top recipients." },
+  { emoji: "🌐", title: "Live Calc on Home", desc: "Visitors can now calculate USD → PHP conversions before signing up." },
 ];
 
 export default function WhatsNew({ darkMode }) {

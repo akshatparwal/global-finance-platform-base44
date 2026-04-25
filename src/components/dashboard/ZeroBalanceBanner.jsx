@@ -4,6 +4,7 @@
  */
 import { motion } from "framer-motion";
 import { ArrowDownToLine, Sparkles } from "lucide-react";
+import { haptic } from "@/utils/haptic";
 
 export default function ZeroBalanceBanner({ darkMode, onFund }) {
   return (
@@ -26,7 +27,7 @@ export default function ZeroBalanceBanner({ darkMode, onFund }) {
           <p className="text-white/50 text-xs mt-0.5">Add funds via ACH, wire, or debit card — arrives in seconds</p>
         </div>
         <button
-          onClick={onFund}
+          onClick={() => { haptic.medium(); onFund(); }}
           className="flex items-center gap-1.5 bg-primary text-secondary font-black px-4 py-2.5 rounded-xl text-sm flex-shrink-0 hover:opacity-90 active:scale-95 transition-all"
         >
           <ArrowDownToLine className="w-4 h-4" />

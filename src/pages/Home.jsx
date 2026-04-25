@@ -4,6 +4,7 @@ import { Sun, Moon, Zap, Shield, Clock, TrendingUp, Users, Star, ChevronRight } 
 import { motion, AnimatePresence } from "framer-motion";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
+import LiveRateCalc from "@/components/home/LiveRateCalc";
 
 const HERO_SLIDES = [
   {
@@ -86,18 +87,25 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
               >
                 {taglish ? (
-                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Ang pera mo,{" "}
                     <span className="text-[#C97B22]">konektado</span>{" "}
                     sa puso mo.
                   </h1>
                 ) : (
-                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Your money,{" "}
                     <span className="text-[#C97B22]">connected</span>{" "}
                     to your heart.
                   </h1>
                 )}
+                {/* Live rate badge in hero */}
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" style={{ background: "rgba(201,123,34,0.18)", border: "1px solid rgba(201,123,34,0.35)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-white/60 text-[11px] font-semibold">Live rate:</span>
+                  <span className="text-[#C97B22] text-[13px] font-black">₱{liveRate}/USD</span>
+                  <span className="text-white/40 text-[10px]">· $0 fee</span>
+                </div>
                 <p className="text-white/75 text-base mb-7 max-w-sm leading-relaxed">
                   {taglish
                     ? "Ipadala ang pera sa pamilya mo — mabilis, ligtas, at walang bayad."
@@ -321,6 +329,11 @@ export default function Home() {
         </div>
 
       <TestimonialsSection taglish={taglish} />
+
+      {/* Live rate calculator */}
+      <div className="mb-16">
+        <LiveRateCalc taglish={taglish} />
+      </div>
 
       {/* Trust bar */}
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-4">

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, Check, Building2, Zap, ArrowDownToLine, CheckCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { haptic } from "@/utils/haptic";
 
 const METHODS = [
   { id: "ach", label: "ACH Transfer", sub: "1–3 business days · Free", icon: Building2, badge: null },
@@ -164,6 +165,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                     <button
                       disabled={!instantAmount || parseFloat(instantAmount) <= 0 || depositing}
                       onClick={async () => {
+                        haptic.medium();
                         setDepositing(true);
                         await new Promise(r => setTimeout(r, 1500));
                         // Update USD wallet balance in the database

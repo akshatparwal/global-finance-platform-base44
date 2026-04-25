@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
@@ -34,8 +34,12 @@ const MAX_AMOUNT = 10000;
 
 const PAY_TABS = ["Transfer History", "Rate Alerts", "Tools", "Protection", "Shipments"];
 
+import CreateScheduledForm from "@/components/pay/CreateScheduledForm";
+
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
+  const navigate = useNavigate();
+  const [showScheduledForm, setShowScheduledForm] = useState(false);
   // Pre-fill from "Send Again" navigation
   const prefill = (() => {
     try { return new URLSearchParams(window.location.search); } catch { return new URLSearchParams(); }
@@ -307,7 +311,7 @@ export default function Pay() {
                 </button>
               );
             })}
-            <button className="flex flex-col items-center gap-1 flex-shrink-0">
+            <button onClick={() => navigate("/dashboard/recipients")} className="flex flex-col items-center gap-1 flex-shrink-0">
               <div className="w-10 h-10 rounded-full border-2 border-dashed border-current opacity-30 flex items-center justify-center"><Plus className="w-3 h-3" /></div>
               <span className={`text-[9px] ${muted}`}>{taglish ? "Dagdag" : "Add"}</span>
             </button>
@@ -439,7 +443,13 @@ export default function Pay() {
           <h3 className="font-bold mb-3">{taglish ? "Naka-iskedyul na Bayad" : "Scheduled & Bills"}</h3>
           {scheduled.length === 0 ? (
             <div className={`border rounded-xl p-6 text-center ${card}`}>
-              <p className={`text-sm ${muted}`}>No scheduled transfers. Add one to automate your bills.</p>
+              <p className="text-2xl mb-2">🔄</p>
+              <p className={`text-sm font-semibold mb-3 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>No auto-padala yet</p>
+              <p className={`text-xs ${muted} mb-4`}>Set up a recurring transfer so your family never misses an allowance.</p>
+              <button onClick={() => setShowScheduledForm(true)}
+                className="bg-primary text-secondary font-bold px-5 py-2.5 rounded-xl text-sm hover:opacity-90 transition-opacity">
+                + Set Up Auto-Padala
+              </button>
             </div>
           ) : (
             <div className="space-y-2">
@@ -640,6 +650,17 @@ export default function Pay() {
           </div>
         </div>
       )}
+      {/* Auto-Padala form */}
+      <AnimatePresence>
+        {showScheduledForm && (
+          <CreateScheduledForm
+            darkMode={darkMode}
+            onClose={() => setShowScheduledForm(false)}
+            onCreated={() => base44.entities.ScheduledTransfer.filter({ is_active: true }).then(setScheduled).catch(() => {})}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Send animation */}
       <SendAnimation
         show={showSendAnim}
