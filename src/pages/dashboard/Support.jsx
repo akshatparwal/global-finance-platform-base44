@@ -93,6 +93,7 @@ export default function Support() {
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: `${SYSTEM_PROMPT}\n\n${contextPrompt}Conversation so far:\n${history}\n\nUser: ${userText}\n\nKaya:`,
+        model: "gemini_3_flash",
       });
 
       const assistantMsg = {
@@ -101,10 +102,11 @@ export default function Support() {
         timestamp: Date.now(),
       };
       setMessages(prev => [...prev, assistantMsg]);
-    } catch {
+    } catch (err) {
+      console.error("Support chat error:", err);
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "I'm having trouble connecting right now. Please try again in a moment, or contact our support team directly.",
+        content: "Sorry, I'm having trouble connecting right now. Please try again, or reach out to our support team via WhatsApp or email above.",
         timestamp: Date.now(),
       }]);
     } finally {
