@@ -180,7 +180,12 @@ export default function Profile() {
             </div>
             <p className={`text-xs ${muted} truncate`}>{user?.email || ""}</p>
             <div className="flex gap-1.5 mt-1.5">
-              <span className="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
+              {user?.kyc_status === "approved"
+                ? <span className="bg-emerald-500/10 text-emerald-500 text-[9px] font-bold px-2 py-0.5 rounded-full">✓ KYC Verified</span>
+                : user?.kyc_status === "pending"
+                  ? <span className="bg-yellow-500/10 text-yellow-400 text-[9px] font-bold px-2 py-0.5 rounded-full">⏳ KYC Pending</span>
+                  : <span className="bg-gray-500/10 text-gray-400 text-[9px] font-bold px-2 py-0.5 rounded-full">○ Verify Identity</span>
+              }
               <span className={`${tier.bg} ${tier.color} text-[9px] font-bold px-2 py-0.5 rounded-full`}>{tier.icon} {tier.label.toUpperCase()}</span>
             </div>
           </div>

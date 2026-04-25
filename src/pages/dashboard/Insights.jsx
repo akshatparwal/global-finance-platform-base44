@@ -102,20 +102,28 @@ export default function Insights() {
           return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         });
         const monthTotal = thisMonth.reduce((s, t) => s + (t.amount_usd || 0), 0);
-        const MONTHLY_BUDGET = 2000;
-        const pctUsed = Math.min(Math.round((monthTotal / MONTHLY_BUDGET) * 100), 100);
-        const remaining = Math.max(MONTHLY_BUDGET - monthTotal, 0);
         const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" }).toUpperCase();
         const remittanceTotal = thisMonth.filter(t => !t.category || t.category === "remittance").reduce((s,t) => s+(t.amount_usd||0),0);
         const billsTotal = thisMonth.filter(t => t.category === "bills").reduce((s,t) => s+(t.amount_usd||0),0);
         const savingsTotal = thisMonth.filter(t => t.category === "savings").reduce((s,t) => s+(t.amount_usd||0),0);
         const otherTotal = thisMonth.filter(t => t.category === "other" || t.category === "subscriptions").reduce((s,t) => s+(t.amount_usd||0),0);
 
+        // Budget caps derived from all-time averages (or sensible defaults relative to actuals)
+        const allTimeMonths = Math.max(1, (() => {
+          const months = new Set(transfers.map(t => { const d = new Date(t.created_date); return `${d.getFullYear()}-${d.getMonth()}`; }));
+          return months.size;
+        })());
+        const allRemittance = transfers.filter(t => !t.category || t.category === "remittance").reduce((s,t) => s+(t.amount_usd||0),0);
+        const dynamicBudget = Math.max(Math.round((allRemittance / allTimeMonths) * 1.25 / 50) * 50, 200);
+        const MONTHLY_BUDGET = dynamicBudget + 300 + 500 + 200;
+        const pctUsed = Math.min(Math.round((monthTotal / MONTHLY_BUDGET) * 100), 100);
+        const remaining = Math.max(MONTHLY_BUDGET - monthTotal, 0);
+
         const BUDGETS_REAL = [
-          { icon: "❤️", label: "Remittances",    spent: remittanceTotal, total: 1000, color: "bg-primary" },
-          { icon: "⚡", label: "Bills & Utilities", spent: billsTotal, total: 300, color: "bg-emerald-500" },
-          { icon: "📦", label: "Savings",         spent: savingsTotal, total: 500, color: "bg-emerald-500" },
-          { icon: "📈", label: "Other",            spent: otherTotal, total: 200, color: "bg-primary" },
+          { icon: "❤️", label: "Remittances",      spent: remittanceTotal, total: dynamicBudget, color: "bg-primary" },
+          { icon: "⚡", label: "Bills & Utilities", spent: billsTotal,      total: 300,           color: "bg-emerald-500" },
+          { icon: "📦", label: "Savings Goals",     spent: savingsTotal,    total: 500,           color: "bg-blue-500" },
+          { icon: "📈", label: "Other",              spent: otherTotal,      total: 200,           color: "bg-purple-500" },
         ];
 
         return (

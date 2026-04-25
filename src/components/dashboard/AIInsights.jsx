@@ -52,10 +52,14 @@ export default function AIInsights({ darkMode, wallets, transfers, goals }) {
       });
       setInsights(result.insights || []);
     } catch {
+      const topGoal = (goals || [])[0];
+      const goalBody = topGoal
+        ? `You're ${topGoal.target_amount > 0 ? Math.round(((topGoal.current_amount || 0) / topGoal.target_amount) * 100) : 0}% toward your "${topGoal.label}" goal ($${(topGoal.current_amount || 0).toLocaleString()} of $${topGoal.target_amount.toLocaleString()}). Keep consistent padala to reach it faster!`
+        : "Set a savings goal in the Goals tab to track your progress toward a dream home, education fund, or emergency savings.";
       setInsights([
-        { icon: "✦", title: "Your Money, Working Hard", body: "Smart Yield is actively growing your idle balance at 5.1% APY — beating most US savings accounts.", action: "View Yield" },
+        { icon: "✦", title: "Your Money, Working Hard", body: "Smart Yield is actively growing your idle balance — beating most US savings accounts.", action: "View Yield" },
         { icon: "⚡", title: "Budget Status: Healthy", body: "Keep up the momentum. You're tracking well against your monthly targets.", action: "See Details" },
-        { icon: "🏠", title: "Bahay Goal Progress", body: "You're 65% toward your dream home. Keep consistent padala and you'll reach it by December 2026.", action: "View Goal" },
+        { icon: topGoal?.emoji || "🏠", title: topGoal ? topGoal.label : "Start a Savings Goal", body: goalBody, action: "View Goal" },
       ]);
     } finally {
       setLoading(false);
