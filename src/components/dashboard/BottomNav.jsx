@@ -34,7 +34,7 @@ export default function BottomNav({ onNavigate }) {
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
               )}
               <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2.5 : 1.8} />
-              <span className="text-[10px] font-semibold leading-none tracking-wide">{label}</span>
+              <span className="text-[12px] font-semibold leading-none tracking-wide">{label}</span>
             </button>
           );
         })}
