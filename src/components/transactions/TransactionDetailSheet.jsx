@@ -1,5 +1,6 @@
 import { X, Copy, Check, RefreshCw, AlertTriangle } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import CategoryPicker from "./CategoryPicker";
 import DisputeFlow from "./DisputeFlow";
@@ -22,6 +23,7 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
   const [tx, setTx] = useState(initialTx);
   const [copied, setCopied] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
+  const navigate = useNavigate();
 
   if (!tx) return null;
 
@@ -152,7 +154,16 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
             {/* Actions */}
             <div className="grid grid-cols-2 gap-3 mb-3">
               <button
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  // Pre-fill the Pay page with this transaction's details via URL params
+                  const params = new URLSearchParams({
+                    amount: tx.amount_usd?.toString() || "",
+                    recipient: tx.recipient_name || "",
+                    bank: tx.recipient_bank || "",
+                  });
+                  navigate(`/dashboard/pay?${params.toString()}`);
+                }}
                 className={`flex items-center justify-center gap-2 py-3.5 rounded-xl border font-bold text-sm ${darkMode ? "border-white/10 hover:bg-white/5 text-white" : "border-black/10 hover:bg-black/5 text-[#1a2a4a]"} transition-colors`}
               >
                 <RefreshCw className="w-4 h-4 text-primary" /> Send Again

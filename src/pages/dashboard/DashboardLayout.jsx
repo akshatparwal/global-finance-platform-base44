@@ -7,6 +7,9 @@ import { useNotifications } from "@/hooks/useNotifications";
 import NotificationPanel from "@/components/notifications/NotificationPanel";
 import NotificationToast from "@/components/notifications/NotificationToast";
 import WhatsNew from "@/components/WhatsNew";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
+import SessionTimeoutWarning from "@/components/SessionTimeoutWarning";
+import BiometricNudge from "@/components/BiometricNudge";
 
 // Per-tab scroll position registry — persists across tab switches
 const scrollRegistry = {};
@@ -36,6 +39,7 @@ export default function DashboardLayout() {
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
   const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
+  const { showWarning, secondsLeft, extendSession, doLogout } = useSessionTimeout();
 
   // Persist preferences
   useEffect(() => { try { localStorage.setItem("kf_dark_mode", darkMode); } catch {} }, [darkMode]);
@@ -196,6 +200,21 @@ export default function DashboardLayout() {
 
         {/* What's New changelog */}
         <WhatsNew darkMode={darkMode} />
+
+        {/* Biometric nudge — shown once post-login */}
+        <BiometricNudge darkMode={darkMode} />
+
+        {/* Session timeout warning */}
+        <AnimatePresence>
+          {showWarning && (
+            <SessionTimeoutWarning
+              secondsLeft={secondsLeft}
+              onExtend={extendSession}
+              onLogout={doLogout}
+              darkMode={darkMode}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Global push toast banner */}
         <AnimatePresence>

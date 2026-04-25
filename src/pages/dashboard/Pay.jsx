@@ -36,9 +36,15 @@ const PAY_TABS = ["Transfer History", "Rate Alerts", "Tools", "Protection", "Shi
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
-  const [sendAmount, setSendAmount] = useState("");
+  // Pre-fill from "Send Again" navigation
+  const prefill = (() => {
+    try { return new URLSearchParams(window.location.search); } catch { return new URLSearchParams(); }
+  })();
+  const [sendAmount, setSendAmount] = useState(prefill.get("amount") || "");
   const [amountError, setAmountError] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState(null);
+  const prefillName = prefill.get("recipient") || "";
+  const prefillBank = prefill.get("bank") || "";
   const [recipients, setRecipients] = useState([]);
   const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [transfers, setTransfers] = useState([]);
@@ -71,7 +77,18 @@ export default function Pay() {
 
   useEffect(() => {
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
-    base44.entities.Recipient.list("-transfer_count", 6).then(r => { setRecipients(r); setRecipientsLoading(false); }).catch(() => setRecipientsLoading(false));
+    base44.entities.Recipient.list("-transfer_count", 6).then(r => {
+      setRecipients(r);
+      setRecipientsLoading(false);
+      // Auto-select recipient if pre-filled from Send Again
+      if (prefillName) {
+        const match = r.find(rec =>
+          (rec.full_name || "").toLowerCase() === prefillName.toLowerCase() ||
+          (rec.nickname || "").toLowerCase() === prefillName.toLowerCase()
+        );
+        if (match) setSelectedRecipient(match);
+      }
+    }).catch(() => setRecipientsLoading(false));
     base44.entities.ScheduledTransfer.filter({ is_active: true }).then(setScheduled).catch(() => {});
     setAlertsLoading(true);
     Promise.all([
