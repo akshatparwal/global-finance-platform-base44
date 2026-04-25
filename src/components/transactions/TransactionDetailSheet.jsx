@@ -1,6 +1,8 @@
-import { X, Copy, Check, ChevronRight, RefreshCw } from "lucide-react";
+import { X, Copy, Check, RefreshCw, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CategoryPicker from "./CategoryPicker";
+import DisputeFlow from "./DisputeFlow";
 
 const CATEGORY_META = {
   remittance:    { label: "Remittance",    emoji: "💸", color: "bg-blue-500/15 text-blue-400" },
@@ -16,8 +18,10 @@ const STATUS_META = {
   failed:    { label: "Failed",    color: "text-red-400",     bg: "bg-red-500/10" },
 };
 
-export default function TransactionDetailSheet({ tx, onClose, darkMode }) {
+export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMode }) {
+  const [tx, setTx] = useState(initialTx);
   const [copied, setCopied] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
 
   if (!tx) return null;
 
@@ -119,10 +123,15 @@ export default function TransactionDetailSheet({ tx, onClose, darkMode }) {
               </div>
             </div>
 
+            {/* Category editor */}
+            <div className={`rounded-2xl border ${darkMode ? "border-white/8 bg-white/5" : "border-black/8 bg-black/4"} p-4 mb-4`}>
+              <CategoryPicker tx={tx} darkMode={darkMode} onUpdated={(updated) => setTx(updated)} />
+            </div>
+
             {/* Actions */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <button
-                onClick={() => alert("Repeat transfer — coming soon!")}
+                onClick={() => alert("Repeat transfer coming soon!")}
                 className={`flex items-center justify-center gap-2 py-3.5 rounded-xl border font-bold text-sm ${darkMode ? "border-white/10 hover:bg-white/5 text-white" : "border-black/10 hover:bg-black/5 text-[#1a2a4a]"} transition-colors`}
               >
                 <RefreshCw className="w-4 h-4 text-primary" /> Repeat
@@ -134,6 +143,21 @@ export default function TransactionDetailSheet({ tx, onClose, darkMode }) {
                 Receipt ↓
               </button>
             </div>
+
+            {/* Dispute */}
+            <button
+              onClick={() => setShowDispute(true)}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-orange-500/30 text-orange-400 font-bold text-sm hover:bg-orange-500/5 transition-colors"
+            >
+              <AlertTriangle className="w-4 h-4" /> Dispute this Transfer
+            </button>
+
+            {/* Dispute modal */}
+            <AnimatePresence>
+              {showDispute && (
+                <DisputeFlow tx={tx} onClose={() => setShowDispute(false)} darkMode={darkMode} />
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>

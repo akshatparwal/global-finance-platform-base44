@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
+import CardTransactionFeed from "@/components/cards/CardTransactionFeed";
 
 const TIERS = [
   { name: "SUGO", threshold: "$0", reached: true },
@@ -21,7 +22,7 @@ const SUBSCRIPTIONS = [
   { emoji: "🎵", label: "Spotify", sub: "Music & Podcasts · Renews Apr 20", amount: "$9.99" },
 ];
 
-const CARD_TABS = ["My Card", "Loyalty", "Controls", "Subscriptions"];
+const CARD_TABS = ["My Card", "Transactions", "Loyalty", "Controls", "Subscriptions"];
 
 // Generate realistic card data
 function generateCardData() {
@@ -389,6 +390,10 @@ export default function Cards() {
             <p className={`text-xs ${muted}`}>{taglish ? "Magdagdag ng miyembro ng pamilya para sa shared na kard." : "Add family members to share a spending card."}</p>
           </div>
         </div>
+      )}
+
+      {activeTab === "Transactions" && (
+        <CardTransactionFeed cardLast4={cardData?.last4} darkMode={darkMode} />
       )}
 
       {activeTab === "Loyalty" && (

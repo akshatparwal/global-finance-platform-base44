@@ -11,6 +11,7 @@ import AIInsights from "@/components/dashboard/AIInsights";
 import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
+import LiveMarkets from "@/components/insights/LiveMarkets";
 
 const padalaData = [
   { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
@@ -307,54 +308,12 @@ export default function Insights() {
       )}
 
       {activeTab === "Markets" && (
-        <div className="space-y-4">
-          <div className={`border rounded-2xl p-6 ${card}`}>
-            <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Philippine Market Overview</h3>
-            <p className={`text-sm ${muted} mb-4`}>Monitoring the Philippine economy helps you time your transfers and investments perfectly.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "🇵🇭 PSEI INDEX", val: "6,847.30", change: "+0.38% · Today" },
-                { label: "🇺🇸 USD / PHP", val: ratesLoading ? "Loading..." : `₱${liveRate.toFixed(2)}`, change: rateChange >= 0 ? `↑ +${rateChange.toFixed(2)}% · Live` : `↓ ${rateChange.toFixed(2)}% · Live` }
-              ].map((m,i) => (
-                <div key={i} className={`p-4 rounded-xl ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
-                  <p className={`text-xs ${muted} mb-1`}>{m.label}</p>
-                  <p className={`font-black text-xl ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{m.val}</p>
-                  <p className={`text-xs mt-1 ${rateChange >= 0 ? "text-emerald-500" : "text-red-400"}`}>{m.change}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <div className="flex justify-between mb-2"><p className={`text-xs ${muted} uppercase tracking-wider`}>PHP Exchange Rate</p><span className={`text-xs font-bold ${ratesLoading ? muted : "text-emerald-500"}`}>{ratesLoading ? "FETCHING..." : "LIVE"}</span></div>
-              <p className={`text-xs ${muted}`}>USD to PHP · Interbank Rate</p>
-              <p className="text-3xl font-black my-2 text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                {ratesLoading ? "₱—.——" : `₱${liveRate.toFixed(2)}`}
-              </p>
-              <p className={`text-xs mb-3 ${rateChange >= 0 ? "text-emerald-500" : "text-red-400"}`}>
-                {rateChange >= 0 ? `↑ +${rateChange.toFixed(2)}%` : `↓ ${rateChange.toFixed(2)}%`} · 24h
-              </p>
-              <div className="bg-primary/10 rounded-lg p-2"><p className="text-primary text-xs">✦ Best time to send: Now. Compare with your rate alerts below.</p></div>
-            </div>
-            <div className={`border rounded-2xl p-5 ${card}`}>
-              <p className={`text-xs ${muted} uppercase tracking-wider mb-1`}>PSEI (Manila)</p>
-              <p className={`text-xs ${muted} mb-2`}>Philippine Stock Exchange Index</p>
-              <p className={`text-3xl font-black my-2 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>6,850.40</p>
-              <p className="text-red-400 text-xs mb-3">▲ -0.45%</p>
-              <p className={`text-xs ${muted}`}>The Manila market is seeing slight consolidation. Financials and Real Estate sectors are leading the volume today.</p>
-            </div>
-          </div>
-          <div className={`border rounded-2xl p-6 ${darkMode ? "bg-[#0d1526] border-white/10" : "bg-[#0d1526] border-white/10"}`}>
-            <div className="mb-3"><p className="text-primary text-xs uppercase tracking-wider font-bold">↗ Filipino Blue Chips</p><p className="text-white/40 text-xs">Top Performers · PSE:PM</p></div>
-            {STOCKS.map((s,i) => (
-              <div key={i} className="flex items-center gap-3 py-3 border-t border-white/5">
-                <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-white font-black text-xs">{s.code}</div>
-                <div className="flex-1"><p className="text-white font-semibold text-sm">{s.name}</p><p className="text-white/40 text-xs">{s.type}</p></div>
-                <div className="text-right"><p className="text-white font-bold text-sm">{s.price}</p><p className={`text-xs font-bold ${s.up ? "text-emerald-500" : "text-red-400"}`}>{s.change}</p></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <LiveMarkets
+          darkMode={darkMode}
+          liveRate={liveRate}
+          rateChange={rateChange}
+          ratesLoading={ratesLoading}
+        />
       )}
     </div>
   );

@@ -6,6 +6,8 @@ import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy,
 import SecurityHub from "@/components/security/SecurityHub";
 import PointsRedemption from "@/components/dashboard/PointsRedemption";
 import EditProfileForm from "@/components/profile/EditProfileForm";
+import AccountDetails from "@/components/profile/AccountDetails";
+import FamilyNetworkPanel from "@/components/profile/FamilyNetworkPanel";
 import { base44 } from "@/api/base44Client";
 
 const TIERS = [
@@ -167,6 +169,9 @@ export default function Profile() {
 
       {activeTab === "General" && (
         <div className="space-y-4">
+          {/* Account Details */}
+          {user && <AccountDetails user={user} darkMode={darkMode} />}
+
           <div className={`flex items-center justify-between p-4 rounded-xl border ${card}`}>
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-primary" />
@@ -275,42 +280,11 @@ export default function Profile() {
           <div className={`border rounded-2xl p-5 ${card}`}>
             <div className="flex items-center gap-2 mb-1"><span className="text-red-400">❤️</span><h3 className="font-extrabold">Katuwang Shared Wallet</h3></div>
             <p className="text-primary text-xs font-bold uppercase mb-3">FOR COUPLES & FAMILY PARTNERS</p>
-            <p className={`text-sm ${muted} mb-4`}>Build your future together. Katuwang wallets require dual-signature approval for major transfers, ensuring your shared goals stay on track.</p>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">👩</span><span className="text-2xl">👴</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <button onClick={() => alert("Partner connection coming soon!")}
-                className="bg-primary text-secondary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-colors">Connect your Partner →</button>
-              <div className="text-right">
-                <p className={`text-xs ${muted} mb-0.5`}>Shared Balance</p>
-                <p className="font-black text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$4,250.00</p>
-                <div className="w-24 h-1.5 bg-gray-200 rounded-full mt-1"><div className="h-full bg-primary rounded-full" style={{ width: "75%" }} /></div>
-                <p className={`text-[10px] ${muted} mt-0.5`}>75% of goal</p>
-              </div>
-            </div>
+            <p className={`text-sm ${muted} mb-4`}>Build your future together. Katuwang wallets require dual-signature approval for major transfers.</p>
+            <button onClick={() => alert("Partner connection coming soon!")}
+              className="bg-primary text-secondary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-colors">Connect your Partner →</button>
           </div>
-          <div className={`border rounded-2xl p-5 ${card}`}>
-            <div className="flex justify-between items-center mb-1">
-              <div><h3 className="font-bold">Family Network</h3><p className="text-primary text-xs font-bold uppercase">BAYANIHAN MAP</p></div>
-            </div>
-            <div className="h-48 rounded-xl mt-3 flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #e8e0d0, #f5efe6)" }}>
-              {[{label:"Quezon City",top:"10%",left:"65%"},{label:"Davao City",top:"45%",left:"25%"},{label:"Cebu City",top:"45%",left:"75%"},{label:"Manila",top:"75%",left:"50%"}].map((c,i) => (
-                <div key={i} className="absolute text-center" style={{ top: c.top, left: c.left, transform: "translate(-50%,-50%)" }}>
-                  <p className="text-[10px] text-[#1a2a4a]/60 font-semibold">{c.label}</p>
-                </div>
-              ))}
-              <div className="w-10 h-10 rounded-full bg-[#1a2a4a] flex items-center justify-center text-white text-lg">👤</div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              {[{icon:"📍",label:"Reach",val:"4 Family Members"},{icon:"📈",label:"Total Sent",val:"₱2.3M"},{icon:"❤️",label:"Loyalty",val:"12 month streak"}].map((s,i) => (
-                <div key={i} className="text-center">
-                  <p className={`text-[10px] sm:text-xs ${muted} mb-1`}><span className="text-primary">{s.icon}</span> {s.label}</p>
-                  <p className={`font-bold text-xs sm:text-sm ${textMain}`}>{s.val}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <FamilyNetworkPanel darkMode={darkMode} />
         </div>
       )}
 
