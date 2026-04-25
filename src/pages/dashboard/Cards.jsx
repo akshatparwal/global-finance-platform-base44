@@ -430,15 +430,32 @@ export default function Cards() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { name: "BAYANI PERKS", perks: ["0.5% Cash rebate on all Padala", "Priority PH support line"] },
-              { name: "DATU PERKS", perks: ["1.0% Cash rebate on all Padala", "Free lounge access at NAIA"] },
-              { name: "LAKAN EXCELLENCE", perks: ["1.5% Cash rebate on all Padala", "Personal Kinnect concierge"] }
-            ].map((t, i) => (
-              <div key={i} className={`rounded-xl p-3 ${i === 0 ? "border border-primary/40 bg-primary/10" : "bg-white/5"}`}>
-                <p className={`text-[10px] font-black uppercase mb-2 ${i === 0 ? "text-primary" : "text-white/50"}`}>{t.name}</p>
-                {t.perks.map((p, j) => <p key={j} className="text-white/60 text-xs flex gap-1 mb-1"><span className="text-primary flex-shrink-0">✓</span>{p}</p>)}
-              </div>
-            ))}
+              { name: "BAYANI PERKS", tierName: "BAYANI", perks: ["0.5% Cash rebate on all Padala", "Priority PH support line"] },
+              { name: "DATU PERKS",   tierName: "DATU",   perks: ["1.0% Cash rebate on all Padala", "Free lounge access at NAIA"] },
+              { name: "LAKAN EXCELLENCE", tierName: "LAKAN", perks: ["1.5% Cash rebate on all Padala", "Personal Kinnect concierge"] }
+            ].map((t, i) => {
+              const tierIndex = TIER_DEFS.findIndex(td => td.name === t.tierName);
+              const currentIndex = TIER_DEFS.findIndex(td => td.name === currentTier.name);
+              const unlocked = currentIndex >= tierIndex;
+              return (
+                <div key={i} className={`rounded-xl p-3 relative overflow-hidden ${unlocked ? "border border-primary/40 bg-primary/10" : "bg-white/5 opacity-60"}`}>
+                  {!unlocked && (
+                    <div className="absolute top-2 right-2 text-white/30 text-base">🔒</div>
+                  )}
+                  <p className={`text-[10px] font-black uppercase mb-2 ${unlocked ? "text-primary" : "text-white/30"}`}>{t.name}</p>
+                  {t.perks.map((p, j) => (
+                    <p key={j} className={`text-xs flex gap-1 mb-1 ${unlocked ? "text-white/70" : "text-white/25"}`}>
+                      <span className={`flex-shrink-0 ${unlocked ? "text-primary" : "text-white/25"}`}>{unlocked ? "✓" : "·"}</span>{p}
+                    </p>
+                  ))}
+                  {!unlocked && (
+                    <p className="text-[9px] text-white/30 mt-2 font-bold uppercase tracking-wider">
+                      Reach {t.tierName} to unlock
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

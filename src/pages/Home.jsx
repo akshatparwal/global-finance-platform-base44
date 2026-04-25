@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Sun, Moon, Zap, Shield, Clock, TrendingUp, Users, Star, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLiveRates } from "@/hooks/useLiveRates";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
 
 const HERO_SLIDES = [
   {
@@ -319,7 +320,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Trust bar */}
+      <TestimonialsSection taglish={taglish} />
+
+      {/* Trust bar */}
         <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-4">
           {[
             { icon: "🔒", label: "256-bit Encryption" },

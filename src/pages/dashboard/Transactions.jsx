@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import TransactionList from "@/components/transactions/TransactionList";
+import { Download } from "lucide-react";
 
 const PAGE_SIZE = 20;
 
@@ -47,13 +48,43 @@ export default function Transactions() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          {taglish ? "Kasaysayan ng Transaksyon" : "Transaction History"}
-        </h1>
-        <p className={`text-xs ${muted}`}>
-          {taglish ? "Lahat ng iyong padala at bayad" : "All your transfers, bills & subscriptions"}
-        </p>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {taglish ? "Kasaysayan ng Transaksyon" : "Transaction History"}
+          </h1>
+          <p className={`text-xs ${muted}`}>
+            {taglish ? "Lahat ng iyong padala at bayad" : "All your transfers, bills & subscriptions"}
+          </p>
+        </div>
+        {transfers.length > 0 && (
+          <button
+            onClick={() => {
+              const header = "Date,Recipient,Bank,Amount USD,Amount PHP,Rate,Fee,Category,Status,Note";
+              const rows = transfers.map(t => [
+                new Date(t.created_date).toLocaleDateString(),
+                `"${t.recipient_name || ""}"`,
+                `"${t.recipient_bank || ""}"`,
+                t.amount_usd?.toFixed(2) || "0.00",
+                t.amount_php?.toFixed(2) || "",
+                t.rate?.toFixed(2) || "",
+                t.fee?.toFixed(2) || "0.00",
+                t.category || "remittance",
+                t.status || "completed",
+                `"${t.note || ""}"`,
+              ].join(","));
+              const csv = [header, ...rows].join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = `KinnectFi-Transactions-${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
+            }}
+            className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary font-bold px-3 py-2 rounded-xl text-xs hover:bg-primary/20 transition-colors flex-shrink-0"
+          >
+            <Download className="w-3.5 h-3.5" /> Export CSV
+          </button>
+        )}
       </div>
 
       {/* Month summary pills */}

@@ -1,5 +1,6 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
 import TransactionDetailSheet from "@/components/transactions/TransactionDetailSheet";
+import { getUpcomingHoliday } from "@/utils/holidays";
 import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown, ArrowDownToLine } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
@@ -72,6 +73,25 @@ export default function Dashboard() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Real-time: when a new transfer is created, update balance and activity feed
+  useEffect(() => {
+    const unsub = base44.entities.Transfer.subscribe((event) => {
+      if (event.type === "create") {
+        const newTx = event.data;
+        setTransfers(prev => [newTx, ...prev].slice(0, 5));
+        // Deduct from USD wallet balance immediately
+        setWallets(prev => prev.map(w =>
+          w.currency_code === "USD"
+            ? { ...w, balance: Math.max(0, (w.balance || 0) - (newTx.amount_usd || 0)) }
+            : w
+        ));
+      } else if (event.type === "update") {
+        setTransfers(prev => prev.map(t => t.id === event.id ? event.data : t));
+      }
+    });
+    return unsub;
+  }, []);
+
   const { containerRef, pullY, phase } = usePullToRefresh(fetchData);
   const pulling = phase === "pulling" || phase === "ready";
   const refreshing = phase === "refreshing";
@@ -141,18 +161,24 @@ export default function Dashboard() {
         </div>
       </div>
       <div ref={containerRef} className="space-y-4 overflow-y-auto">
-      {/* Banner */}
-      <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-primary text-lg flex-shrink-0">🙏</span>
-          <div className="min-w-0">
-            <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
-            <span className={`text-sm font-semibold ${textMain}`}>Semana Santa</span>
-            <span className={`text-sm ${muted} hidden sm:inline`}> · {taglish ? "Banal na Linggo" : "Reflecting during the Holy Week"}</span>
+      {/* Dynamic holiday banner */}
+      {(() => {
+        const holiday = getUpcomingHoliday();
+        if (!holiday) return null;
+        return (
+          <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-lg flex-shrink-0">{holiday.emoji}</span>
+              <div className="min-w-0">
+                <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
+                <span className={`text-sm font-semibold ${textMain}`}>{taglish ? holiday.tl : holiday.en}</span>
+                <span className={`text-sm ${muted} hidden sm:inline`}> · {holiday.diff === 0 ? "Today!" : holiday.diff === 1 ? "Tomorrow" : `In ${holiday.diff} days`}</span>
+              </div>
+            </div>
+            <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
           </div>
-        </div>
-        <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
-      </div>
+        );
+      })()}
 
       {/* Post-onboarding "3 next steps" card — shown once after KYC complete */}
       {user?.onboarding_completed && (

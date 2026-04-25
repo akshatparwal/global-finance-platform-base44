@@ -160,17 +160,32 @@ export default function Support() {
           </div>
           <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
         </button>
-        <button
-          onClick={() => sendMessage("I need to speak to a live agent")}
-          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${card} hover:border-primary/30`}
-        >
-          <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-          <div className="min-w-0">
-            <p className={`text-xs font-bold ${text}`}>Live Support</p>
-            <p className={`text-[10px] ${muted} truncate`}>Chat with a human</p>
-          </div>
-          <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
-        </button>
+        <div className={`flex flex-col rounded-xl border overflow-hidden ${card}`}>
+          <a
+            href="https://wa.me/14155238886?text=Hi%2C%20I%20need%20help%20with%20my%20KinnectFi%20account"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 px-3 py-2 border-b text-left transition-colors hover:border-primary/30 ${darkMode ? "border-white/5" : "border-black/5"}`}
+          >
+            <span className="text-base flex-shrink-0">💬</span>
+            <div className="min-w-0">
+              <p className={`text-xs font-bold ${text}`}>WhatsApp Support</p>
+              <p className={`text-[10px] ${muted} truncate`}>Human agent · Replies in mins</p>
+            </div>
+            <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
+          </a>
+          <a
+            href={`mailto:support@kinnectfi.com?subject=Support%20Request&body=Hi%2C%20I%20need%20help%20with%20my%20KinnectFi%20account.%20My%20email%3A%20${encodeURIComponent(user?.email || "")}`}
+            className="flex items-center gap-2 px-3 py-2 text-left transition-colors hover:opacity-80"
+          >
+            <Phone className="w-4 h-4 text-primary flex-shrink-0" />
+            <div className="min-w-0">
+              <p className={`text-xs font-bold ${text}`}>Email Support</p>
+              <p className={`text-[10px] ${muted} truncate`}>support@kinnectfi.com</p>
+            </div>
+            <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
+          </a>
+        </div>
       </div>
 
       {/* Chat area */}
