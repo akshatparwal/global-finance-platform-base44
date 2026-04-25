@@ -312,6 +312,16 @@ export default function Auth() {
 
           {renderStep()}
 
+          {/* Already have an account - sign up only */}
+          {tab === "signup" && (
+            <p className="text-white/50 text-sm text-center mt-4">
+              Already have an account?{" "}
+              <button onClick={() => handleTabSwitch("signin")} className="text-primary font-bold hover:underline">
+                Sign in
+              </button>
+            </p>
+          )}
+
           {/* Progress dots */}
           <div className="flex gap-2 justify-center mt-6">
             {Array.from({ length: totalSteps }).map((_, i) => (
