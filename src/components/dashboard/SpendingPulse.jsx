@@ -107,11 +107,13 @@ export default function SpendingPulse({ transfers = [], darkMode }) {
       </div>
 
       {/* SVG graph */}
-      <div className="relative select-none" style={{ height: H }}>
+      <div className="relative select-none overflow-hidden" style={{ height: H }}>
         <svg
           width="100%"
+          height={H}
           viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="none"
+          overflow="hidden"
           aria-hidden="true"
         >
           <defs>
