@@ -105,23 +105,46 @@ export default function Insights() {
         ))}
       </div>
 
-      {activeTab === "Activity" && (
+      {activeTab === "Activity" && (() => {
+        const now = new Date();
+        const thisMonth = transfers.filter(t => {
+          const d = new Date(t.created_date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+        const monthTotal = thisMonth.reduce((s, t) => s + (t.amount_usd || 0), 0);
+        const MONTHLY_BUDGET = 2000;
+        const pctUsed = Math.min(Math.round((monthTotal / MONTHLY_BUDGET) * 100), 100);
+        const remaining = Math.max(MONTHLY_BUDGET - monthTotal, 0);
+        const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" }).toUpperCase();
+        const remittanceTotal = thisMonth.filter(t => !t.category || t.category === "remittance").reduce((s,t) => s+(t.amount_usd||0),0);
+        const billsTotal = thisMonth.filter(t => t.category === "bills").reduce((s,t) => s+(t.amount_usd||0),0);
+        const savingsTotal = thisMonth.filter(t => t.category === "savings").reduce((s,t) => s+(t.amount_usd||0),0);
+        const otherTotal = thisMonth.filter(t => t.category === "other" || t.category === "subscriptions").reduce((s,t) => s+(t.amount_usd||0),0);
+
+        const BUDGETS_REAL = [
+          { icon: "❤️", label: "Remittances",    spent: remittanceTotal, total: 1000, color: "bg-primary" },
+          { icon: "⚡", label: "Bills & Utilities", spent: billsTotal, total: 300, color: "bg-emerald-500" },
+          { icon: "📦", label: "Savings",         spent: savingsTotal, total: 500, color: "bg-emerald-500" },
+          { icon: "📈", label: "Other",            spent: otherTotal, total: 200, color: "bg-primary" },
+        ];
+
+        return (
         <div className="space-y-6">
           <div className={`border rounded-2xl p-6 ${card}`}>
             <p className="text-xs uppercase tracking-widest font-bold mb-1" style={{ color: "hsl(var(--muted-foreground))" }}>Monthly Spending</p>
             <div className="flex justify-between items-start mb-4">
               <div>
-                <p className="text-4xl font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$1,465</p>
-                <p className={`text-sm ${muted}`}>of $2,000 monthly budget</p>
+                <p className="text-4xl font-black" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>${monthTotal.toFixed(2)}</p>
+                <p className={`text-sm ${muted}`}>of ${MONTHLY_BUDGET.toLocaleString()} monthly budget</p>
               </div>
-              <div className="w-14 h-14 rounded-full border-4 border-primary flex items-center justify-center font-black text-primary">73%</div>
+              <div className="w-14 h-14 rounded-full border-4 border-primary flex items-center justify-center font-black text-primary">{pctUsed}%</div>
             </div>
             <div className={`w-full h-2 rounded-full ${darkMode ? "bg-white/10" : "bg-black/10"} mb-2`}>
-              <div className="h-full bg-primary rounded-full" style={{ width: "73%" }} />
+              <div className="h-full bg-primary rounded-full" style={{ width: `${pctUsed}%` }} />
             </div>
             <div className="flex justify-between text-xs">
-              <span className={muted}>$535 remaining this period</span>
-              <span className={muted}>APRIL 2026</span>
+              <span className={muted}>${remaining.toFixed(2)} remaining this period</span>
+              <span className={muted}>{monthLabel}</span>
             </div>
           </div>
 
@@ -151,19 +174,19 @@ export default function Insights() {
           </div>
 
           <div className="space-y-3">
-            {BUDGETS.map((b, i) => {
-              const pct = Math.round((b.spent / b.total) * 100);
+            {BUDGETS_REAL.map((b, i) => {
+              const pct = b.total > 0 ? Math.min(Math.round((b.spent / b.total) * 100), 100) : 0;
               return (
                 <div key={i} className={`border rounded-xl p-4 ${card}`}>
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2"><span>{b.icon}</span><span className="font-semibold text-sm">{b.label}</span></div>
-                    <span className="font-bold text-sm">${b.spent} <span className={`${muted} font-normal`}>/ ${b.total}</span></span>
+                    <span className="font-bold text-sm">${b.spent.toFixed(2)} <span className={`${muted} font-normal`}>/ ${b.total}</span></span>
                   </div>
                   <div className={`w-full h-2 rounded-full ${darkMode ? "bg-white/10" : "bg-black/10"} mb-1`}>
                     <div className={`h-full ${b.color} rounded-full`} style={{ width: `${pct}%` }} />
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className={muted}>${b.total - b.spent} left to spend</span>
+                    <span className={muted}>${Math.max(b.total - b.spent, 0).toFixed(2)} left to spend</span>
                     <span className="text-primary font-bold">{pct}%</span>
                   </div>
                 </div>
@@ -174,7 +197,8 @@ export default function Insights() {
           <AIInsights darkMode={darkMode} wallets={wallets} transfers={transfers} goals={goals} />
           <RateAlertsPanel darkMode={darkMode} currentRate={liveRate} />
         </div>
-      )}
+        );
+      })()}
 
       <AnimatePresence>
         {addFundsGoal && (

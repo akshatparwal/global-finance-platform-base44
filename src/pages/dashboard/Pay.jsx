@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, Info } from "lucide-react";
+import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import TransferEstimator from "@/components/dashboard/TransferEstimator";
@@ -11,6 +11,7 @@ import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, ReferenceLine } f
 import { AnimatePresence } from "framer-motion";
 import TransferConfirmModal from "@/components/transfer/TransferConfirmModal";
 import TransactionReceipt from "@/components/transfer/TransactionReceipt";
+import CurrencyConverter from "@/components/pay/CurrencyConverter";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -23,29 +24,21 @@ const PRESETS = [
   { label: "₱56.00 ▼", rate: 56.00, direction: "below" },
 ];
 
-const RECENT = [
-  { initials: "NM", label: "Nanay", color: "bg-purple-500", bank: "GCash" },
-  { initials: "TJ", label: "Tatay", color: "bg-blue-500", bank: "BDO" },
-  { initials: "AR", label: "Ate", color: "bg-red-500", bank: "BPI" },
-  { initials: "KM", label: "Kuya", color: "bg-yellow-500", bank: "GCash" },
-  { initials: "TL", label: "Tita", color: "bg-teal-500", bank: "Metrobank" },
-];
+const AVATAR_COLORS = ["bg-purple-500","bg-blue-500","bg-red-500","bg-yellow-500","bg-teal-500","bg-emerald-500","bg-pink-500","bg-indigo-500"];
 
-const SCHEDULED = [
-  { emoji: "🏠", label: "Rent Payment", sub: "Monthly · 1st · Next: May 1", amount: "$1,800.00" },
-  { emoji: "⚡", label: "Meralco (Electricity)", sub: "Monthly · 15th · Next: May 15", amount: "₱3,450.00" },
-  { emoji: "💧", label: "Maynilad (Water)", sub: "Monthly · 20th · Next: May 20", amount: "₱890.00" },
-  { emoji: "🏛️", label: "SSS Multi-Purpose Loan", sub: "Monthly · 28th · Next: May 28", amount: "₱1,200.00" },
-  { emoji: "📡", label: "Internet", sub: "Monthly · 20th · Next: May 20", amount: "$65.00" },
-];
+const MIN_AMOUNT = 1;
+const MAX_AMOUNT = 10000;
 
 const PAY_TABS = ["Transfer History", "Rate Alerts", "Tools", "Protection", "Shipments"];
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
   const [sendAmount, setSendAmount] = useState("");
+  const [amountError, setAmountError] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState(null);
+  const [recipients, setRecipients] = useState([]);
   const [transfers, setTransfers] = useState([]);
+  const [scheduled, setScheduled] = useState([]);
   const [sending, setSending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [completedTransfer, setCompletedTransfer] = useState(null);
@@ -69,6 +62,8 @@ export default function Pay() {
 
   useEffect(() => {
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
+    base44.entities.Recipient.list("-transfer_count", 6).then(setRecipients).catch(() => {});
+    base44.entities.ScheduledTransfer.filter({ is_active: true }).then(setScheduled).catch(() => {});
     setAlertsLoading(true);
     Promise.all([
       base44.entities.RateAlert.filter({ is_active: true }),
@@ -116,10 +111,25 @@ export default function Pay() {
     setRateAlerts(prev => prev.filter(a => a.id !== id));
   };
 
-  // Step 1: open confirm modal
+  // Amount validation
+  const validateAmount = (val) => {
+    const amt = parseFloat(val);
+    if (!val || isNaN(amt)) return "Please enter an amount.";
+    if (amt < MIN_AMOUNT) return `Minimum transfer is $${MIN_AMOUNT}.`;
+    if (amt > MAX_AMOUNT) return `Maximum transfer is $${MAX_AMOUNT.toLocaleString()}.`;
+    return "";
+  };
+
+  const handleAmountChange = (val) => {
+    const cleaned = val.replace(/[^0-9.]/g, "");
+    setSendAmount(cleaned);
+    if (amountError) setAmountError(validateAmount(cleaned));
+  };
+
+  // Step 1: validate then open confirm modal
   const handleSend = () => {
-    const amt = parseFloat(sendAmount);
-    if (!amt || amt <= 0) return;
+    const error = validateAmount(sendAmount);
+    if (error) { setAmountError(error); return; }
     haptic.medium();
     setShowConfirm(true);
   };
@@ -130,7 +140,7 @@ export default function Pay() {
     setSending(true);
     setShowConfirm(false);
 
-    const recipientName = selectedRecipient?.label || "Family";
+    const recipientName = selectedRecipient?.nickname || selectedRecipient?.full_name || "Family";
     const recipientBank = selectedRecipient?.bank || "GCash";
 
     const optimisticId = `optimistic-${Date.now()}`;
@@ -213,14 +223,22 @@ export default function Pay() {
         <div className="flex items-center gap-3 mb-6 overflow-x-auto">
           <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {RECENT.map((r,i) => (
-              <button key={i} onClick={() => setSelectedRecipient(r === selectedRecipient ? null : r)}
-                className="flex flex-col items-center gap-1 group">
-                <div className={`w-10 h-10 rounded-full ${r.color} flex items-center justify-center text-white text-xs font-black group-hover:scale-110 transition-transform ring-2 ${selectedRecipient?.initials === r.initials ? "ring-primary" : "ring-transparent"}`}>{r.initials}</div>
-                <span className={`text-[9px] ${muted}`}>{r.label}</span>
-              </button>
-            ))}
-            <button className="flex flex-col items-center gap-1">
+            {recipients.length === 0 && (
+              <span className={`text-xs ${muted} italic py-3`}>No recipients yet — add one below</span>
+            )}
+            {recipients.map((r, i) => {
+              const initials = (r.nickname || r.full_name || "?").slice(0, 2).toUpperCase();
+              const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
+              const isSelected = selectedRecipient?.id === r.id;
+              return (
+                <button key={r.id} onClick={() => setSelectedRecipient(isSelected ? null : r)}
+                  className="flex flex-col items-center gap-1 group flex-shrink-0">
+                  <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-white text-xs font-black group-hover:scale-110 transition-transform ring-2 ${isSelected ? "ring-primary" : "ring-transparent"}`}>{initials}</div>
+                  <span className={`text-[9px] ${muted} max-w-[44px] truncate`}>{r.nickname || r.full_name}</span>
+                </button>
+              );
+            })}
+            <button className="flex flex-col items-center gap-1 flex-shrink-0">
               <div className="w-10 h-10 rounded-full border-2 border-dashed border-current opacity-30 flex items-center justify-center"><Plus className="w-3 h-3" /></div>
               <span className={`text-[9px] ${muted}`}>{taglish ? "Dagdag" : "Add"}</span>
             </button>
@@ -230,20 +248,27 @@ export default function Pay() {
         {selectedRecipient && (
           <div className="mb-4 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2 flex items-center gap-2">
             <span className="text-primary text-sm">✓</span>
-            <span className="text-primary text-sm font-bold">Sending to: {selectedRecipient.label} via {selectedRecipient.bank}</span>
+            <span className="text-primary text-sm font-bold">Sending to: {selectedRecipient.nickname || selectedRecipient.full_name} via {selectedRecipient.bank}</span>
           </div>
         )}
 
         <div className="space-y-3 mb-4">
           <div>
             <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Ipadala" : "You Send"}</label>
-            <div className={`flex items-center border rounded-xl overflow-hidden ${inputBg}`}>
+            <div className={`flex items-center border rounded-xl overflow-hidden transition-colors ${amountError ? "border-red-500" : inputBg}`}>
               <div className="bg-[#0d1526] text-white px-3 h-12 flex items-center gap-1 flex-shrink-0 border-r border-white/10">
                 <span>🇺🇸</span><span className="text-xs font-bold">USD</span>
               </div>
-              <input value={sendAmount} onChange={e => setSendAmount(e.target.value.replace(/[^0-9.]/g,""))}
+              <input value={sendAmount} onChange={e => handleAmountChange(e.target.value)}
                 placeholder="0.00" inputMode="decimal" className="flex-1 bg-transparent px-4 h-12 text-xl font-black outline-none" />
             </div>
+            {amountError && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                <p className="text-red-400 text-xs font-semibold">{amountError}</p>
+              </div>
+            )}
+            <p className={`text-[10px] ${muted} mt-1`}>Min $${MIN_AMOUNT} · Max $${MAX_AMOUNT.toLocaleString()} per transfer</p>
           </div>
           <div>
             <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Matatanggap" : "They Receive"}</label>
@@ -320,15 +345,33 @@ export default function Pay() {
           )}
 
           <h3 className="font-bold mb-3">{taglish ? "Naka-iskedyul na Bayad" : "Scheduled & Bills"}</h3>
-          <div className="space-y-2">
-            {SCHEDULED.map((s,i) => (
-              <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${card}`}>
-                <span className="text-2xl flex-shrink-0">{s.emoji}</span>
-                <div className="flex-1"><p className="font-semibold text-sm">{s.label}</p><p className={`text-xs ${muted}`}>{s.sub}</p></div>
-                <div className="text-right"><p className="font-bold text-sm">{s.amount}</p><span className="text-primary text-[10px] font-bold uppercase">ACTIVE</span></div>
-              </div>
-            ))}
-          </div>
+          {scheduled.length === 0 ? (
+            <div className={`border rounded-xl p-6 text-center ${card}`}>
+              <p className={`text-sm ${muted}`}>No scheduled transfers. Add one to automate your bills.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {scheduled.map((s) => {
+                const nextDay = s.day_of_month;
+                const now = new Date();
+                const nextDate = new Date(now.getFullYear(), nextDay <= now.getDate() ? now.getMonth() + 1 : now.getMonth(), nextDay);
+                const nextLabel = nextDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                return (
+                  <div key={s.id} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${card}`}>
+                    <span className="text-2xl flex-shrink-0">{s.emoji}</span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{s.label}</p>
+                      <p className={`text-xs ${muted}`}>Monthly · {s.day_of_month ? `${s.day_of_month}th · Next: ${nextLabel}` : "Active"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-sm">{s.currency === "PHP" ? "₱" : "$"}{s.amount?.toLocaleString()}</p>
+                      <span className="text-primary text-[10px] font-bold uppercase">ACTIVE</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -450,20 +493,22 @@ export default function Pay() {
       )}
 
       {activeTab === "Tools" && (
-        <div className={`border rounded-2xl p-6 ${card}`}>
-          <h3 className="font-bold mb-4">Transfer Tools</h3>
-          <div className="space-y-3">
-            {[
-              { icon: "📊", label: "Rate Alerts", sub: "Get notified when PHP/USD hits your target rate", action: () => alert("Rate alerts — set your target rate and we'll notify you!") },
-              { icon: "🔄", label: "Auto-Padala", sub: "Schedule recurring transfers automatically", action: () => alert("Auto-Padala — schedule monthly transfers to your family!") },
-              { icon: "💱", label: "Currency Converter", sub: "Convert between 10+ currencies", action: () => alert("Multi-currency converter coming soon!") },
-            ].map((tool, i) => (
-              <button key={i} onClick={tool.action}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>
-                <span className="text-2xl">{tool.icon}</span>
-                <div><p className="font-semibold text-sm">{tool.label}</p><p className={`text-xs ${muted}`}>{tool.sub}</p></div>
-              </button>
-            ))}
+        <div className="space-y-4">
+          <CurrencyConverter darkMode={darkMode} />
+          <div className={`border rounded-2xl p-5 ${card}`}>
+            <h3 className="font-bold mb-3">More Tools</h3>
+            <div className="space-y-2">
+              {[
+                { icon: "📊", label: "Rate Alerts", sub: "Set a target rate and get notified", action: () => setActiveTab("Rate Alerts") },
+                { icon: "🔄", label: "Auto-Padala", sub: "Schedule recurring transfers automatically", action: () => alert("Auto-Padala — schedule monthly transfers to your family!") },
+              ].map((tool, i) => (
+                <button key={i} onClick={tool.action}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>
+                  <span className="text-2xl">{tool.icon}</span>
+                  <div><p className="font-semibold text-sm">{tool.label}</p><p className={`text-xs ${muted}`}>{tool.sub}</p></div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -511,7 +556,7 @@ export default function Pay() {
               amount: sendAmount,
               receive,
               rate,
-              recipient: selectedRecipient?.label || "Family",
+              recipient: selectedRecipient?.nickname || selectedRecipient?.full_name || "Family",
               bank: selectedRecipient?.bank || "GCash",
             }}
             onConfirm={handleConfirmedSend}

@@ -1,0 +1,44 @@
+{
+  "name": "ScheduledTransfer",
+  "type": "object",
+  "properties": {
+    "emoji": {
+      "type": "string",
+      "default": "\ud83d\udcb8"
+    },
+    "label": {
+      "type": "string"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "weekly",
+        "biweekly"
+      ],
+      "default": "monthly"
+    },
+    "day_of_month": {
+      "type": "number"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "USD",
+        "PHP"
+      ],
+      "default": "USD"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "label",
+    "amount"
+  ]
+}

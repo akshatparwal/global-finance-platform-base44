@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
 import SecurityHub from "@/components/security/SecurityHub";
 import PointsRedemption from "@/components/dashboard/PointsRedemption";
+import EditProfileForm from "@/components/profile/EditProfileForm";
 import { base44 } from "@/api/base44Client";
 
 const TIERS = [
@@ -231,6 +232,15 @@ export default function Profile() {
               {user?.kyc_doc_url ? "Continue KYC Setup →" : "⬆ Start Identity Verification"}
             </button>
           </div>
+
+          {/* Editable profile fields */}
+          {user && (
+            <EditProfileForm
+              user={user}
+              darkMode={darkMode}
+              onUpdated={(updated) => setUser(u => ({ ...u, ...updated }))}
+            />
+          )}
 
           {/* Language & Theme */}
           <div className={`border rounded-xl p-4 ${card}`}>

@@ -1,32 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import TransactionList from "@/components/transactions/TransactionList";
+
+const PAGE_SIZE = 20;
 
 export default function Transactions() {
   const { darkMode, taglish } = useOutletContext() || {};
   const [transfers, setTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
 
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
 
-  useEffect(() => {
-    base44.entities.Transfer.list("-created_date", 100)
-      .then(setTransfers)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+  const loadPage = useCallback(async (pageNum) => {
+    if (pageNum === 0) setLoading(true); else setLoadingMore(true);
+    const results = await base44.entities.Transfer.list("-created_date", PAGE_SIZE, pageNum * PAGE_SIZE).catch(() => []);
+    if (pageNum === 0) setTransfers(results);
+    else setTransfers(prev => [...prev, ...results]);
+    setHasMore(results.length === PAGE_SIZE);
+    if (pageNum === 0) setLoading(false); else setLoadingMore(false);
   }, []);
 
-  // Subscribe to real-time updates
+  useEffect(() => { loadPage(0); }, [loadPage]);
+
+  // Real-time updates for first page only
   useEffect(() => {
     const unsub = base44.entities.Transfer.subscribe((event) => {
-      if (event.type === "create") {
-        setTransfers(prev => [event.data, ...prev]);
-      } else if (event.type === "update") {
-        setTransfers(prev => prev.map(t => t.id === event.id ? event.data : t));
-      } else if (event.type === "delete") {
-        setTransfers(prev => prev.filter(t => t.id !== event.id));
-      }
+      if (event.type === "create") setTransfers(prev => [event.data, ...prev]);
+      else if (event.type === "update") setTransfers(prev => prev.map(t => t.id === event.id ? event.data : t));
+      else if (event.type === "delete") setTransfers(prev => prev.filter(t => t.id !== event.id));
     });
     return unsub;
   }, []);
@@ -72,6 +77,22 @@ export default function Transactions() {
       </div>
 
       <TransactionList transfers={transfers} loading={loading} darkMode={darkMode} taglish={taglish} />
+
+      {/* Load more */}
+      {!loading && hasMore && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => { const next = page + 1; setPage(next); loadPage(next); }}
+            disabled={loadingMore}
+            className="bg-primary/10 border border-primary/20 text-primary font-bold px-6 py-3 rounded-xl text-sm hover:bg-primary/20 disabled:opacity-50 transition-colors"
+          >
+            {loadingMore ? "Loading..." : "Load more transfers"}
+          </button>
+        </div>
+      )}
+      {!loading && !hasMore && transfers.length > 0 && (
+        <p className={`text-center text-xs ${muted} mt-4 pb-2`}>All {transfers.length} transactions loaded</p>
+      )}
     </div>
   );
 }
