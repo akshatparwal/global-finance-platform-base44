@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Zap, Globe } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Zap, Globe, ArrowLeft } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -10,9 +10,7 @@ import WhatsNew from "@/components/WhatsNew";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import SessionTimeoutWarning from "@/components/SessionTimeoutWarning";
 import BiometricNudge from "@/components/BiometricNudge";
-
-// Per-tab scroll position registry — persists across tab switches
-const scrollRegistry = {};
+import { useTabStack } from "@/hooks/useTabStack";
 
 const NAV = [
   { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard",          color: "text-blue-400",    bg: "bg-blue-500/15" },
@@ -26,6 +24,8 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const mainRef = useRef(null);
+  const { activeTab, currentPath, stackDepth, isRoot, switchTab, resetTab, push, pop, loadScroll, saveScroll } = useTabStack();
+  
   const [darkMode, setDarkMode] = useState(() => {
     try { return localStorage.getItem("kf_dark_mode") !== "false"; } catch { return true; }
   });
@@ -41,6 +41,15 @@ export default function DashboardLayout() {
   const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
   const { showWarning, secondsLeft, extendSession, doLogout } = useSessionTimeout();
 
+  // Sync React Router location with tab stack
+  useEffect(() => {
+    const tab = ["/dashboard", "/dashboard/insights", "/dashboard/pay", "/dashboard/cards", "/dashboard/profile"].find(
+      t => location.pathname === t || location.pathname.startsWith(t + "/")
+    ) || "/dashboard";
+    push(location.pathname);
+    switchTab(tab);
+  }, [location.pathname, push, switchTab]);
+
   // Persist preferences
   useEffect(() => { try { localStorage.setItem("kf_dark_mode", darkMode); } catch {} }, [darkMode]);
   useEffect(() => { try { localStorage.setItem("kf_taglish", taglish); } catch {} }, [taglish]);
@@ -55,12 +64,19 @@ export default function DashboardLayout() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Save current tab scroll before navigating away
-  const navigateTab = useCallback((path) => {
-    scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0;
+  // Handle tab navigation with re-tap-to-reset
+  const handleTabClick = useCallback((tabPath) => {
+    if (activeTab === tabPath) {
+      // Re-tap same tab = reset to root
+      resetTab(tabPath);
+      navigate(tabPath);
+    } else {
+      // Switch to different tab
+      switchTab(tabPath);
+      navigate(tabPath);
+    }
     setMobileOpen(false);
-    navigate(path);
-  }, [location.pathname, navigate]);
+  }, [activeTab, resetTab, switchTab, navigate]);
 
   const bgMain = darkMode ? "bg-[#0a0f1a]" : "bg-[#f5efe6]";
   const bgSidebar = darkMode ? "bg-[#0d1526]" : "bg-[#1a2a4a]";
@@ -91,16 +107,16 @@ export default function DashboardLayout() {
         {/* Nav */}
         <nav className="flex-1 px-3 space-y-0.5">
           {NAV.map(({ label, icon: NavIcon, path, color, bg }) => {
-            const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
+            const active = activeTab === path;
             return (
-              <Link key={path} to={path} onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-white/10 text-white" : "text-white/55 hover:text-white hover:bg-white/5"}`}>
+              <button key={path} onClick={() => handleTabClick(path)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-white/10 text-white" : "text-white/55 hover:text-white hover:bg-white/5"}`}>
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${active ? `${bg} ${color}` : "bg-white/5 text-white/40"}`}>
                   <NavIcon className="w-3.5 h-3.5" />
                 </div>
                 <span className={active ? "text-white" : ""}>{label}</span>
                 {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />}
-              </Link>
+              </button>
             );
           })}
         </nav>
@@ -139,9 +155,16 @@ export default function DashboardLayout() {
       <div className="flex-1 sm:ml-56 flex flex-col min-h-screen">
         {/* Top bar */}
         <header className={`${bgContent} border-b ${darkMode ? "border-white/5" : "border-black/5"} px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
-          <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile: Back button if not root, menu button if root */}
+          {!isRoot ? (
+            <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => { pop(); navigate(activeTab); }} title="Go back">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          ) : (
+            <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          )}
           {/* Logo shown in mobile header */}
           <div className="sm:hidden flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
@@ -190,19 +213,19 @@ export default function DashboardLayout() {
 
         <main
           ref={mainRef}
-          onScroll={() => { scrollRegistry[location.pathname] = mainRef.current?.scrollTop ?? 0; }}
+          onScroll={() => { saveScroll(mainRef.current?.scrollTop ?? 0); }}
           className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={location.pathname}
+              key={currentPath}
               initial={{ x: 40, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -40, opacity: 0 }}
               transition={{ duration: 0.22, ease: "easeInOut" }}
               onAnimationComplete={() => {
                 if (mainRef.current) {
-                  mainRef.current.scrollTop = scrollRegistry[location.pathname] ?? 0;
+                  mainRef.current.scrollTop = loadScroll();
                 }
               }}
             >
@@ -211,7 +234,7 @@ export default function DashboardLayout() {
           </AnimatePresence>
         </main>
 
-        <BottomNav onNavigate={navigateTab} />
+        <BottomNav onNavigate={handleTabClick} />
 
         {/* What's New changelog */}
         <WhatsNew darkMode={darkMode} />
