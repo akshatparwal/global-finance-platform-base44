@@ -1,37 +1,46 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, History, MessageCircle, BookUser } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
 import NotificationPanel from "@/components/notifications/NotificationPanel";
 import NotificationToast from "@/components/notifications/NotificationToast";
+import WhatsNew from "@/components/WhatsNew";
 
 // Per-tab scroll position registry — persists across tab switches
 const scrollRegistry = {};
 
 const NAV = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Insights & Wealth", icon: TrendingUp, path: "/dashboard/insights" },
-  { label: "Pay", icon: Send, path: "/dashboard/pay" },
-  { label: "History", icon: History, path: "/dashboard/transactions" },
-  { label: "Cards", icon: CreditCard, path: "/dashboard/cards" },
-  { label: "Recipients", icon: BookUser, path: "/dashboard/recipients" },
-  { label: "Support", icon: MessageCircle, path: "/dashboard/support" },
-  { label: "Profile", icon: User, path: "/dashboard/profile" },
+  { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard" },
+  { label: "Insights & Wealth",icon: TrendingUp,      path: "/dashboard/insights" },
+  { label: "Pay",              icon: Send,            path: "/dashboard/pay" },
+  { label: "Cards",            icon: CreditCard,      path: "/dashboard/cards" },
+  { label: "Profile",          icon: User,            path: "/dashboard/profile" },
 ];
 
 export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const mainRef = useRef(null);
-  const [darkMode, setDarkMode] = useState(true);
-  const [taglish, setTaglish] = useState(false);
-  const [bahay, setBahay] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem("kf_dark_mode") !== "false"; } catch { return true; }
+  });
+  const [taglish, setTaglish] = useState(() => {
+    try { return localStorage.getItem("kf_taglish") === "true"; } catch { return false; }
+  });
+  const [bahay, setBahay] = useState(() => {
+    try { return localStorage.getItem("kf_bahay") === "true"; } catch { return false; }
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
   const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
+
+  // Persist preferences
+  useEffect(() => { try { localStorage.setItem("kf_dark_mode", darkMode); } catch {} }, [darkMode]);
+  useEffect(() => { try { localStorage.setItem("kf_taglish", taglish); } catch {} }, [taglish]);
+  useEffect(() => { try { localStorage.setItem("kf_bahay", bahay); } catch {} }, [bahay]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -121,6 +130,11 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
+            {/* Support shortcut */}
+            <Link to="/dashboard/support"
+              className={`hidden sm:flex w-9 h-9 items-center justify-center rounded-lg transition-colors ${darkMode ? "text-white/40 hover:text-white hover:bg-white/8" : "text-[#1a2a4a]/40 hover:bg-black/8"}`}>
+              <MessageCircle className="w-4 h-4" />
+            </Link>
             <div className="relative" ref={notifRef}>
               <button onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markAllRead(); }}
                 className="relative w-9 h-9 flex items-center justify-center hover:opacity-70 transition-opacity">
@@ -179,6 +193,9 @@ export default function DashboardLayout() {
         </main>
 
         <BottomNav onNavigate={navigateTab} />
+
+        {/* What's New changelog */}
+        <WhatsNew darkMode={darkMode} />
 
         {/* Global push toast banner */}
         <AnimatePresence>

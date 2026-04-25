@@ -27,10 +27,25 @@ const WELCOME_MESSAGE = {
   timestamp: Date.now(),
 };
 
+const LS_CHAT_KEY = "kf_support_chat";
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(LS_CHAT_KEY);
+    if (!raw) return [WELCOME_MESSAGE];
+    const parsed = JSON.parse(raw);
+    return parsed.length > 0 ? parsed : [WELCOME_MESSAGE];
+  } catch { return [WELCOME_MESSAGE]; }
+}
+
+function saveHistory(msgs) {
+  try { localStorage.setItem(LS_CHAT_KEY, JSON.stringify(msgs.slice(-40))); } catch {}
+}
+
 export default function Support() {
   const { darkMode, taglish } = useOutletContext() || {};
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState(loadHistory);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPrompts, setShowPrompts] = useState(true);
@@ -97,8 +112,13 @@ export default function Support() {
     }
   };
 
+  // Persist messages on every change
+  useEffect(() => { saveHistory(messages); }, [messages]);
+
   const handleReset = () => {
-    setMessages([WELCOME_MESSAGE]);
+    const fresh = [WELCOME_MESSAGE];
+    setMessages(fresh);
+    saveHistory(fresh);
     setShowPrompts(true);
     setInput("");
   };

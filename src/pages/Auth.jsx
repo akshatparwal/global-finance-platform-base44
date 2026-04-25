@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, HelpCircle, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, HelpCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const LANGUAGES = [
@@ -176,7 +176,8 @@ export default function Auth() {
             </div>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleSignUp} disabled={password.length < 6 || loading}
-              className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
+              className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Creating account..." : "Create Account"}
             </button>
           </>
@@ -199,7 +200,8 @@ export default function Auth() {
             />
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleVerifyOtp} disabled={otpCode.length < 4 || loading}
-              className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40 mb-3">
+              className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 mb-3 flex items-center justify-center gap-2">
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Verifying..." : "Verify & Continue →"}
             </button>
             <button onClick={handleResendOtp} disabled={resendCooldown > 0}
@@ -238,7 +240,8 @@ export default function Auth() {
             </div>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleSignIn} disabled={loading}
-              className="w-full bg-white text-secondary font-bold py-3.5 rounded-xl hover:bg-white/90 transition-colors disabled:opacity-40">
+              className="w-full bg-white text-secondary font-bold py-3.5 rounded-xl hover:bg-white/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </>

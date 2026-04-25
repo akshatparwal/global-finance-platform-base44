@@ -290,9 +290,16 @@ export default function Recipients() {
                 <div className="flex-1 min-w-0">
                   <p className={`font-bold text-sm ${text}`}>{rec.nickname}</p>
                   <p className={`text-xs ${muted}`}>{rec.bank}{rec.account_number ? ` · ${rec.account_number}` : ""}</p>
-                  {recTransfers.length > 0 && (
-                    <p className="text-xs text-primary font-bold">{recTransfers.length} transfer{recTransfers.length !== 1 ? "s" : ""} · ${totalSent.toFixed(0)} total</p>
-                  )}
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    {recTransfers.length > 0 ? (
+                      <p className="text-xs text-primary font-bold">{recTransfers.length} transfer{recTransfers.length !== 1 ? "s" : ""} · ${totalSent.toFixed(0)}</p>
+                    ) : (
+                      <p className={`text-xs ${muted}`}>No transfers yet</p>
+                    )}
+                    {recTransfers.length > 0 && (
+                      <p className={`text-xs ${muted}`}>· Last: {new Date(recTransfers[0].created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+                    )}
+                  </div>
                 </div>
                 <ChevronRight className={`w-4 h-4 ${muted} flex-shrink-0`} />
               </button>

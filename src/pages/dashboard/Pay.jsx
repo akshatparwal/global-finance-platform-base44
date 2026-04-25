@@ -12,6 +12,7 @@ import { AnimatePresence } from "framer-motion";
 import TransferConfirmModal from "@/components/transfer/TransferConfirmModal";
 import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 import CurrencyConverter from "@/components/pay/CurrencyConverter";
+import SendAnimation from "@/components/transfer/SendAnimation";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -42,6 +43,8 @@ export default function Pay() {
   const [sending, setSending] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [completedTransfer, setCompletedTransfer] = useState(null);
+  const [showSendAnim, setShowSendAnim] = useState(false);
+  const [sendAnimData, setSendAnimData] = useState({ amount: "", recipient: "" });
   const [activeTab, setActiveTab] = useState("Transfer History");
   const { rates, loading: ratesLoading, refetch } = useLiveRates();
   const { toast } = useToast();
@@ -171,7 +174,10 @@ export default function Pay() {
       setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
       haptic.success();
       sfx.success();
-      // Show receipt
+      // Show send animation then receipt
+      setSendAnimData({ amount: amt.toFixed(2), recipient: recipientName });
+      setShowSendAnim(true);
+      // Store for after animation
       setCompletedTransfer(finalTransfer);
     } catch {
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
@@ -548,6 +554,14 @@ export default function Pay() {
           </div>
         </div>
       )}
+      {/* Send animation */}
+      <SendAnimation
+        show={showSendAnim}
+        amount={sendAnimData.amount}
+        recipientName={sendAnimData.recipient}
+        onDone={() => setShowSendAnim(false)}
+      />
+
       {/* Confirm modal */}
       <AnimatePresence>
         {showConfirm && (
