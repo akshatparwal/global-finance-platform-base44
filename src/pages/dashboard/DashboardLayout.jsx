@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Zap, Globe } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -15,11 +15,11 @@ import BiometricNudge from "@/components/BiometricNudge";
 const scrollRegistry = {};
 
 const NAV = [
-  { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Insights & Wealth",icon: TrendingUp,      path: "/dashboard/insights" },
-  { label: "Pay",              icon: Send,            path: "/dashboard/pay" },
-  { label: "Cards",            icon: CreditCard,      path: "/dashboard/cards" },
-  { label: "Profile",          icon: User,            path: "/dashboard/profile" },
+  { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard",          color: "text-blue-400",    bg: "bg-blue-500/15" },
+  { label: "Insights & Wealth",icon: TrendingUp,      path: "/dashboard/insights", color: "text-emerald-400", bg: "bg-emerald-500/15" },
+  { label: "Pay",              icon: Send,            path: "/dashboard/pay",      color: "text-primary",     bg: "bg-primary/15" },
+  { label: "Cards",            icon: CreditCard,      path: "/dashboard/cards",    color: "text-purple-400",  bg: "bg-purple-500/15" },
+  { label: "Profile",          icon: User,            path: "/dashboard/profile",  color: "text-orange-400",  bg: "bg-orange-500/15" },
 ];
 
 export default function DashboardLayout() {
@@ -75,44 +75,59 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       <aside className={`${bgSidebar} w-56 flex-shrink-0 flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
         {/* Logo */}
-        <div className="p-5 pb-8">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
-            <div><div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></div><div className="text-white/30 text-[8px] uppercase tracking-widest">Cross-Border Neobank</div></div>
+        <div className="p-5 pb-6 border-b border-white/8">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-primary/30"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
+            <div>
+              <div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <Globe className="w-2.5 h-2.5 text-primary/60" />
+                <span className="text-white/30 text-[8px] uppercase tracking-widest">Cross-Border Neobank</span>
+              </div>
+            </div>
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-1">
-          {NAV.map(({ label, icon: NavIcon, path }) => {
+        <nav className="flex-1 px-3 space-y-0.5">
+          {NAV.map(({ label, icon: NavIcon, path, color, bg }) => {
             const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
             return (
               <Link key={path} to={path} onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? activeClass : inactiveClass}`}>
-                <NavIcon className="w-4 h-4 flex-shrink-0" />
-                {label}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-white/10 text-white" : "text-white/55 hover:text-white hover:bg-white/5"}`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${active ? `${bg} ${color}` : "bg-white/5 text-white/40"}`}>
+                  <NavIcon className="w-3.5 h-3.5" />
+                </div>
+                <span className={active ? "text-white" : ""}>{label}</span>
+                {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />}
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom toggles */}
-        <div className="p-4 space-y-3 border-t border-white/10">
-          <div className="flex items-center justify-between">
-            <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Taglish Mode</span>
-            <button onClick={() => setTaglish(!taglish)} className={`w-10 h-5 rounded-full transition-all ${taglish ? "bg-primary" : "bg-white/20"} relative`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${taglish ? "left-5" : "left-0.5"}`} />
+        <div className="p-4 space-y-2.5 border-t border-white/8">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-primary/60" />
+              <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Taglish</span>
+            </div>
+            <button onClick={() => setTaglish(!taglish)} className={`w-9 h-5 rounded-full transition-all duration-200 ${taglish ? "bg-primary" : "bg-white/15"} relative`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${taglish ? "left-4" : "left-0.5"}`} />
             </button>
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1"><span className="text-[10px]">🏠</span><span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Bahay Mode</span></div>
-            <button onClick={() => setBahay(!bahay)} className={`w-10 h-5 rounded-full transition-all ${bahay ? "bg-primary" : "bg-white/20"} relative`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${bahay ? "left-5" : "left-0.5"}`} />
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px]">🏠</span>
+              <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Bahay Mode</span>
+            </div>
+            <button onClick={() => setBahay(!bahay)} className={`w-9 h-5 rounded-full transition-all duration-200 ${bahay ? "bg-primary" : "bg-white/15"} relative`}>
+              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${bahay ? "left-4" : "left-0.5"}`} />
             </button>
           </div>
-          <div className="flex items-center gap-2 mt-2">
-            <Shield className="w-3 h-3 text-primary" />
-            <span className="text-white/30 text-[9px] uppercase tracking-widest">Bank-Grade Trust</span>
+          <div className="flex items-center gap-1.5 px-1 pt-1">
+            <Shield className="w-3 h-3 text-emerald-400/70" />
+            <span className="text-white/25 text-[9px] uppercase tracking-widest">Bank-Grade Secure</span>
           </div>
         </div>
       </aside>

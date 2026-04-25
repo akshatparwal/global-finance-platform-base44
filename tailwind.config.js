@@ -2,9 +2,15 @@
 module.exports = {
   darkMode: ['class'],
   content: [
+    './index.html',
     './src/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
     './pages/**/*.{js,jsx,ts,tsx}',
+  ],
+  safelist: [
+    "bg-blue-500", "bg-violet-500", "bg-emerald-500", "bg-rose-500", "bg-amber-500",
+    "text-blue-400", "text-emerald-400", "text-purple-400", "text-orange-400",
+    "bg-blue-500/15", "bg-emerald-500/15", "bg-purple-500/15", "bg-orange-500/15", "bg-primary/15",
   ],
   theme: {
     container: {

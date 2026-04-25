@@ -279,16 +279,20 @@ export default function Dashboard() {
         <h2 className={`font-bold text-sm mb-3 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
         <div className="relative">
           <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-            {QUICK_SEND.map((p, i) => (
-              <button key={i} onClick={() => navigate("/dashboard/pay")}
-                className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow ${p.isAdd ? `border-2 border-dashed ${darkMode ? "border-white/20" : "border-black/20"}` : `${darkMode ? "bg-white/10" : "bg-black/10"}`}`}>
-                  {p.isAdd ? <Plus className="w-5 h-5 opacity-40" /> : p.emoji}
-                </div>
-                <span className={`text-[10px] font-semibold ${muted}`}>{p.label}</span>
-                {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">{taglish ? "PADALA" : "SEND"}</span>}
-              </button>
-            ))}
+            {QUICK_SEND.map((p, i) => {
+              const avatarColors = ["bg-blue-500","bg-violet-500","bg-emerald-500","bg-rose-500","bg-amber-500"];
+              const avatarColor = avatarColors[i % avatarColors.length];
+              return (
+                <button key={i} onClick={() => navigate("/dashboard/pay")}
+                  className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
+                  <div className={`w-13 h-13 w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-xl shadow-md ${p.isAdd ? `border-2 border-dashed ${darkMode ? "border-white/20" : "border-black/20"}` : `${avatarColor} text-white`}`}>
+                    {p.isAdd ? <Plus className="w-5 h-5 opacity-40" /> : p.emoji}
+                  </div>
+                  <span className={`text-[10px] font-semibold ${muted} max-w-[52px] truncate text-center`}>{p.label}</span>
+                  {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">{taglish ? "PADALA" : "SEND"}</span>}
+                </button>
+              );
+            })}
           </div>
           <div className={`absolute right-0 top-0 bottom-0 w-10 pointer-events-none ${darkMode ? "bg-gradient-to-l from-[#0a0f1a]" : "bg-gradient-to-l from-[#f5efe6]"}`} />
         </div>
@@ -334,25 +338,30 @@ export default function Dashboard() {
           </div>
         )}
         {!loading && transfers.length > 0 && (
-          <div className="space-y-2 mb-4">
-            {transfers.map((t, i) => (
-              <button key={i} onClick={() => setSelectedTx(t)}
-                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left hover:border-primary/30 transition-colors ${darkMode ? "border-white/5" : "border-black/5"}`}>
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
-                  {t.recipient_name?.[0] || "?"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold ${textMain}`}>Sent to {t.recipient_name}</p>
-                  <p className={`text-[10px] uppercase tracking-wider font-bold ${muted}`}>
-                    {new Date(t.created_date).toLocaleDateString()} · {t.status}
-                  </p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-bold text-primary">${t.amount_usd}</p>
-                  {t.amount_php && <p className={`text-[10px] ${muted}`}>₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
-                </div>
-              </button>
-            ))}
+          <div className={`rounded-2xl border overflow-hidden mb-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+            {transfers.map((t, i) => {
+              const initials = (t.recipient_name || "?").slice(0, 2).toUpperCase();
+              const avatarColors = ["bg-blue-500","bg-violet-500","bg-emerald-500","bg-rose-500","bg-amber-500"];
+              const avatarColor = avatarColors[t.recipient_name?.charCodeAt(0) % avatarColors.length] || "bg-primary";
+              return (
+                <button key={i} onClick={() => setSelectedTx(t)}
+                  className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors border-b last:border-0 hover:bg-primary/5 ${darkMode ? "border-white/5" : "border-black/5"}`}>
+                  <div className={`w-10 h-10 rounded-xl ${avatarColor} flex items-center justify-center text-white font-black text-xs flex-shrink-0`}>
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-semibold ${textMain}`}>{t.recipient_name}</p>
+                    <p className={`text-[10px] font-medium ${muted}`}>
+                      {new Date(t.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · via {t.recipient_bank || "Transfer"}
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="font-bold text-sm text-primary">−${t.amount_usd}</p>
+                    {t.amount_php && <p className={`text-[10px] ${muted}`}>₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
 
