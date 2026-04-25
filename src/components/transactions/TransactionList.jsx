@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, Download } from "lucide-react";
 import TransactionDetailSheet from "./TransactionDetailSheet";
 import EmptyState from "@/components/ui/EmptyState";
 import { TransactionSkeleton } from "@/components/ui/SkeletonLoader";
@@ -39,6 +39,30 @@ function groupByDate(txs) {
     groups[label].push(tx);
   });
   return groups;
+}
+
+function exportCSV(transfers) {
+  const header = "Date,Recipient,Bank,Amount USD,Amount PHP,Rate,Fee,Category,Status,Note";
+  const rows = transfers.map(t => [
+    new Date(t.created_date).toLocaleDateString(),
+    `"${t.recipient_name || ""}"`,
+    `"${t.recipient_bank || ""}"`,
+    t.amount_usd?.toFixed(2) || "0.00",
+    t.amount_php?.toFixed(2) || "",
+    t.rate?.toFixed(2) || "",
+    t.fee?.toFixed(2) || "0.00",
+    t.category || "remittance",
+    t.status || "completed",
+    `"${t.note || ""}"`,
+  ].join(","));
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `KinnectFi-Transactions-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function TransactionList({ transfers = [], loading, darkMode, taglish }) {
@@ -180,7 +204,16 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
       {filtered.length > 0 && (
         <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl border mb-3 ${card}`}>
           <span className={`text-xs font-semibold ${muted}`}>{filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</span>
-          <span className={`text-sm font-black ${text}`}>-${totalSpent.toFixed(2)}</span>
+          <div className="flex items-center gap-3">
+            <span className={`text-sm font-black ${text}`}>-${totalSpent.toFixed(2)}</span>
+            <button
+              onClick={() => exportCSV(filtered)}
+              className="flex items-center gap-1 text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70 transition-opacity"
+              title="Export CSV"
+            >
+              <Download className="w-3 h-3" /> CSV
+            </button>
+          </div>
         </div>
       )}
 

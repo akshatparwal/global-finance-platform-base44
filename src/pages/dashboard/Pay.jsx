@@ -544,7 +544,7 @@ export default function Pay() {
             <div className="space-y-2">
               {[
                 { icon: "📊", label: "Rate Alerts", sub: "Set a target rate and get notified", action: () => setActiveTab("Rate Alerts") },
-                { icon: "🔄", label: "Auto-Padala", sub: "Schedule recurring transfers automatically", action: () => alert("Auto-Padala — schedule monthly transfers to your family!") },
+                { icon: "🔄", label: "Auto-Padala", sub: "Schedule recurring transfers automatically", action: () => setActiveTab("Transfer History") },
               ].map((tool, i) => (
                 <button key={i} onClick={tool.action}
                   className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>

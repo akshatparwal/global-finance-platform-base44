@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useOutletContext } from "react-router-dom";
-import { Shield, Bell, Settings, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
+import { Shield, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
 import SecurityHub from "@/components/security/SecurityHub";
 import PointsRedemption from "@/components/dashboard/PointsRedemption";
 import EditProfileForm from "@/components/profile/EditProfileForm";
@@ -67,6 +67,16 @@ export default function Profile() {
     setShowOnboarding(true);
   };
 
+  const referralCode = user?.email?.split("@")[0] || "user";
+  const referralLink = `kinnect.fi/join/${referralCode}`;
+  const invited = referrals.length;
+  const joined  = referrals.filter(r => r.status === "joined" || r.status === "rewarded").length;
+  const pending = referrals.filter(r => r.status === "pending").length;
+  const tier    = getTier(joined);
+  const nextTier = TIERS[TIERS.indexOf(tier) + 1];
+  const toNext   = nextTier ? nextTier.min - joined : 0;
+  const pointsEarned = referrals.reduce((sum, r) => sum + (r.points_awarded || 0), 0) || joined * 500;
+
   // Compute real points from transfers (50 pts per $10 sent) + referrals
   const transferPoints = transfers.reduce((sum, t) => sum + Math.floor((t.amount_usd || 0) / 10) * 50, 0);
   const realPoints = transferPoints + (joined * 500);
@@ -87,16 +97,6 @@ export default function Profile() {
     }
     return count;
   })();
-
-  const referralCode = user?.email?.split("@")[0] || "user";
-  const referralLink = `kinnect.fi/join/${referralCode}`;
-  const invited = referrals.length;
-  const joined  = referrals.filter(r => r.status === "joined" || r.status === "rewarded").length;
-  const pending = referrals.filter(r => r.status === "pending").length;
-  const tier    = getTier(joined);
-  const nextTier = TIERS[TIERS.indexOf(tier) + 1];
-  const toNext   = nextTier ? nextTier.min - joined : 0;
-  const pointsEarned = referrals.reduce((sum, r) => sum + (r.points_awarded || 0), 0) || joined * 500;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`https://${referralLink}`).then(() => {
@@ -174,7 +174,7 @@ export default function Profile() {
             <p className={`text-xs ${muted} truncate`}>{user?.email || ""}</p>
             <div className="flex gap-1.5 mt-1.5">
               <span className="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full">⚡ KYC Verified</span>
-              <span className={`${darkMode ? "bg-white/10 text-white/60" : "bg-black/10 text-black/60"} text-[9px] font-bold px-2 py-0.5 rounded-full`}>BAYANI</span>
+              <span className={`${tier.bg} ${tier.color} text-[9px] font-bold px-2 py-0.5 rounded-full`}>{tier.icon} {tier.label.toUpperCase()}</span>
             </div>
           </div>
         )}
@@ -210,7 +210,7 @@ export default function Profile() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-primary text-xs font-bold uppercase">Bayani Streak</span>
-                  <span className="bg-yellow-500/20 text-yellow-400 text-[9px] font-bold px-1.5 rounded">LEGENDARY</span>
+                  {streak >= 12 && <span className="bg-yellow-500/20 text-yellow-400 text-[9px] font-bold px-1.5 rounded">LEGENDARY</span>}
                 </div>
                 <h3 className="text-white font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{streak} Month Padala Streak</h3>
                 <p className="text-white/50 text-xs">{streak >= 12 ? "You've supported your family every month for a year. That's true Bayanihan!" : streak > 0 ? `${streak} consecutive months of supporting your family. Keep it up!` : "Send your first padala to start your streak!"}</p>
@@ -292,8 +292,7 @@ export default function Profile() {
             <p className="text-white/70 text-xs uppercase tracking-wider mb-1">✦</p>
             <h3 className="text-white font-extrabold text-xl mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Your 2026 KinnectFi Story</h3>
             <p className="text-white/70 text-sm mb-4">Watch your year of connection, sacrifice, and love.</p>
-            <button onClick={() => alert("Your 2026 KinnectFi Story is being prepared. Check back soon!")}
-              className="w-full bg-white text-[#c97a20] font-bold py-3 rounded-xl hover:bg-white/90 transition-colors">Watch Now</button>
+            <button disabled className="w-full bg-white/70 text-[#c97a20] font-bold py-3 rounded-xl cursor-not-allowed opacity-60">Coming Soon ✨</button>
           </div>
         </div>
       )}
@@ -304,8 +303,8 @@ export default function Profile() {
             <div className="flex items-center gap-2 mb-1"><span className="text-red-400">❤️</span><h3 className="font-extrabold">Katuwang Shared Wallet</h3></div>
             <p className="text-primary text-xs font-bold uppercase mb-3">FOR COUPLES & FAMILY PARTNERS</p>
             <p className={`text-sm ${muted} mb-4`}>Build your future together. Katuwang wallets require dual-signature approval for major transfers.</p>
-            <button onClick={() => alert("Partner connection coming soon!")}
-              className="bg-primary text-secondary font-bold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-colors">Connect your Partner →</button>
+            <button onClick={() => {}}
+              className="bg-primary/50 text-secondary font-bold px-5 py-2.5 rounded-xl text-sm cursor-not-allowed opacity-60">Coming Soon →</button>
           </div>
           <FamilyNetworkPanel darkMode={darkMode} />
         </div>
@@ -431,15 +430,10 @@ export default function Profile() {
 
       {activeTab === "Support" && (
         <div className="space-y-3">
-          {[
-            { icon: Settings, label: "App Settings", action: () => alert("App settings panel coming soon!") },
-            { icon: HelpCircle, label: "Help Center & FAQs", action: () => window.open("/HowItWorks", "_blank") }
-          ].map((s,i) => (
-            <button key={i} onClick={s.action} className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${card} ${darkMode ? "hover:bg-white/5" : "hover:bg-black/5"}`}>
-              <s.icon className={`w-5 h-5 ${muted}`} />
-              <span className="font-semibold text-sm">{s.label}</span>
-            </button>
-          ))}
+          <button onClick={() => window.open("/HowItWorks", "_blank")} className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${card} ${darkMode ? "hover:bg-white/5" : "hover:bg-black/5"}`}>
+            <HelpCircle className={`w-5 h-5 ${muted}`} />
+            <span className="font-semibold text-sm">Help Center & FAQs</span>
+          </button>
           <button onClick={handleSignOut} className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-500/20 hover:bg-red-500/5">
             <LogOut className="w-5 h-5 text-red-500" />
             <span className="font-semibold text-sm text-red-500">Sign Out</span>

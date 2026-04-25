@@ -49,7 +49,18 @@ export default function Dashboard() {
       setUser(u);
       if (!u.onboarding_completed) setShowOnboarding(true);
     }
-    setWallets(walletsResult.data || []);
+    let walletData = walletsResult.data || [];
+    // Auto-seed starter wallets if none exist yet
+    if (walletData.length === 0 && !walletsResult.fromCache) {
+      try {
+        await base44.entities.WalletBalance.bulkCreate([
+          { currency_code: "USD", currency_name: "US Dollar", flag: "🇺🇸", balance: 0, yield_pct: "4.5%" },
+          { currency_code: "PHP", currency_name: "Philippine Peso", flag: "🇵🇭", balance: 0, yield_pct: "2.1%" },
+        ]);
+        walletData = await base44.entities.WalletBalance.list().catch(() => []);
+      } catch {}
+    }
+    setWallets(walletData);
     setTransfers(transfersResult.data || []);
     setOffline(walletsResult.fromCache || transfersResult.fromCache);
     setLoading(false);
@@ -324,7 +335,11 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {showFundWallet && (
-          <FundWalletModal onClose={() => setShowFundWallet(false)} darkMode={darkMode} user={user} />
+          <FundWalletModal
+            onClose={() => { setShowFundWallet(false); fetchData(); }}
+            darkMode={darkMode}
+            user={user}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -405,8 +405,8 @@ export default function Cards() {
             </div>
             <div className="text-right flex-shrink-0">
               <p className="text-white/40 text-xs mb-0.5">Lifetime Padala</p>
-              <p className="text-white font-black text-lg">$12,450</p>
-              <p className="text-white/40 text-xs">Tier: BAYANI</p>
+              <p className="text-white font-black text-lg">—</p>
+              <p className="text-white/40 text-xs">Sync via Profile</p>
             </div>
           </div>
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
