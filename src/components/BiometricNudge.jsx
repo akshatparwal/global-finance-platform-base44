@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Fingerprint, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const STORAGE_KEY = "kf_biometric_nudge_dismissed";
 
@@ -33,12 +34,17 @@ export default function BiometricNudge({ darkMode }) {
 
   const handleEnable = async () => {
     setEnrolling(true);
-    // Simulate a brief "registering" delay — in production this would call navigator.credentials.create()
-    await new Promise(r => setTimeout(r, 1200));
-    setEnrolling(false);
-    setDone(true);
-    localStorage.setItem(STORAGE_KEY, "true");
-    setTimeout(() => setShow(false), 2000);
+    try {
+      // Register biometric preference on backend
+      await base44.auth.updateMe({ biometric_enabled: true });
+      setEnrolling(false);
+      setDone(true);
+      localStorage.setItem(STORAGE_KEY, "true");
+      setTimeout(() => setShow(false), 2000);
+    } catch (error) {
+      console.error("Failed to enable biometrics:", error);
+      setEnrolling(false);
+    }
   };
 
   if (!supported) return null;
