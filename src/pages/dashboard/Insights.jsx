@@ -157,6 +157,7 @@ export default function Insights() {
                 <Calendar className="w-3 h-3" /> LAST 30 DAYS
               </div>
             </div>
+            <div className="overflow-hidden">
             <ResponsiveContainer width="100%" height={120}>
               <AreaChart data={padalaData}>
                 <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
@@ -165,6 +166,7 @@ export default function Insights() {
                 <Area type="monotone" dataKey="rate" stroke="hsl(var(--primary))" fill="url(#rg)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
             <div className="mt-2 flex items-center gap-2 bg-primary/10 rounded-lg p-2">
               <Info className="w-3 h-3 text-primary" />
               <span className="text-xs text-primary">OPTIMAL SENDING WINDOW — Rates often peak around the 15th and 30th. Convert USD slightly before these dates for maximum value.</span>

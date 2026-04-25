@@ -95,6 +95,7 @@ export default function SpendAnalytics({ transfers, darkMode }) {
       {/* Monthly bar chart */}
       <div className={`border rounded-2xl p-5 ${card}`}>
         <p className={`text-xs font-bold uppercase tracking-wider ${muted} mb-4`}>Monthly Spend — Last 6 Months</p>
+        <div className="overflow-hidden">
         <ResponsiveContainer width="100%" height={140}>
           <BarChart data={monthlyData} barGap={2}>
             <XAxis dataKey="month" tick={{ fontSize: 11, fill: darkMode ? "rgba(255,255,255,0.4)" : "rgba(26,42,74,0.5)" }} axisLine={false} tickLine={false} />
@@ -103,6 +104,7 @@ export default function SpendAnalytics({ transfers, darkMode }) {
             <Bar dataKey="spending" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Category breakdown */}

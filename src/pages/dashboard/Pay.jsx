@@ -508,6 +508,7 @@ export default function Pay() {
                 </button>
               </div>
             </div>
+            <div className="overflow-hidden">
             <ResponsiveContainer width="100%" height={60}>
               <AreaChart data={RATE_HISTORY} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <defs><linearGradient id="rg3" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
@@ -517,6 +518,7 @@ export default function Pay() {
                 <Area type="monotone" dataKey="rate" stroke="hsl(var(--primary))" fill="url(#rg3)" strokeWidth={2} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           </div>
 
           {/* New alert form */}
