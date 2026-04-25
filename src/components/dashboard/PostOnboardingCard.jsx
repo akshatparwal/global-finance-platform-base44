@@ -10,24 +10,36 @@ import { X, ArrowDownToLine, UserPlus, Send } from "lucide-react";
 
 const LS_KEY = "kf_onboarding_card_dismissed";
 
-export default function PostOnboardingCard({ darkMode, onFund }) {
+export default function PostOnboardingCard({ darkMode, onFund, user }) {
   const [dismissed, setDismissed] = useState(() => {
     try { return localStorage.getItem(LS_KEY) === "true"; } catch { return false; }
   });
   const navigate = useNavigate();
 
-  if (dismissed) return null;
+  // Track completion of 3 steps based on user data
+  const hasFunded = user?.wallet_funded || false;
+  const hasAddedRecipient = !!user?.first_recipient_name;
+  const hasSentTransfer = user?.first_transfer_sent || false;
+
+  const completed = [hasFunded, hasAddedRecipient, hasSentTransfer];
+  const completedCount = completed.filter(Boolean).length;
+
+  // Hide if user explicitly dismissed OR all 3 steps completed
+  if (dismissed || completedCount === 3) return null;
 
   const dismiss = () => {
     try { localStorage.setItem(LS_KEY, "true"); } catch {}
     setDismissed(true);
   };
 
-  const steps = [
-    { icon: ArrowDownToLine, label: "Add funds to your wallet", sub: "via ACH, wire or debit card", action: () => { onFund?.(); dismiss(); }, cta: "Add Funds" },
-    { icon: UserPlus, label: "Add your first recipient", sub: "family in the Philippines", action: () => { navigate("/dashboard/recipients"); dismiss(); }, cta: "Add Recipient" },
-    { icon: Send, label: "Send your first padala", sub: "zero fees, live rate", action: () => { navigate("/dashboard/pay"); dismiss(); }, cta: "Send Now" },
+  // Show only remaining steps
+  const allSteps = [
+    { icon: ArrowDownToLine, label: "Add funds to your wallet", sub: "via ACH, wire or debit card", action: () => { onFund?.(); }, cta: "Add Funds", done: hasFunded },
+    { icon: UserPlus, label: "Add your first recipient", sub: "family in the Philippines", action: () => { navigate("/dashboard/recipients"); }, cta: "Add Recipient", done: hasAddedRecipient },
+    { icon: Send, label: "Send your first padala", sub: "zero fees, live rate", action: () => { navigate("/dashboard/pay"); }, cta: "Send Now", done: hasSentTransfer },
   ];
+
+  const steps = allSteps.filter(s => !s.done);
 
   return (
     <motion.div

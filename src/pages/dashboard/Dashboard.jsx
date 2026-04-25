@@ -182,7 +182,7 @@ export default function Dashboard() {
 
       {/* Post-onboarding "3 next steps" card — shown once after KYC complete */}
       {user?.onboarding_completed && (
-        <PostOnboardingCard darkMode={darkMode} onFund={() => setShowFundWallet(true)} />
+        <PostOnboardingCard darkMode={darkMode} onFund={() => setShowFundWallet(true)} user={user} />
       )}
 
       {/* KYC Completion Banner — only if onboarding incomplete */}
