@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Zap, Shield, Clock, TrendingUp, Users, Star, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLiveRates } from "@/hooks/useLiveRates";
 
@@ -49,7 +49,7 @@ export default function Home() {
   const dotInactive= darkHero ? "rgba(255,255,255,0.2)" : "rgba(13,31,60,0.18)";
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
       <section className="flex flex-col lg:flex-row" style={{ height: "100vh", minHeight: 600, maxHeight: 900 }}>
 
         {/* LEFT: full-bleed photo */}
@@ -239,6 +239,100 @@ export default function Home() {
               <span>{taglish ? "Bayad" : "Fee"} <span className="font-black" style={{ color: "#C97B22" }}>$0</span></span>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Features Strip ── */}
+      <section style={{ backgroundColor: "#F5EFE3" }} className="px-6 py-16 max-w-5xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C97B22" }}>Why KinnectFi</p>
+          <h2 className="text-3xl sm:text-4xl font-black leading-tight mb-3" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Built for the OFW. <span style={{ color: "#C97B22" }}>Zero compromises.</span>
+          </h2>
+          <p className="text-base max-w-md mx-auto" style={{ color: "rgba(13,31,60,0.55)" }}>
+            Every feature is designed around the real needs of Filipino families sending love across oceans.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+          {[
+            { icon: Zap, emoji: "⚡", title: "30-Second Delivery", desc: "GCash & Maya transfers arrive before your next heartbeat. No waiting, no anxiety.", badge: "INSTANT" },
+            { icon: Shield, emoji: "🔒", title: "Zero Hidden Fees", desc: "What you see is what they get. No spread markup, no service charge, no surprises.", badge: "FREE" },
+            { icon: TrendingUp, emoji: "📈", title: "Live Exchange Rate", desc: `Today's rate: ₱${liveRate}/USD — the real mid-market rate, always.`, badge: "LIVE" },
+            { icon: Clock, emoji: "🔔", title: "Rate Alerts", desc: "Set your target rate and get notified the moment it hits. Never miss a peak.", badge: "SMART" },
+            { icon: Users, emoji: "👨‍👩‍👧", title: "Family Wallets", desc: "Give your loved ones in the Philippines a linked wallet. Support them directly.", badge: "FAMILY" },
+            { icon: Star, emoji: "🎁", title: "Kinnect Points", desc: "Earn points on every padala. Redeem for fee credits, cash back, or donations.", badge: "REWARDS" },
+          ].map((f, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.07 }}
+              className="rounded-2xl p-5 border"
+              style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: "rgba(201,123,34,0.1)" }}>
+                  {f.emoji}
+                </div>
+                <span className="text-[9px] font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(201,123,34,0.12)", color: "#C97B22" }}>{f.badge}</span>
+              </div>
+              <h3 className="font-extrabold text-base mb-1" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{f.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(13,31,60,0.5)" }}>{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* How it works */}
+        <div className="rounded-3xl overflow-hidden mb-16" style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #3d2e00 60%, #8a6a00 100%)" }}>
+          <div className="px-8 py-10 sm:px-12">
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(201,123,34,0.7)" }}>How it works</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Send padala in <span style={{ color: "#C97B22" }}>3 simple steps</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { step: "01", title: "Fund your wallet", desc: "Add USD via ACH bank transfer, wire, or debit card. Funds arrive instantly." },
+                { step: "02", title: "Choose your recipient", desc: "Add your family once. Select their GCash, Maya, or bank account." },
+                { step: "03", title: "Send & they receive", desc: "Hit send. Your family gets notified in seconds. Zero fees deducted." },
+              ].map((s, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm" style={{ background: "rgba(201,123,34,0.2)", color: "#C97B22" }}>{s.step}</div>
+                  <div>
+                    <h4 className="text-white font-bold mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.title}</h4>
+                    <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+              <Link to="/auth"
+                className="inline-flex items-center gap-2 font-bold rounded-xl py-3.5 px-7 text-sm hover:opacity-90 transition-opacity"
+                style={{ background: "#C97B22", color: "#fff" }}>
+                {taglish ? "Magsimula Na →" : "Create Free Account →"}
+              </Link>
+              <Link to="/HowItWorks" className="inline-flex items-center gap-2 ml-4 text-sm font-semibold hover:opacity-80 transition-opacity" style={{ color: "rgba(255,255,255,0.5)" }}>
+                Learn more <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust bar */}
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-4">
+          {[
+            { icon: "🔒", label: "256-bit Encryption" },
+            { icon: "🏦", label: "FDIC-Insured Partners" },
+            { icon: "⭐", label: "4.9 App Store Rating" },
+            { icon: "🇵🇭", label: "10,000+ OFW Families" },
+            { icon: "💸", label: "$0 Transfer Fees" },
+          ].map((t, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-lg">{t.icon}</span>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "rgba(13,31,60,0.45)" }}>{t.label}</span>
+            </div>
+          ))}
         </div>
       </section>
     </div>

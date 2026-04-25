@@ -208,8 +208,8 @@ export default function Pay() {
           <p className={`text-xs ${muted}`}>{taglish ? "Mabilis at ligtas na padala" : "Fast, secure cross-border transfers"}</p>
         </div>
         <div className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-1">
-          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-          <span className="text-primary text-[10px] font-bold">APR 30</span>
+        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+        <span className="text-primary text-[10px] font-bold">{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</span>
         </div>
       </div>
 

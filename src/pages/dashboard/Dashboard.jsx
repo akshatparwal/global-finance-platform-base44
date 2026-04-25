@@ -1,4 +1,5 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
+import TransactionDetailSheet from "@/components/transactions/TransactionDetailSheet";
 import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown, ArrowDownToLine } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFundWallet, setShowFundWallet] = useState(false);
+  const [selectedTx, setSelectedTx] = useState(null);
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
@@ -308,20 +310,22 @@ export default function Dashboard() {
         {!loading && transfers.length > 0 && (
           <div className="space-y-2 mb-4">
             {transfers.map((t, i) => (
-              <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${darkMode ? "border-white/5" : "border-black/5"}`}>
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm">
+              <button key={i} onClick={() => setSelectedTx(t)}
+                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left hover:border-primary/30 transition-colors ${darkMode ? "border-white/5" : "border-black/5"}`}>
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
                   {t.recipient_name?.[0] || "?"}
                 </div>
-                <div className="flex-1">
-                  <p className={`text-sm font-semibold ${textMain}`}>
-                    Sent to {t.recipient_name}
-                  </p>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-semibold ${textMain}`}>Sent to {t.recipient_name}</p>
                   <p className={`text-[10px] uppercase tracking-wider font-bold ${muted}`}>
                     {new Date(t.created_date).toLocaleDateString()} · {t.status}
                   </p>
                 </div>
-                <p className="font-bold text-primary">${t.amount_usd}</p>
-              </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="font-bold text-primary">${t.amount_usd}</p>
+                  {t.amount_php && <p className={`text-[10px] ${muted}`}>₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
+                </div>
+              </button>
             ))}
           </div>
         )}
@@ -351,6 +355,16 @@ export default function Dashboard() {
             onClose={() => { setShowFundWallet(false); fetchData(); }}
             darkMode={darkMode}
             user={user}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedTx && (
+          <TransactionDetailSheet
+            tx={selectedTx}
+            onClose={() => setSelectedTx(null)}
+            darkMode={darkMode}
           />
         )}
       </AnimatePresence>
