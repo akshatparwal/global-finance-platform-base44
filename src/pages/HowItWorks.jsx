@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Send, Wallet, Users, Globe, Shield, Zap, Clock, TrendingUp, Check, ChevronDown } from "lucide-react";
@@ -37,6 +38,8 @@ const faqs = [
 
 export default function HowItWorks() {
   const [openFaq, setOpenFaq] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => { base44.auth.isAuthenticated().then(setIsLoggedIn).catch(() => {}); }, []);
 
   const steps = [
     { num: "01", title: "Create your free account", desc: "Sign up with your email and verify your identity in just minutes. No paperwork, no branch visits — all digital, all easy.", icon: <Users className="w-7 h-7" />, color: "bg-primary" },
@@ -53,6 +56,16 @@ export default function HowItWorks() {
 
   return (
     <div>
+      {/* Dashboard back nav for logged-in users */}
+      {isLoggedIn && (
+        <div className="bg-secondary border-b border-white/10 px-6 py-3 flex items-center justify-between">
+          <span className="text-secondary-foreground/50 text-xs">KinnectFi Help Center</span>
+          <Link to="/dashboard" className="flex items-center gap-1.5 text-primary font-bold text-sm hover:opacity-80 transition-opacity">
+            ← Back to Dashboard
+          </Link>
+        </div>
+      )}
+
       {/* Hero */}
       <section className="relative min-h-[50vh] bg-secondary flex items-center overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/15 rounded-full blur-[120px] pointer-events-none" />

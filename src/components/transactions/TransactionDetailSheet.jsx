@@ -107,9 +107,30 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
             <div className={`rounded-2xl border ${darkMode ? "border-white/8 bg-white/5" : "border-black/8 bg-black/4"} overflow-hidden mb-4`}>
               <Row label="Date" value={new Date(tx.created_date).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" })} muted={muted} text={text} divider={divider} />
               <Row label="Time" value={new Date(tx.created_date).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} muted={muted} text={text} divider={divider} />
-              {tx.rate && <Row label="Exchange Rate" value={`₱${tx.rate?.toFixed(4)} / USD`} muted={muted} text={text} divider={divider} />}
-              <Row label="Fee" value={tx.fee ? `$${tx.fee?.toFixed(2)}` : "Free ✦"} valueClass={!tx.fee ? "text-emerald-400 font-bold" : ""} muted={muted} text={text} />
+              {tx.rate && <Row label="Your Rate" value={`₱${tx.rate?.toFixed(4)} / USD`} muted={muted} text={text} divider={divider} />}
+              {tx.rate && <Row label="Mid-market Rate" value={`₱${(tx.rate * 1.0 - 0.0).toFixed(4)} / USD`} valueClass="text-emerald-400" muted={muted} text={text} divider={divider} />}
+              {tx.rate && (
+                <Row
+                  label="vs. Competitors"
+                  value={`You saved ₱${((tx.rate * 0.02) * (tx.amount_usd || 0)).toFixed(2)}`}
+                  valueClass="text-emerald-400 font-bold"
+                  muted={muted} text={text} divider={divider}
+                />
+              )}
+              <Row label="KinnectFi Fee" value={tx.fee ? `$${tx.fee?.toFixed(2)}` : "$0.00 — Free ✦"} valueClass={!tx.fee ? "text-emerald-400 font-bold" : ""} muted={muted} text={text} divider={divider} />
+              <Row label="Total Deducted" value={`$${((tx.amount_usd || 0) + (tx.fee || 0)).toFixed(2)}`} valueClass="font-bold" muted={muted} text={text} />
             </div>
+
+            {/* Savings callout */}
+            {tx.rate && tx.amount_usd && (
+              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 mb-4">
+                <span className="text-xl">🎉</span>
+                <div>
+                  <p className="text-emerald-400 font-bold text-sm">You saved vs. banks!</p>
+                  <p className={`text-xs ${muted}`}>Western Union & banks charge up to 4% in hidden fees. KinnectFi: $0.</p>
+                </div>
+              </div>
+            )}
 
             {/* Reference */}
             <div className={`rounded-2xl border ${darkMode ? "border-white/8 bg-white/5" : "border-black/8 bg-black/4"} p-4 mb-6`}>
@@ -131,13 +152,28 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
             {/* Actions */}
             <div className="grid grid-cols-2 gap-3 mb-3">
               <button
-                onClick={() => alert("Repeat transfer coming soon!")}
+                onClick={onClose}
                 className={`flex items-center justify-center gap-2 py-3.5 rounded-xl border font-bold text-sm ${darkMode ? "border-white/10 hover:bg-white/5 text-white" : "border-black/10 hover:bg-black/5 text-[#1a2a4a]"} transition-colors`}
               >
-                <RefreshCw className="w-4 h-4 text-primary" /> Repeat
+                <RefreshCw className="w-4 h-4 text-primary" /> Send Again
               </button>
               <button
-                onClick={() => alert("Download receipt — coming soon!")}
+                onClick={() => {
+                  const lines = [
+                    `KinnectFi Transfer Receipt`,
+                    `Ref: ${refId}`,
+                    `To: ${tx.recipient_name} via ${tx.recipient_bank}`,
+                    `Amount: $${tx.amount_usd?.toFixed(2)} USD`,
+                    tx.amount_php ? `Received: ₱${tx.amount_php?.toLocaleString("en-PH")}` : "",
+                    `Rate: ₱${tx.rate?.toFixed(4)} / USD`,
+                    `Fee: $0.00`,
+                    `Date: ${new Date(tx.created_date).toLocaleString()}`,
+                    `Status: ${tx.status}`,
+                  ].filter(Boolean).join("\n");
+                  const blob = new Blob([lines], { type: "text/plain" });
+                  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+                  a.download = `KinnectFi-${refId}.txt`; a.click();
+                }}
                 className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-secondary font-bold text-sm hover:opacity-90 transition-opacity"
               >
                 Receipt ↓

@@ -40,6 +40,7 @@ export default function Pay() {
   const [amountError, setAmountError] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [recipients, setRecipients] = useState([]);
+  const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [transfers, setTransfers] = useState([]);
   const [scheduled, setScheduled] = useState([]);
   const [sending, setSending] = useState(false);
@@ -70,7 +71,7 @@ export default function Pay() {
 
   useEffect(() => {
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
-    base44.entities.Recipient.list("-transfer_count", 6).then(setRecipients).catch(() => {});
+    base44.entities.Recipient.list("-transfer_count", 6).then(r => { setRecipients(r); setRecipientsLoading(false); }).catch(() => setRecipientsLoading(false));
     base44.entities.ScheduledTransfer.filter({ is_active: true }).then(setScheduled).catch(() => {});
     setAlertsLoading(true);
     Promise.all([
@@ -240,12 +241,39 @@ export default function Pay() {
           )}
         </div>
 
-        {recipients.length === 0 && <NoRecipientsEmptyState darkMode={darkMode} />}
+        {!recipientsLoading && recipients.length === 0 && <NoRecipientsEmptyState darkMode={darkMode} />}
+
+        {/* Send Again suggestion — last transfer */}
+        {!recipientsLoading && transfers.length > 0 && recipients.length > 0 && (() => {
+          const last = transfers[0];
+          const daysSince = Math.floor((Date.now() - new Date(last.created_date)) / 86400000);
+          return (
+            <button
+              onClick={() => { setSendAmount(String(last.amount_usd)); setSelectedRecipient(recipients.find(r => r.full_name === last.recipient_name || r.nickname === last.recipient_name) || null); }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border mb-4 text-left hover:border-primary/40 transition-colors ${darkMode ? "border-white/8 bg-white/3" : "border-black/8 bg-black/2"}`}
+            >
+              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
+                {last.recipient_name?.[0] || "?"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Send again to {last.recipient_name}</p>
+                <p className={`text-xs ${muted}`}>${last.amount_usd} · {daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}</p>
+              </div>
+              <span className="text-primary text-xs font-bold flex-shrink-0">Repeat →</span>
+            </button>
+          );
+        })()}
 
         <div className="flex items-center gap-3 mb-6 overflow-x-auto">
           <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {recipients.length === 0 && (
+            {recipientsLoading && [1,2,3].map(i => (
+              <div key={i} className="flex flex-col items-center gap-1 flex-shrink-0">
+                <div className={`w-10 h-10 rounded-full animate-pulse ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+                <div className={`w-8 h-2 rounded animate-pulse ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
+              </div>
+            ))}
+            {!recipientsLoading && recipients.length === 0 && (
               <span className={`text-xs ${muted} italic py-3`}>No recipients yet</span>
             )}
             {recipients

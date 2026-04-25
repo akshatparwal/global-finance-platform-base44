@@ -183,7 +183,7 @@ export default function SpendingPulse({ transfers = [], darkMode }) {
             </g>
           )}
 
-          {/* Invisible touch targets */}
+          {/* Invisible touch/hover targets — mobile-reliable */}
           {daily.map((d, i) => (
             <rect
               key={i}
@@ -192,11 +192,21 @@ export default function SpendingPulse({ transfers = [], darkMode }) {
               width={W / daily.length}
               height={H}
               fill="transparent"
-              style={{ cursor: "crosshair" }}
+              style={{ cursor: "crosshair", touchAction: "none" }}
               onMouseEnter={() => setHovered(d)}
               onMouseLeave={() => setHovered(null)}
-              onTouchStart={() => setHovered(d)}
-              onTouchEnd={() => setTimeout(() => setHovered(null), 1500)}
+              onTouchStart={(e) => { e.preventDefault(); setHovered(d); }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const svgEl = e.currentTarget.closest("svg");
+                if (!svgEl) return;
+                const rect = svgEl.getBoundingClientRect();
+                const relX = ((touch.clientX - rect.left) / rect.width) * W;
+                const idx = Math.min(daily.length - 1, Math.max(0, Math.round((relX / W) * (daily.length - 1))));
+                setHovered(daily[idx]);
+              }}
+              onTouchEnd={() => setTimeout(() => setHovered(null), 1800)}
               aria-label={`${new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}: $${d.amount.toFixed(2)}`}
             />
           ))}

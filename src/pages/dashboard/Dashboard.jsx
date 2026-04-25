@@ -14,6 +14,7 @@ import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
 import FundWalletModal from "@/components/wallet/FundWalletModal";
 import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
+import PostOnboardingCard from "@/components/dashboard/PostOnboardingCard";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -150,6 +151,11 @@ export default function Dashboard() {
         </div>
         <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
       </div>
+
+      {/* Post-onboarding "3 next steps" card — shown once after KYC complete */}
+      {user?.onboarding_completed && (
+        <PostOnboardingCard darkMode={darkMode} onFund={() => setShowFundWallet(true)} />
+      )}
 
       {/* KYC Completion Banner — only if onboarding incomplete */}
       {user && !user.onboarding_completed && (

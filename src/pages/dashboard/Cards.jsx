@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import {
   Snowflake, Eye, EyeOff, CreditCard as CardIcon, Wifi, Key,
@@ -8,11 +8,11 @@ import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import CardTransactionFeed from "@/components/cards/CardTransactionFeed";
 
-const TIERS = [
-  { name: "SUGO", threshold: "$0", reached: true },
-  { name: "BAYANI", threshold: "$10k", reached: true },
-  { name: "DATU", threshold: "$50k", reached: false },
-  { name: "LAKAN", threshold: "$100k", reached: false },
+const TIER_DEFS = [
+  { name: "SUGO",   threshold: "$0",    min: 0 },
+  { name: "BAYANI", threshold: "$10k",  min: 10000 },
+  { name: "DATU",   threshold: "$50k",  min: 50000 },
+  { name: "LAKAN",  threshold: "$100k", min: 100000 },
 ];
 
 const SUBSCRIPTIONS = [
@@ -88,13 +88,21 @@ export default function Cards() {
     darkMode ? "bg-[#0d1526] border-white/10 text-white placeholder-white/30" : "bg-[#f5efe6] border-black/10 text-[#1a2a4a]"
   }`;
 
+  const [transfers, setTransfers] = useState([]);
+
+  const lifetimePadala = useMemo(() => transfers.reduce((s, t) => s + (t.amount_usd || 0), 0), [transfers]);
+  const TIERS = useMemo(() => TIER_DEFS.map(t => ({ ...t, reached: lifetimePadala >= t.min })), [lifetimePadala]);
+  const currentTier = [...TIERS].reverse().find(t => t.reached) || TIERS[0];
+
   useEffect(() => {
     Promise.all([
       base44.auth.me().catch(() => null),
       base44.entities.VirtualCard.list("-created_date", 1).catch(() => []),
-    ]).then(([u, cards]) => {
+      base44.entities.Transfer.list("-created_date", 100).catch(() => []),
+    ]).then(([u, cards, txs]) => {
       setUser(u);
       if (cards.length > 0) setCardData(cards[0]);
+      setTransfers(txs);
     });
   }, []);
 
@@ -405,8 +413,8 @@ export default function Cards() {
             </div>
             <div className="text-right flex-shrink-0">
               <p className="text-white/40 text-xs mb-0.5">Lifetime Padala</p>
-              <p className="text-white font-black text-lg">—</p>
-              <p className="text-white/40 text-xs">Sync via Profile</p>
+              <p className="text-white font-black text-lg">${lifetimePadala.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+              <p className="text-primary text-xs font-bold">{currentTier.name} TIER</p>
             </div>
           </div>
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
