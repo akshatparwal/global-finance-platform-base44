@@ -72,12 +72,13 @@ export default function Dashboard() {
     return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   })();
 
+  const [recipients, setRecipients] = useState([]);
+  useEffect(() => {
+    base44.entities.Recipient.list("-transfer_count", 5).then(setRecipients).catch(() => {});
+  }, []);
+
   const QUICK_SEND = [
-    { emoji: "👩", label: taglish ? "Nanay" : "Mom" },
-    { emoji: "👴", label: taglish ? "Tatay" : "Dad" },
-    { emoji: "👩‍🦱", label: taglish ? "Ate" : "Sister" },
-    { emoji: "👦", label: taglish ? "Kuya" : "Brother" },
-    { emoji: "💛", label: taglish ? "Kaibigan" : "Friend" },
+    ...recipients.map(r => ({ emoji: r.emoji || "👤", label: r.nickname || r.full_name, id: r.id })),
     { emoji: "+", label: taglish ? "Bagong Padala" : "New Send", isAdd: true },
   ];
 
@@ -251,7 +252,7 @@ export default function Dashboard() {
       <div>
         <div className="flex justify-between items-center mb-3">
           <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity"}</h2>
-          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
+          <button onClick={() => navigate("/dashboard/transactions")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
         </div>
 
         {/* Recent Transfers */}

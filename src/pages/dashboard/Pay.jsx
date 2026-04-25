@@ -41,6 +41,8 @@ export default function Pay() {
   const [transfers, setTransfers] = useState([]);
   const [scheduled, setScheduled] = useState([]);
   const [sending, setSending] = useState(false);
+  const [recipientSearch, setRecipientSearch] = useState("");
+  const [transferNote, setTransferNote] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [completedTransfer, setCompletedTransfer] = useState(null);
   const [showSendAnim, setShowSendAnim] = useState(false);
@@ -169,7 +171,9 @@ export default function Pay() {
         status: "completed",
         rate,
         fee: 0,
+        note: transferNote || undefined,
       });
+      setTransferNote("");
       const finalTransfer = { ...saved, status: "completed" };
       setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
       haptic.success();
@@ -222,8 +226,15 @@ export default function Pay() {
       <div className={`border rounded-2xl p-4 mb-4 ${card}`}>
         <div className={`flex items-center gap-3 border rounded-xl px-4 py-3 mb-5 ${inputBg}`}>
           <Search className="w-4 h-4 opacity-40" />
-          <input placeholder={taglish ? "Hanapin ang tatanggap..." : "Search by email or name..."}
-            className="flex-1 bg-transparent outline-none text-sm" />
+          <input
+            placeholder={taglish ? "Hanapin ang tatanggap..." : "Search by name or bank..."}
+            className="flex-1 bg-transparent outline-none text-sm"
+            value={recipientSearch}
+            onChange={e => setRecipientSearch(e.target.value)}
+          />
+          {recipientSearch && (
+            <button onClick={() => setRecipientSearch("")} className="opacity-40 hover:opacity-70 text-xs font-bold">✕</button>
+          )}
         </div>
 
         <div className="flex items-center gap-3 mb-6 overflow-x-auto">
@@ -232,7 +243,9 @@ export default function Pay() {
             {recipients.length === 0 && (
               <span className={`text-xs ${muted} italic py-3`}>No recipients yet — add one below</span>
             )}
-            {recipients.map((r, i) => {
+            {recipients
+              .filter(r => !recipientSearch || (r.nickname + " " + r.full_name + " " + r.bank).toLowerCase().includes(recipientSearch.toLowerCase()))
+              .map((r, i) => {
               const initials = (r.nickname || r.full_name || "?").slice(0, 2).toUpperCase();
               const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
               const isSelected = selectedRecipient?.id === r.id;
@@ -297,6 +310,27 @@ export default function Pay() {
 
         <div className="mb-4">
           <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
+        </div>
+
+        {/* Quick amount presets */}
+        <div className="flex gap-2 mb-4">
+          {[50, 100, 200, 500].map(amt => (
+            <button key={amt} onClick={() => { setSendAmount(String(amt)); setAmountError(""); }}
+              className={`flex-1 py-2 rounded-xl text-sm font-bold border transition-all active:scale-95 ${parseFloat(sendAmount) === amt ? "bg-primary text-secondary border-primary" : darkMode ? "border-white/10 text-white/60 hover:border-white/30" : "border-black/10 text-[#1a2a4a]/60 hover:border-black/30"}`}>
+              ${amt}
+            </button>
+          ))}
+        </div>
+
+        {/* Note/memo field */}
+        <div className="mb-4">
+          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Mensahe (opsyonal)" : "Note (optional)"}</label>
+          <input
+            value={transferNote}
+            onChange={e => setTransferNote(e.target.value)}
+            placeholder={taglish ? "para sa pagkain, bayad ng kuryente..." : "for groceries, school fees..."}
+            className={`w-full border rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition-colors ${inputBg}`}
+          />
         </div>
 
         <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
