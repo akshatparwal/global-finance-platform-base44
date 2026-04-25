@@ -209,24 +209,18 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
     0 0 0 1px rgba(201, 160, 80, 0.14) inset;       /* golden rim */
 }
 
-/* All rounded bordered cards — applies a top-edge highlight + depth shadow */
+/* All rounded bordered cards — minimal inset highlight only */
 .rounded-2xl.border,
 .rounded-xl.border {
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.08) inset,   /* top highlight */
-    0 6px 24px 0 rgba(0, 0, 0, 0.22),             /* depth shadow */
-    0 1px 4px 0 rgba(0, 0, 0, 0.14);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset;
 }
 
-/* Light-background content area: warm beige bg means cards need brighter highlights */
+/* Light-background content area */
 .bg-\[#f5efe6\] .rounded-2xl.border,
 .bg-\[#f5efe6\] .rounded-xl.border,
 .bg-white .rounded-2xl.border,
 .bg-white .rounded-xl.border {
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.98) inset,   /* strong bright top highlight */
-    0 6px 20px 0 rgba(0, 0, 0, 0.07),
-    0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.98) inset;
 }
 
 /* Smooth scrollbar */
