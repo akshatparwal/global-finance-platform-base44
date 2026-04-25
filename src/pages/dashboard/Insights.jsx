@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import AddFundsModal from "@/components/savings/AddFundsModal";
+import CreateGoalModal from "@/components/savings/CreateGoalModal";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -51,6 +52,7 @@ export default function Insights() {
   const [goals, setGoals] = useState([]);
   const [goalsLoading, setGoalsLoading] = useState(true);
   const [addFundsGoal, setAddFundsGoal] = useState(null);
+  const [showCreateGoal, setShowCreateGoal] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [transfers, setTransfers] = useState([]);
   const { rates, loading: ratesLoading } = useLiveRates();
@@ -74,20 +76,7 @@ export default function Insights() {
     setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));
   };
 
-  const handleCreateGoal = async () => {
-    const label = prompt("Goal name (e.g. New Laptop, Vacation Fund):");
-    if (!label) return;
-    const target = prompt("Target amount in USD:");
-    if (!target || isNaN(target)) return;
-    const emoji = prompt("Choose an emoji for your goal (e.g. 🏠 ✈️ 💻):", "🎯");
-    try {
-      const newGoal = await base44.entities.SavingsGoal.create({
-        emoji: emoji || "🎯", label, description: "Personal savings goal",
-        target_amount: parseFloat(target), current_amount: 0
-      });
-      setGoals(prev => [...prev, newGoal]);
-    } catch { alert("Could not create goal. Please try again."); }
-  };
+  const handleCreateGoal = () => setShowCreateGoal(true);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -211,50 +200,87 @@ export default function Insights() {
           />
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {showCreateGoal && (
+          <CreateGoalModal
+            darkMode={darkMode}
+            onClose={() => setShowCreateGoal(false)}
+            onCreated={(newGoal) => setGoals(prev => [...prev, newGoal])}
+          />
+        )}
+      </AnimatePresence>
 
       {activeTab === "Goals" && (
         <div className="space-y-6">
-          <div className={`border rounded-2xl p-6 ${card}`}>
-            <div className="flex items-center gap-2 mb-4"><span>👨‍👩‍👧</span><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Family Financial Health</h3></div>
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
-              {[{ label: "Total Family Support", val: "₱82,400" },{ label: "Health Coverage", val: "95%" },{ label: "Shared Progress", val: "₱142,000" }].map((s,i) => (
-                <div key={i}><p className={`text-[10px] sm:text-xs ${muted} mb-1`}>{s.label}</p><p className={`font-black text-base sm:text-lg ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.val}</p></div>
-              ))}
-            </div>
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-bold text-sm">PH Family Connectivity</h4>
-              <span className="text-primary text-xs font-bold">REAL-TIME SYNC</span>
-            </div>
-            {[{ emoji: "👩", name: "Maria (Mother)", sub: "Insured · Active", amount: "₱12,400", ago: "2h ago" },{ emoji: "👴", name: "Jose (Father)", sub: "Active Card", amount: "₱5,200", ago: "1d ago" }].map((m,i) => (
-              <div key={i} className={`flex items-center gap-3 py-3 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
-                <span className="text-2xl">{m.emoji}</span>
-                <div className="flex-1"><p className={`font-semibold text-sm ${text}`}>{m.name}</p><p className={`text-xs ${muted}`}>{m.sub}</p></div>
-                <div className="text-right"><p className={`font-bold text-sm ${text}`}>{m.amount}</p><p className={`text-xs ${muted}`}>{m.ago}</p></div>
+          {(() => {
+            const totalPhpSent = transfers.reduce((s, t) => s + (t.amount_php || (t.amount_usd || 0) * 56.24), 0);
+            const uniqueRecipients = [...new Set(transfers.map(t => t.recipient_name).filter(Boolean))];
+            const transferCount = transfers.length;
+            return (
+              <div className={`border rounded-2xl p-6 ${card}`}>
+                <div className="flex items-center gap-2 mb-4"><span>👨‍👩‍👧</span><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Family Financial Health</h3></div>
+                <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+                  {[
+                    { label: "Total PH Support", val: totalPhpSent > 0 ? `₱${Math.round(totalPhpSent).toLocaleString("en-PH")}` : "₱0" },
+                    { label: "Recipients", val: `${uniqueRecipients.length}` },
+                    { label: "Total Transfers", val: `${transferCount}` },
+                  ].map((s, i) => (
+                    <div key={i}><p className={`text-[10px] sm:text-xs ${muted} mb-1`}>{s.label}</p><p className={`font-black text-base sm:text-lg ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.val}</p></div>
+                  ))}
+                </div>
+                {uniqueRecipients.length > 0 ? (
+                  <>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-bold text-sm">Recipients</h4>
+                      <span className="text-primary text-xs font-bold">{uniqueRecipients.length} CONNECTED</span>
+                    </div>
+                    {uniqueRecipients.slice(0, 3).map((name, i) => {
+                      const recTx = transfers.filter(t => t.recipient_name === name);
+                      const recTotal = recTx.reduce((s, t) => s + (t.amount_php || (t.amount_usd || 0) * 56.24), 0);
+                      const last = recTx[0];
+                      return (
+                        <div key={i} className={`flex items-center gap-3 py-3 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
+                          <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">{name[0]}</div>
+                          <div className="flex-1"><p className={`font-semibold text-sm ${text}`}>{name}</p><p className={`text-xs ${muted}`}>{recTx.length} transfer{recTx.length !== 1 ? "s" : ""}</p></div>
+                          <div className="text-right"><p className={`font-bold text-sm ${text}`}>₱{Math.round(recTotal).toLocaleString("en-PH")}</p><p className={`text-xs ${muted}`}>{last ? new Date(last.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}</p></div>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <p className={`text-sm text-center py-4 ${muted}`}>Send your first transfer to see family data here.</p>
+                )}
               </div>
-            ))}
-            <button onClick={() => alert("Full Family Audit — detailed breakdown of all family transactions and health metrics coming soon!")}
-              className={`w-full mt-4 py-3 rounded-xl border font-bold text-sm flex items-center justify-center gap-2 ${darkMode ? "border-white/20 text-white hover:bg-white/5" : "border-black/20 text-[#1a2a4a] hover:bg-black/5"} transition-colors`}>
-              FULL FAMILY AUDIT ↗
-            </button>
-          </div>
+            );
+          })()}
 
-          <div className={`border rounded-2xl p-6 ${darkMode ? "bg-[#0d1526] border-white/10" : "bg-[#0d1526] border-white/10"}`}>
-            <p className="text-primary/60 text-xs uppercase tracking-wider mb-1">Dream Goal</p>
-            <h3 className="text-white font-extrabold text-lg mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Home Construction</h3>
-            <p className="text-white/50 text-sm mb-4">Your dream home in Antipolo is becoming a reality.</p>
-            <div className="flex gap-2 mb-4 text-[10px] uppercase tracking-wider">
-              {["Land","Foundation","Walls","Roofing","Finished"].map((s,i) => (
-                <span key={s} className={`flex-1 text-center py-1 rounded ${i <= 2 ? "text-primary border-b-2 border-primary" : "text-white/30"}`}>{s}</span>
-              ))}
-            </div>
-            <p className={`text-xs text-white/40 uppercase tracking-wider mb-1`}>Construction Progress</p>
-            <div className="w-full h-2 bg-white/10 rounded-full mb-3"><div className="h-full bg-primary rounded-full" style={{ width: "65%" }} /></div>
-            <div className="flex justify-between text-white/50 text-xs mb-4"><span>$32,500 / $50,000</span></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className={`bg-white/5 rounded-xl p-3`}><p className="text-white/40 text-xs mb-1">Est. Completion</p><p className="text-white font-bold">Dec 2026</p></div>
-              <div className={`bg-white/5 rounded-xl p-3`}><p className="text-white/40 text-xs mb-1">Smart Yield Contribution</p><p className="text-primary font-bold">+$1,240 earned</p></div>
-            </div>
-          </div>
+          {goals.length > 0 && (() => {
+            const topGoal = goals.reduce((best, g) => {
+              const pct = g.target_amount > 0 ? (g.current_amount || 0) / g.target_amount : 0;
+              const bestPct = best.target_amount > 0 ? (best.current_amount || 0) / best.target_amount : 0;
+              return pct > bestPct ? g : best;
+            }, goals[0]);
+            const pct = topGoal.target_amount > 0 ? Math.min(Math.round(((topGoal.current_amount || 0) / topGoal.target_amount) * 100), 100) : 0;
+            return (
+              <div className="border rounded-2xl p-6 bg-[#0d1526] border-white/10">
+                <p className="text-primary/60 text-xs uppercase tracking-wider mb-1">🌟 Featured Goal</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{topGoal.emoji}</span>
+                  <div>
+                    <h3 className="text-white font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{topGoal.label}</h3>
+                    {topGoal.description && <p className="text-white/50 text-sm">{topGoal.description}</p>}
+                  </div>
+                </div>
+                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Progress</p>
+                <div className="w-full h-2 bg-white/10 rounded-full mb-3"><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
+                <div className="flex justify-between text-white/50 text-xs mb-4"><span>${(topGoal.current_amount || 0).toLocaleString()} / ${topGoal.target_amount.toLocaleString()}</span><span>{pct}%</span></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/5 rounded-xl p-3"><p className="text-white/40 text-xs mb-1">Remaining</p><p className="text-white font-bold">${Math.max(topGoal.target_amount - (topGoal.current_amount || 0), 0).toLocaleString()}</p></div>
+                  <div className="bg-white/5 rounded-xl p-3"><p className="text-white/40 text-xs mb-1">Auto-Save</p><p className="text-primary font-bold">{topGoal.auto_save_enabled ? `$${topGoal.auto_save_amount}/${topGoal.auto_save_frequency}` : "Off"}</p></div>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ Create Goal</button></div>
           {goalsLoading ? (

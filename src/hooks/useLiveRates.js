@@ -7,6 +7,7 @@ let lastFetched = 0;
 const CACHE_MS = 5 * 60 * 1000; // 5 minutes
 
 export function useLiveRates() {
+  // exposed lastUpdated timestamp
   const [rates, setRates] = useState(cachedRates || { USDPHP: 56.24, EURUSD: 1.08, GBPUSD: 1.27, loading: !cachedRates });
   const [loading, setLoading] = useState(!cachedRates);
   const [error, setError] = useState(null);
@@ -57,5 +58,13 @@ export function useLiveRates() {
 
   useEffect(() => { fetchRates(); }, [fetchRates]);
 
-  return { rates, loading, error, refetch: () => fetchRates(true) };
+  const lastUpdatedLabel = (() => {
+    if (!rates?.fetched_at) return null;
+    const mins = Math.round((Date.now() - new Date(rates.fetched_at).getTime()) / 60000);
+    if (mins < 1) return "Just now";
+    if (mins === 1) return "1 min ago";
+    return `${mins} mins ago`;
+  })();
+
+  return { rates, loading, error, refetch: () => fetchRates(true), lastUpdatedLabel };
 }

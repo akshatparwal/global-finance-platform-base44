@@ -62,7 +62,7 @@ export default function Pay() {
   const [sendAnimData, setSendAnimData] = useState({ amount: "", recipient: "" });
   const [trackedTransfer, setTrackedTransfer] = useState(null);
   const [activeTab, setActiveTab] = useState("Transfer History");
-  const { rates, loading: ratesLoading, refetch } = useLiveRates();
+  const { rates, loading: ratesLoading, refetch, lastUpdatedLabel } = useLiveRates();
   const { toast } = useToast();
   // Rate alerts state
   const [rateAlerts, setRateAlerts] = useState([]);
@@ -200,6 +200,16 @@ export default function Pay() {
       });
       setTransferNote("");
       const finalTransfer = { ...saved, status: "completed" };
+      // Send confirmation email
+      const u = alertUser;
+      if (u?.email) {
+        base44.integrations.Core.SendEmail({
+          to: u.email,
+          from_name: "KinnectFi",
+          subject: `✅ Transfer Confirmed — $${amt.toFixed(2)} to ${recipientName}`,
+          body: `Hi ${u.full_name || "there"},\n\nYour transfer has been sent successfully!\n\n📤 Amount Sent: $${amt.toFixed(2)} USD\n🇵🇭 Received: ₱${parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 })} PHP\n👤 To: ${recipientName}\n🏦 Via: ${recipientBank}\n💱 Rate: ₱${rate.toFixed(2)}/USD\n💸 Fee: $0.00\n📋 Ref: KF-${saved.id?.slice(0,8).toUpperCase()}\n\nThank you for using KinnectFi — the neobank built for Filipino families.\n\n— The KinnectFi Team`,
+        }).catch(() => {});
+      }
       setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
       haptic.success();
       sfx.success();
@@ -359,7 +369,10 @@ export default function Pay() {
             <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>{taglish ? "Live na Palitan" : "Live Exchange Rate"}</span>
           </div>
+          <div className="text-right">
           <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>1 USD = {ratesLoading ? "..." : `${rate.toFixed(2)}`} PHP</span>
+          {lastUpdatedLabel && <p className={`text-[9px] ${darkMode ? "text-white/30" : "text-black/30"} mt-0.5`}>Updated {lastUpdatedLabel}</p>}
+        </div>
         </div>
 
         <div className="mb-4">

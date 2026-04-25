@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFundWallet, setShowFundWallet] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
-  const { rates, loading: ratesLoading } = useLiveRates();
+  const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
@@ -206,7 +206,7 @@ export default function Dashboard() {
               </p>
               <p className="text-white/50 text-xs">{secondaryAmount}</p>
               <p className="text-white/30 text-[10px] mt-0.5">
-                {ratesLoading ? "Fetching rate..." : `₱${liveRate.toFixed(2)}/USD · Live`}
+                {ratesLoading ? "Fetching rate..." : `₱${liveRate.toFixed(2)}/USD · Live${lastUpdatedLabel ? ` · ${lastUpdatedLabel}` : ""}`}
               </p>
             </div>
             <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">

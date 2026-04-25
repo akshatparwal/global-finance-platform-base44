@@ -207,7 +207,13 @@ export default function Recipients() {
             </div>
           </div>
           <button
-            onClick={() => navigate("/dashboard/pay")}
+            onClick={() => {
+              const params = new URLSearchParams({
+                recipient: selectedRec.full_name || selectedRec.nickname,
+                bank: selectedRec.bank,
+              });
+              navigate(`/dashboard/pay?${params.toString()}`);
+            }}
             className="w-full mt-4 bg-primary text-secondary font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Send className="w-4 h-4" /> Send to {selectedRec.nickname}
