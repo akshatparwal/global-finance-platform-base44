@@ -200,8 +200,8 @@ export default function Pay() {
       });
       setTransferNote("");
       const finalTransfer = { ...saved, status: "completed" };
-      // Send confirmation email
-      const u = alertUser;
+      // Send confirmation email — fetch user fresh if not yet loaded
+      const u = alertUser || await base44.auth.me().catch(() => null);
       if (u?.email) {
         base44.integrations.Core.SendEmail({
           to: u.email,
