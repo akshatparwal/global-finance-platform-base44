@@ -206,9 +206,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
   box-shadow:
     0 1px 0 0 rgba(255, 255, 255, 0.16) inset,   /* top highlight streak */
     0 -1px 0 0 rgba(0, 0, 0, 0.45) inset,          /* bottom depth edge */
-    0 0 0 1px rgba(201, 160, 80, 0.14) inset,       /* golden rim */
-    0 16px 48px 0 rgba(0, 0, 0, 0.40),              /* deep ambient shadow */
-    0 4px 16px 0 rgba(201, 160, 80, 0.12);          /* warm golden glow */
+    0 0 0 1px rgba(201, 160, 80, 0.14) inset;       /* golden rim */
 }
 
 /* All rounded bordered cards — applies a top-edge highlight + depth shadow */
