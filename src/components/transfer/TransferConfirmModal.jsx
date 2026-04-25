@@ -101,9 +101,25 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
             ))}
           </div>
 
-          {/* PIN pad */}
+          {/* PIN pad — native input for mobile autofill */}
           <div className="mb-4">
             <p className="text-white/50 text-xs text-center mb-3">Enter your 4-digit transaction PIN</p>
+            {/* Hidden native input for mobile keyboard / autofill */}
+            <input
+              type="password"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={4}
+              value={pin}
+              onChange={e => {
+                const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                setPin(v);
+                setPinError(false);
+                if (v.length === 4) setTimeout(() => handleConfirm(v), 200);
+              }}
+              className="sr-only"
+              aria-label="Transaction PIN"
+            />
             {/* Dots */}
             <div className="flex justify-center gap-3 mb-4">
               {[0, 1, 2, 3].map(i => (

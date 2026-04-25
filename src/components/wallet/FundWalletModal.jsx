@@ -2,9 +2,9 @@
  * FundWalletModal — Wise/Chime-style "Add Funds" sheet.
  * Shows ACH deposit instructions + wire details.
  */
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Copy, Check, Building2, Zap, ArrowDownToLine } from "lucide-react";
+import { X, Copy, Check, Building2, Zap, ArrowDownToLine, CheckCircle } from "lucide-react";
 
 const METHODS = [
   { id: "ach", label: "ACH Transfer", sub: "1–3 business days · Free", icon: Building2, badge: null },
@@ -37,6 +37,9 @@ function CopyRow({ label, value, darkMode }) {
 
 export default function FundWalletModal({ onClose, darkMode, user }) {
   const [method, setMethod] = useState("ach");
+  const [instantAmount, setInstantAmount] = useState("");
+  const [instantSuccess, setInstantSuccess] = useState(false);
+  const [depositing, setDepositing] = useState(false);
   const bg = darkMode ? "bg-[#0d1526]" : "bg-white";
   const card = darkMode ? "bg-white/5 border-white/10" : "bg-[#f5efe6] border-black/8";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
@@ -118,24 +121,60 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
 
             {method === "instant" && (
               <motion.div key="instant" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className={`rounded-2xl border p-5 ${card}`}>
-                  <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-4`}>Instant Deposit via Debit Card</p>
-                  <div className="space-y-3 mb-4">
-                    <input placeholder="Card Number" className={`w-full border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input placeholder="MM / YY" className={`border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
-                      <input placeholder="CVV" className={`border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
+                {instantSuccess ? (
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="flex flex-col items-center text-center py-6"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4">
+                      <CheckCircle className="w-8 h-8 text-emerald-400" />
                     </div>
-                    <div className={`flex items-center border rounded-xl overflow-hidden ${darkMode ? "bg-[#1a2332] border-white/10" : "bg-white border-black/10"}`}>
-                      <span className={`px-3 text-lg font-bold ${muted}`}>$</span>
-                      <input type="number" placeholder="0.00" className={`flex-1 py-3 pr-4 bg-transparent outline-none text-lg font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} />
+                    <p className={`font-extrabold text-xl mb-1 ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      Deposit Successful!
+                    </p>
+                    <p className="text-emerald-400 font-black text-2xl mb-1">${parseFloat(instantAmount || 0).toFixed(2)}</p>
+                    <p className={`text-sm ${muted} mb-5`}>Added to your USD wallet · Available now</p>
+                    <button onClick={onClose} className="bg-primary text-secondary font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90">
+                      Done ✓
+                    </button>
+                  </motion.div>
+                ) : (
+                  <div className={`rounded-2xl border p-5 ${card}`}>
+                    <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-4`}>Instant Deposit via Debit Card</p>
+                    <div className="space-y-3 mb-4">
+                      <input placeholder="Card Number" inputMode="numeric" className={`w-full border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input placeholder="MM / YY" inputMode="numeric" className={`border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
+                        <input placeholder="CVV" inputMode="numeric" className={`border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
+                      </div>
+                      <div className={`flex items-center border rounded-xl overflow-hidden ${darkMode ? "bg-[#1a2332] border-white/10" : "bg-white border-black/10"}`}>
+                        <span className={`px-3 text-lg font-bold ${muted}`}>$</span>
+                        <input
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={instantAmount}
+                          onChange={e => setInstantAmount(e.target.value)}
+                          className={`flex-1 py-3 pr-4 bg-transparent outline-none text-lg font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}
+                        />
+                      </div>
                     </div>
+                    <button
+                      disabled={!instantAmount || parseFloat(instantAmount) <= 0 || depositing}
+                      onClick={() => {
+                        setDepositing(true);
+                        setTimeout(() => { setDepositing(false); setInstantSuccess(true); }, 1500);
+                      }}
+                      className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
+                    >
+                      {depositing ? (
+                        <><span className="w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />Processing...</>
+                      ) : "Deposit Instantly →"}
+                    </button>
+                    <p className={`text-[10px] ${muted} text-center mt-2`}>1.5% processing fee · Funds available immediately</p>
                   </div>
-                  <button className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 transition-opacity">
-                    Deposit Instantly →
-                  </button>
-                  <p className={`text-[10px] ${muted} text-center mt-2`}>1.5% processing fee · Funds available immediately</p>
-                </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

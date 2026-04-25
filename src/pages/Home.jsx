@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLiveRates } from "@/hooks/useLiveRates";
 
 const HERO_SLIDES = [
   {
@@ -30,6 +31,8 @@ export default function Home() {
   const [darkHero, setDarkHero] = useState(true);
   const [taglish, setTaglish] = useState(false);
   const [slideIdx, setSlideIdx] = useState(0);
+  const { rates } = useLiveRates();
+  const liveRate = rates?.USDPHP ? rates.USDPHP.toFixed(2) : "56.24";
 
   useEffect(() => {
     const t = setInterval(() => setSlideIdx(i => (i + 1) % HERO_SLIDES.length), 4500);
@@ -232,7 +235,7 @@ export default function Home() {
               {taglish ? "Secured ng 256-bit Encryption" : "Secured by 256-bit Encryption"}
             </div>
             <div className="flex items-center gap-3" style={{ color: panelMuted }}>
-              <span>PHP/USD <span className="font-black" style={{ color: "#C97B22" }}>₱56.24</span></span>
+              <span>PHP/USD <span className="font-black" style={{ color: "#C97B22" }}>₱{liveRate}</span></span>
               <span>{taglish ? "Bayad" : "Fee"} <span className="font-black" style={{ color: "#C97B22" }}>$0</span></span>
             </div>
           </div>

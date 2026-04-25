@@ -14,6 +14,7 @@ import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 import CurrencyConverter from "@/components/pay/CurrencyConverter";
 import SendAnimation from "@/components/transfer/SendAnimation";
 import TransferTracker from "@/components/transfer/TransferTracker";
+import NoRecipientsEmptyState from "@/components/pay/NoRecipientsEmptyState";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -239,11 +240,13 @@ export default function Pay() {
           )}
         </div>
 
+        {recipients.length === 0 && <NoRecipientsEmptyState darkMode={darkMode} />}
+
         <div className="flex items-center gap-3 mb-6 overflow-x-auto">
           <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {recipients.length === 0 && (
-              <span className={`text-xs ${muted} italic py-3`}>No recipients yet — add one below</span>
+              <span className={`text-xs ${muted} italic py-3`}>No recipients yet</span>
             )}
             {recipients
               .filter(r => !recipientSearch || (r.nickname + " " + r.full_name + " " + r.bank).toLowerCase().includes(recipientSearch.toLowerCase()))

@@ -19,6 +19,7 @@ import Profile from './pages/dashboard/Profile';
 import Transactions from './pages/dashboard/Transactions';
 import Support from './pages/dashboard/Support';
 import Recipients from './pages/dashboard/Recipients';
+import ErrorBoundaryPage from './components/ErrorBoundaryPage';
 
 // Add page imports here
 
@@ -51,15 +52,14 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/auth" element={<Auth />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="insights" element={<Insights />} />
-        <Route path="pay" element={<Pay />} />
-        <Route path="cards" element={<Cards />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="support" element={<Support />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="recipients" element={<Recipients />} />
-
+        <Route index element={<ErrorBoundaryPage><Dashboard /></ErrorBoundaryPage>} />
+        <Route path="insights" element={<ErrorBoundaryPage><Insights /></ErrorBoundaryPage>} />
+        <Route path="pay" element={<ErrorBoundaryPage><Pay /></ErrorBoundaryPage>} />
+        <Route path="cards" element={<ErrorBoundaryPage><Cards /></ErrorBoundaryPage>} />
+        <Route path="transactions" element={<ErrorBoundaryPage><Transactions /></ErrorBoundaryPage>} />
+        <Route path="support" element={<ErrorBoundaryPage><Support /></ErrorBoundaryPage>} />
+        <Route path="profile" element={<ErrorBoundaryPage><Profile /></ErrorBoundaryPage>} />
+        <Route path="recipients" element={<ErrorBoundaryPage><Recipients /></ErrorBoundaryPage>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -13,6 +13,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
 import FundWalletModal from "@/components/wallet/FundWalletModal";
+import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -188,6 +189,11 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Zero balance nudge */}
+      {!loading && totalUSD === 0 && (
+        <ZeroBalanceBanner darkMode={darkMode} onFund={() => setShowFundWallet(true)} />
+      )}
 
       {/* Wallets */}
       <div>
