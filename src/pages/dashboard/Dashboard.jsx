@@ -1,5 +1,5 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown } from "lucide-react";
+import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown, ArrowDownToLine } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
@@ -12,6 +12,7 @@ import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/compone
 import EmptyState from "@/components/ui/EmptyState";
 import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
+import FundWalletModal from "@/components/wallet/FundWalletModal";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [transfers, setTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFundWallet, setShowFundWallet] = useState(false);
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
@@ -180,9 +182,15 @@ export default function Dashboard() {
       <div>
         <div className="flex justify-between items-center mb-2">
           <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
-          <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
-            {taglish ? "Padala →" : "Send →"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowFundWallet(true)} className="flex items-center gap-1 text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
+              <ArrowDownToLine className="w-3 h-3" />{taglish ? "Mag-deposit" : "Add Funds"}
+            </button>
+            <span className={`text-[10px] ${darkMode ? "text-white/20" : "text-black/20"}`}>·</span>
+            <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
+              {taglish ? "Padala →" : "Send →"}
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {loading ? <WalletSkeleton darkMode={darkMode} /> : wallets.length === 0 ? (
@@ -313,6 +321,12 @@ export default function Dashboard() {
         </div>
       </div>
       </div>{/* end containerRef */}
+
+      <AnimatePresence>
+        {showFundWallet && (
+          <FundWalletModal onClose={() => setShowFundWallet(false)} darkMode={darkMode} user={user} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

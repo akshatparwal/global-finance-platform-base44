@@ -31,6 +31,7 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [activeLang, setActiveLang] = useState("EN");
+  const [transfers, setTransfers] = useState([]);
   // Referrals state
   const [referrals, setReferrals] = useState([]);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -52,6 +53,7 @@ export default function Profile() {
           .catch(() => setReferralsLoading(false));
       }
     }).catch(() => setLoadingUser(false));
+    base44.entities.Transfer.list("-created_date", 100).then(setTransfers).catch(() => {});
   }, []);
 
   const handleSignOut = () => {
@@ -64,6 +66,27 @@ export default function Profile() {
   const handleUploadDocument = () => {
     setShowOnboarding(true);
   };
+
+  // Compute real points from transfers (50 pts per $10 sent) + referrals
+  const transferPoints = transfers.reduce((sum, t) => sum + Math.floor((t.amount_usd || 0) / 10) * 50, 0);
+  const realPoints = transferPoints + (joined * 500);
+
+  // Compute streak — count consecutive months with at least one transfer
+  const streak = (() => {
+    if (!transfers.length) return 0;
+    const monthSet = new Set(transfers.map(t => {
+      const d = new Date(t.created_date);
+      return `${d.getFullYear()}-${d.getMonth()}`;
+    }));
+    let count = 0;
+    const now = new Date();
+    for (let i = 0; i < 24; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      if (monthSet.has(`${d.getFullYear()}-${d.getMonth()}`)) count++;
+      else break;
+    }
+    return count;
+  })();
 
   const referralCode = user?.email?.split("@")[0] || "user";
   const referralLink = `kinnect.fi/join/${referralCode}`;
@@ -112,7 +135,7 @@ export default function Profile() {
       <AnimatePresence>
         {showRedemption && (
           <PointsRedemption
-            points={2450}
+          points={realPoints}
             darkMode={darkMode}
             onClose={() => setShowRedemption(false)}
           />
@@ -189,8 +212,8 @@ export default function Profile() {
                   <span className="text-primary text-xs font-bold uppercase">Bayani Streak</span>
                   <span className="bg-yellow-500/20 text-yellow-400 text-[9px] font-bold px-1.5 rounded">LEGENDARY</span>
                 </div>
-                <h3 className="text-white font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>12 Month Padala Streak</h3>
-                <p className="text-white/50 text-xs">You've supported your family every month for a year. That's true Bayanihan!</p>
+                <h3 className="text-white font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{streak} Month Padala Streak</h3>
+                <p className="text-white/50 text-xs">{streak >= 12 ? "You've supported your family every month for a year. That's true Bayanihan!" : streak > 0 ? `${streak} consecutive months of supporting your family. Keep it up!` : "Send your first padala to start your streak!"}</p>
               </div>
             </div>
           </div>
@@ -200,7 +223,7 @@ export default function Profile() {
               <span className="text-2xl">🎁</span>
               <span className="text-primary text-[10px] font-bold uppercase bg-primary/10 px-2 py-0.5 rounded-full">REWARDS</span>
             </div>
-            <p className={`text-3xl font-black ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>2,450</p>
+            <p className={`text-3xl font-black ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{realPoints.toLocaleString()}</p>
             <p className={`text-xs ${muted} mb-3`}>Kinnect Points Balance</p>
             <button
               onClick={() => setShowRedemption(true)}

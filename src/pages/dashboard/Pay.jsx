@@ -13,6 +13,7 @@ import TransferConfirmModal from "@/components/transfer/TransferConfirmModal";
 import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 import CurrencyConverter from "@/components/pay/CurrencyConverter";
 import SendAnimation from "@/components/transfer/SendAnimation";
+import TransferTracker from "@/components/transfer/TransferTracker";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -47,6 +48,7 @@ export default function Pay() {
   const [completedTransfer, setCompletedTransfer] = useState(null);
   const [showSendAnim, setShowSendAnim] = useState(false);
   const [sendAnimData, setSendAnimData] = useState({ amount: "", recipient: "" });
+  const [trackedTransfer, setTrackedTransfer] = useState(null);
   const [activeTab, setActiveTab] = useState("Transfer History");
   const { rates, loading: ratesLoading, refetch } = useLiveRates();
   const { toast } = useToast();
@@ -367,19 +369,21 @@ export default function Pay() {
           ) : (
             <div className="space-y-2 mb-6">
               {transfers.map((t, i) => (
-                <div key={i} className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border ${card}`}>
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black">
+                <button key={i} onClick={() => setTrackedTransfer(t)}
+                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black flex-shrink-0">
                     {t.recipient_name?.[0] || "?"}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm">{t.recipient_name}</p>
-                    <p className={`text-xs ${muted}`}>{t.recipient_bank} · {new Date(t.created_date).toLocaleDateString()}</p>
+                    <p className={`text-xs ${muted} truncate`}>{t.recipient_bank} · {new Date(t.created_date).toLocaleDateString()}</p>
+                    {t.note && <p className={`text-xs ${muted} truncate italic`}>"{t.note}"</p>}
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0">
                     <p className="font-bold text-sm">${t.amount_usd}</p>
                     <span className={`text-[10px] font-bold uppercase ${t.status === "completed" ? "text-emerald-500" : "text-primary"}`}>{t.status}</span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -595,6 +599,13 @@ export default function Pay() {
         recipientName={sendAnimData.recipient}
         onDone={() => setShowSendAnim(false)}
       />
+
+      {/* Transfer tracker */}
+      <AnimatePresence>
+        {trackedTransfer && (
+          <TransferTracker transfer={trackedTransfer} onClose={() => setTrackedTransfer(null)} darkMode={darkMode} />
+        )}
+      </AnimatePresence>
 
       {/* Confirm modal */}
       <AnimatePresence>
