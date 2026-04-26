@@ -227,7 +227,7 @@ export default function Home() {
                 <button
                   key={i}
                   onClick={() => setSlideIdx(i)}
-                  className="h-1.5 rounded-full transition-all duration-300"
+                  className="h-1.5 rounded-full transition-all duration-300 !min-h-0"
                   style={{ width: i === slideIdx ? 28 : 7, background: i === slideIdx ? "#C97B22" : dotInactive }}
                 />
               ))}
