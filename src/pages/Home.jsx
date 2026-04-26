@@ -87,15 +87,15 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
               >
                 {taglish ? (
-                  <h1 className="text-2xl sm:text-4xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-2 sm:mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Ang pera mo,{" "}
-                    <span className="text-[#C97B22]">konektado</span>{" "}
+                  <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    Ang pera mo,<br />
+                    <span className="text-[#C97B22]">konektado</span><br />
                     sa puso mo.
                   </h1>
                 ) : (
-                  <h1 className="text-2xl sm:text-4xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-2 sm:mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Your money,{" "}
-                    <span className="text-[#C97B22]">connected</span>{" "}
+                  <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    Your money,<br />
+                    <span className="text-[#C97B22]">connected</span><br />
                     to your heart.
                   </h1>
                 )}
