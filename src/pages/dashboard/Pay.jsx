@@ -17,6 +17,7 @@ import SendAnimation from "@/components/transfer/SendAnimation";
 import TransferTracker from "@/components/transfer/TransferTracker";
 import NoRecipientsEmptyState from "@/components/pay/NoRecipientsEmptyState";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import CreateScheduledForm from "@/components/pay/CreateScheduledForm";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -35,8 +36,6 @@ const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 10000;
 
 const PAY_TABS = ["Transfer History", "Rate Alerts", "Tools", "Protection", "Shipments"];
-
-import CreateScheduledForm from "@/components/pay/CreateScheduledForm";
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
@@ -284,20 +283,20 @@ export default function Pay() {
       </div>
 
       {/* Best time banner — compact single line */}
-      <div className={`border rounded-xl px-4 py-3 mb-4 flex items-center justify-between gap-2 ${card}`}>
+      <div className={`border rounded-xl px-3 py-2.5 mb-4 flex items-center justify-between gap-2 ${card}`}>
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-primary text-base flex-shrink-0">🕐</span>
-          <div className="min-w-0">
-            <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{taglish ? "Pinakamabuting Oras" : "Best Time to Send"} </span>
+          <span className="text-primary text-sm flex-shrink-0">🕐</span>
+          <div className="min-w-0 flex items-center gap-1 flex-wrap">
+            <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{taglish ? "Pinakamabuting Oras" : "Best Time"}</span>
             <span className="text-primary text-xs font-bold">↑ +₱0.42</span>
-            <span className={`text-xs ${muted}`}> vs. last week</span>
+            <span className={`text-xs ${muted} hidden sm:inline`}>vs. last week</span>
           </div>
         </div>
         <span className="bg-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0">OPTIMAL</span>
       </div>
 
       {/* Send form */}
-      <div className={`border rounded-2xl p-4 mb-4 ${card}`}>
+      <div className={`border rounded-2xl p-3 sm:p-4 mb-4 ${card}`}>
         <div className={`flex items-center gap-3 border rounded-xl px-4 py-3 mb-5 ${inputBg}`}>
           <Search className="w-4 h-4 opacity-40" />
           <input
@@ -336,9 +335,9 @@ export default function Pay() {
           );
         })()}
 
-        <div className="flex items-center gap-3 mb-6 overflow-x-auto">
+        <div className="flex items-center gap-3 mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
           <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 flex-shrink-0">
             {recipientsLoading && [1,2,3,4].map(i => (
               <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
                 <div className={`w-11 h-11 rounded-full animate-pulse ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
@@ -370,18 +369,20 @@ export default function Pay() {
         </div>
 
         {selectedRecipient && (
-          <div className="mb-4 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2 flex items-center gap-2">
-            <span className="text-primary text-sm">✓</span>
-            <span className="text-primary text-sm font-bold">Sending to: {selectedRecipient.nickname || selectedRecipient.full_name} via {selectedRecipient.bank}</span>
+          <div className="mb-3 bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 flex items-center gap-2 min-w-0">
+            <span className="text-primary text-sm flex-shrink-0">✓</span>
+            <span className="text-primary text-xs sm:text-sm font-bold truncate">
+              {selectedRecipient.nickname || selectedRecipient.full_name} · {selectedRecipient.bank}
+            </span>
           </div>
         )}
 
         {/* Revolut-style big amount display */}
-        <div className={`rounded-2xl p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
-          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-2 block`}>{taglish ? "Ipadala (USD)" : "You Send (USD)"}</label>
+        <div className={`rounded-2xl p-3 sm:p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
+          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>{taglish ? "Ipadala (USD)" : "You Send (USD)"}</label>
           <div
-            className={`text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 60 }}
+            className={`text-4xl sm:text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 48 }}
           >
             {sendAmount ? `$${formatAmountDisplay(sendAmount)}` : <span className="opacity-20">$0</span>}
           </div>
@@ -412,7 +413,7 @@ export default function Pay() {
         </div>
 
         {/* Numpad */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-1.5 mb-3">
           {[1,2,3,4,5,6,7,8,9,".",0,"⌫"].map((d, i) => (
             <button
               key={i}
@@ -423,14 +424,12 @@ export default function Pay() {
                   if (amountError) setAmountError(validateAmount(next));
                 } else {
                   const next = String(sendAmount) + String(d);
-                  // Prevent double dots
                   if (d === "." && sendAmount.includes(".")) return;
-                  // Limit to 2 decimal places
                   if (sendAmount.includes(".") && sendAmount.split(".")[1]?.length >= 2) return;
                   handleAmountChange(next);
                 }
               }}
-              className={`h-14 rounded-2xl text-xl font-bold transition-all active:scale-95 select-none
+              className={`h-11 sm:h-14 rounded-xl sm:rounded-2xl text-lg sm:text-xl font-bold transition-all active:scale-95 select-none
                 ${d === "⌫"
                   ? `${darkMode ? "text-white/50 bg-white/5" : "text-[#1a2a4a]/50 bg-black/5"}`
                   : `${darkMode ? "bg-white/8 text-white hover:bg-white/12" : "bg-black/6 text-[#1a2a4a] hover:bg-black/10"} border ${darkMode ? "border-white/5" : "border-black/5"}`
@@ -441,7 +440,7 @@ export default function Pay() {
           ))}
         </div>
 
-        <div className={`flex items-center justify-between py-3 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-4`}>
+        <div className={`flex items-center justify-between py-2.5 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-3`}>
           <div className="flex items-center gap-2">
             <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>{taglish ? "Live na Palitan" : "Live Exchange Rate"}</span>
@@ -452,25 +451,25 @@ export default function Pay() {
         </div>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-3">
           <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
         </div>
 
         {/* Note/memo field */}
-        <div className="mb-4">
-          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Mensahe (opsyonal)" : "Note (optional)"}</label>
+        <div className="mb-3">
+          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1 block`}>{taglish ? "Mensahe (opsyonal)" : "Note (optional)"}</label>
           <input
             value={transferNote}
             onChange={e => setTransferNote(e.target.value)}
             placeholder={taglish ? "para sa pagkain, bayad ng kuryente..." : "for groceries, school fees..."}
-            className={`w-full border rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition-colors ${inputBg}`}
+            className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors ${inputBg}`}
           />
         </div>
 
         <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
-          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
-          {!isOnline ? "📶 OFFLINE — RECONNECT TO SEND" : sending ? "SENDING..." : taglish ? "SURIIN AT MAGPADALA →" : "REVIEW & SEND →"}
+          className={`w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
+          {!isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : taglish ? "Suriin at Magpadala →" : "Review & Send →"}
         </button>
       </div>
 
@@ -575,8 +574,8 @@ export default function Pay() {
                 </button>
               </div>
             </div>
-            <div className="overflow-hidden" style={{ height: 60 }}>
-            <ResponsiveContainer width="100%" height={60}>
+            <div className="overflow-hidden w-full" style={{ height: 60 }}>
+            <ResponsiveContainer width="99%" height={60}>
               <AreaChart data={RATE_HISTORY} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <defs><linearGradient id="rg3" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                 <XAxis dataKey="date" hide />
