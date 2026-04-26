@@ -55,7 +55,7 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row min-h-screen lg:max-h-[900px]" style={{ minHeight: "100vh" }}>
 
         {/* LEFT: full-bleed photo */}
-        <div className="relative flex-1 overflow-hidden min-h-[50vh] lg:min-h-0">
+        <div className="relative flex-1 overflow-hidden min-h-[65vh] lg:min-h-0">
           <img
             src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=1400&q=90"
             alt="Filipino family celebration"

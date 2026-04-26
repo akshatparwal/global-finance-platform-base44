@@ -20,17 +20,23 @@ const CHANGES = [
   { emoji: "🌐", title: "Live Calc on Home", desc: "Visitors can now calculate USD → PHP conversions before signing up." },
 ];
 
-export default function WhatsNew({ darkMode }) {
+export default function WhatsNew({ darkMode, onDismissed }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     const seen = localStorage.getItem(LS_KEY);
-    if (seen !== CURRENT_VERSION) setShow(true);
+    if (seen !== CURRENT_VERSION) {
+      // Delay slightly so it doesn't pop instantly on load
+      const t = setTimeout(() => setShow(true), 800);
+      return () => clearTimeout(t);
+    }
   }, []);
 
   const dismiss = () => {
     localStorage.setItem(LS_KEY, CURRENT_VERSION);
     setShow(false);
+    // Notify parent so BiometricNudge can show after this is dismissed
+    setTimeout(() => onDismissed?.(), 400);
   };
 
   const bg = darkMode ? "bg-[#0d1526]" : "bg-white";

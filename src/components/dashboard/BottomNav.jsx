@@ -19,22 +19,22 @@ export default function BottomNav({ onNavigate }) {
       className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0d1526] border-t border-white/10"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="flex items-stretch h-[60px]">
+      <div className="flex items-stretch h-[64px]">
         {NAV.map(({ label, icon: Icon, path }) => {
           const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
           return (
             <button
               key={path}
               onClick={() => go(path)}
-              className={`flex-1 flex flex-col items-center justify-center gap-0.5 relative transition-colors ${
-                active ? "text-primary" : "text-white/35"
+              className={`flex-1 flex flex-col items-center justify-center gap-1 relative transition-colors ${
+                active ? "text-primary" : "text-white/40"
               }`}
             >
               {active && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] bg-primary rounded-full" />
               )}
               <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 2.5 : 1.8} />
-              <span className="text-[12px] font-semibold leading-none tracking-wide">{label}</span>
+              <span className="text-[12px] font-semibold leading-none">{label}</span>
             </button>
           );
         })}

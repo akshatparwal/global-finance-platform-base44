@@ -37,6 +37,9 @@ export default function DashboardLayout() {
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [whatsNewDone, setWhatsNewDone] = useState(() => {
+    try { return localStorage.getItem("kinnectfi_whats_new_seen") === "3.0.0"; } catch { return false; }
+  });
   const notifRef = useRef(null);
   const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
   const { showWarning, secondsLeft, extendSession, doLogout } = useSessionTimeout();
@@ -236,11 +239,11 @@ export default function DashboardLayout() {
 
         <BottomNav onNavigate={handleTabClick} />
 
-        {/* What's New changelog */}
-        <WhatsNew darkMode={darkMode} />
+        {/* What's New changelog — BiometricNudge shown only after this is dismissed */}
+        <WhatsNew darkMode={darkMode} onDismissed={() => setWhatsNewDone(true)} />
 
-        {/* Biometric nudge — shown once post-login */}
-        <BiometricNudge darkMode={darkMode} />
+        {/* Biometric nudge — staggered after WhatsNew */}
+        <BiometricNudge darkMode={darkMode} whatsNewDismissed={whatsNewDone} />
 
         {/* Session timeout warning */}
         <AnimatePresence>
