@@ -409,7 +409,7 @@ export default function Pay() {
               <p className="text-red-400 text-xs font-semibold">{amountError}</p>
             </div>
           )}
-          <p className={`text-[10px] ${muted} mt-2`}>Min $${MIN_AMOUNT} · Max $${MAX_AMOUNT.toLocaleString()}</p>
+          <p className={`text-[10px] ${muted} mt-2`}>Min ${MIN_AMOUNT} · Max ${MAX_AMOUNT.toLocaleString()}</p>
         </div>
 
         {/* Numpad */}
