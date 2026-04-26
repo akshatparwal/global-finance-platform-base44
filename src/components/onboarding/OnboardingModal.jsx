@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, CheckCircle, Upload, Camera, Phone, User, CreditCard, ArrowRight, Shield } from "lucide-react";
+import { X, CheckCircle, Upload, Camera, Phone, User, CreditCard, ArrowRight, Shield, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STEPS = [
@@ -34,8 +34,10 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
   const [docType, setDocType] = useState(user?.kyc_doc_type || "");
   const [docUploading, setDocUploading] = useState(false);
   const [docUploaded, setDocUploaded] = useState(!!user?.kyc_doc_url);
+  const [docError, setDocError] = useState("");
   const [selfieUploading, setSelfieUploading] = useState(false);
   const [selfieUploaded, setSelfieUploaded] = useState(!!user?.kyc_selfie_url);
+  const [selfieError, setSelfieError] = useState("");
   const [phone, setPhone] = useState(user?.phone_number || "");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -66,12 +68,18 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setDocUploading(true);
+    setDocError("");
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await base44.auth.updateMe({ kyc_doc_url: file_url, kyc_doc_type: docType, kyc_status: "pending" });
       setDocUploaded(true);
+    } catch (err) {
+      setDocError("Upload failed. Please check your file and try again.");
+      setDocUploaded(false);
     } finally {
       setDocUploading(false);
+      // Reset the input so the same file can be re-selected if needed
+      if (docInputRef.current) docInputRef.current.value = "";
     }
   };
 
@@ -79,12 +87,17 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setSelfieUploading(true);
+    setSelfieError("");
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       await base44.auth.updateMe({ kyc_selfie_url: file_url });
       setSelfieUploaded(true);
+    } catch (err) {
+      setSelfieError("Upload failed. Please try again.");
+      setSelfieUploaded(false);
     } finally {
       setSelfieUploading(false);
+      if (selfieInputRef.current) selfieInputRef.current.value = "";
     }
   };
 
@@ -169,7 +182,7 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
             <label className="text-white/60 text-xs uppercase tracking-wider mb-2 block">Document Type</label>
             <div className="grid grid-cols-3 gap-2 mb-5">
               {DOC_TYPES.map(d => (
-                <button key={d.value} onClick={() => setDocType(d.value)}
+                <button key={d.value} onClick={() => { setDocType(d.value); if (d.value !== docType) { setDocUploaded(false); setDocError(""); } }}
                   className={`flex flex-col items-center gap-1 py-3 rounded-xl border-2 text-xs font-bold transition-all ${docType === d.value ? "border-primary bg-primary/10 text-primary" : "border-white/10 text-white/50 hover:border-white/30"}`}>
                   <span className="text-xl">{d.flag}</span>
                   {d.label}
@@ -202,6 +215,12 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
               )}
             </button>
 
+            {docError && (
+              <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <p className="text-red-400 text-sm">{docError}</p>
+              </div>
+            )}
             <button onClick={() => goNext({ kyc_doc_type: docType, address_country: country })}
               disabled={!docUploaded || !country || !docType || saving}
               className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 disabled:opacity-40 transition-opacity">
@@ -253,6 +272,12 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
               )}
             </button>
 
+            {selfieError && (
+              <div className="flex items-center gap-2 mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <p className="text-red-400 text-sm">{selfieError}</p>
+              </div>
+            )}
             <button onClick={() => goNext()} disabled={!selfieUploaded || saving}
               className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 disabled:opacity-40 transition-opacity mb-3">
               {saving ? "Saving..." : "Continue →"}
