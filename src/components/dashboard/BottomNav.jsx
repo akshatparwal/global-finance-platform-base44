@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User } from "lucide-react";
+import { haptic } from "@/utils/haptic";
 
 const NAV = [
   { label: "Home",   icon: LayoutDashboard, path: "/dashboard" },
@@ -12,7 +13,10 @@ const NAV = [
 export default function BottomNav({ onNavigate }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const go = onNavigate ?? navigate;
+  const go = (path) => {
+    haptic.light();
+    (onNavigate ?? navigate)(path);
+  };
 
   return (
     <nav

@@ -51,6 +51,7 @@ export default function Insights() {
   const [activeTab, setActiveTab] = useState("Activity");
   const [goals, setGoals] = useState([]);
   const [goalsLoading, setGoalsLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
   const [addFundsGoal, setAddFundsGoal] = useState(null);
   const [showCreateGoal, setShowCreateGoal] = useState(false);
   const [wallets, setWallets] = useState([]);
@@ -69,7 +70,7 @@ export default function Insights() {
       .then(g => { setGoals(g); setGoalsLoading(false); })
       .catch(() => setGoalsLoading(false));
     base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
-    base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
+    base44.entities.Transfer.list("-created_date", 10).then(t => { setTransfers(t); setActivityLoading(false); }).catch(() => setActivityLoading(false));
   }, []);
 
   const handleGoalUpdated = (updatedGoal) => {
@@ -95,7 +96,18 @@ export default function Insights() {
         ))}
       </div>
 
-      {activeTab === "Activity" && (() => {
+      {activeTab === "Activity" && activityLoading && (
+        <div className="space-y-4">
+          {[1,2,3].map(i => (
+            <div key={i} className={`border rounded-2xl p-6 animate-pulse ${card}`}>
+              <div className={`h-4 w-32 rounded-lg mb-3 ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+              <div className={`h-10 w-48 rounded-lg mb-4 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
+              <div className={`h-2 w-full rounded-full ${darkMode ? "bg-white/5" : "bg-black/5"}`} />
+            </div>
+          ))}
+        </div>
+      )}
+      {activeTab === "Activity" && !activityLoading && (() => {
         const now = new Date();
         const thisMonth = transfers.filter(t => {
           const d = new Date(t.created_date);

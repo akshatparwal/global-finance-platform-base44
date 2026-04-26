@@ -11,6 +11,7 @@ import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import SessionTimeoutWarning from "@/components/SessionTimeoutWarning";
 import BiometricNudge from "@/components/BiometricNudge";
 import { useTabStack } from "@/hooks/useTabStack";
+import PWAInstallNudge from "@/components/PWAInstallNudge";
 
 const NAV = [
   { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard",          color: "text-blue-400",    bg: "bg-blue-500/15" },
@@ -64,7 +65,11 @@ export default function DashboardLayout() {
       if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false);
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
   }, []);
 
   // Handle tab navigation with re-tap-to-reset
@@ -244,6 +249,9 @@ export default function DashboardLayout() {
 
         {/* Biometric nudge — staggered after WhatsNew */}
         <BiometricNudge darkMode={darkMode} whatsNewDismissed={whatsNewDone} />
+
+        {/* PWA install nudge */}
+        <PWAInstallNudge darkMode={darkMode} />
 
         {/* Session timeout warning */}
         <AnimatePresence>

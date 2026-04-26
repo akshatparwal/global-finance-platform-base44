@@ -256,16 +256,21 @@ export default function Profile() {
             </div>
             <div className="space-y-2 mb-4">
               {[
-                { label: "Document uploaded", done: !!user?.kyc_doc_url },
-                { label: "Selfie verified",   done: !!user?.kyc_selfie_url },
-                { label: "Phone secured",     done: !!user?.phone_verified },
+                { label: "Document uploaded", sub: "PhilSys, Passport, UMID or any gov ID", done: !!user?.kyc_doc_url },
+                { label: "Selfie verified",   sub: "Live selfie for liveness check", done: !!user?.kyc_selfie_url },
+                { label: "Phone secured",     sub: "OTP verification via SMS", done: !!user?.phone_verified },
               ].map((item, i) => (
-                <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${item.done ? "bg-emerald-500/10" : darkMode ? "bg-white/5" : "bg-black/5"}`}>
-                  <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${item.done ? "bg-emerald-500" : "border-2 border-current opacity-30"}`}>
-                    {item.done && <span className="text-white text-[8px] font-black">✓</span>}
+                <button key={i} onClick={handleUploadDocument}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all active:scale-[0.98] text-left ${item.done ? (darkMode ? "bg-emerald-500/10 border-emerald-500/20" : "bg-emerald-50 border-emerald-200") : (darkMode ? "bg-white/5 border-white/8 hover:border-white/20" : "bg-black/3 border-black/8 hover:border-black/20")}`}>
+                  <div className={`w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center ${item.done ? "bg-emerald-500" : (darkMode ? "bg-white/10 border-2 border-white/20" : "bg-black/8 border-2 border-black/15")}`}>
+                    {item.done ? <span className="text-white text-sm font-black">✓</span> : <span className={`text-xs font-black ${muted}`}>{i + 1}</span>}
                   </div>
-                  <span className={`text-sm ${item.done ? (darkMode ? "text-white" : "text-[#1a2a4a]") : muted}`}>{item.label}</span>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-bold ${item.done ? (darkMode ? "text-emerald-400" : "text-emerald-600") : (darkMode ? "text-white" : "text-[#1a2a4a]")}`}>{item.label}</p>
+                    <p className={`text-xs ${muted} truncate`}>{item.sub}</p>
+                  </div>
+                  {!item.done && <ChevronRight className={`w-4 h-4 flex-shrink-0 ${muted}`} />}
+                </button>
               ))}
             </div>
             <button onClick={handleUploadDocument} className="w-full bg-primary text-secondary font-bold px-5 py-3 rounded-xl text-sm hover:bg-primary/90 transition-colors">

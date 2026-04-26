@@ -290,17 +290,19 @@ export default function Pay() {
           const daysSince = Math.floor((Date.now() - new Date(last.created_date)) / 86400000);
           return (
             <button
-              onClick={() => { setSendAmount(String(last.amount_usd)); setSelectedRecipient(recipients.find(r => r.full_name === last.recipient_name || r.nickname === last.recipient_name) || null); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border mb-4 text-left hover:border-primary/40 transition-colors ${darkMode ? "border-white/8 bg-white/3" : "border-black/8 bg-black/2"}`}
+              onClick={() => { setSendAmount(String(last.amount_usd)); setSelectedRecipient(recipients.find(r => r.full_name === last.recipient_name || r.nickname === last.recipient_name) || null); haptic.light(); }}
+              className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl border mb-4 text-left active:scale-[0.98] transition-all ${darkMode ? "border-primary/20 bg-primary/5 hover:border-primary/40" : "border-primary/15 bg-primary/4 hover:border-primary/35"}`}
             >
-              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
+              <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
                 {last.recipient_name?.[0] || "?"}
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Send again to {last.recipient_name}</p>
                 <p className={`text-xs ${muted}`}>${last.amount_usd} · {daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}</p>
               </div>
-              <span className="text-primary text-xs font-bold flex-shrink-0">Repeat →</span>
+              <div className="flex items-center gap-1.5 bg-primary text-secondary font-bold text-xs px-3 py-2 rounded-xl flex-shrink-0">
+                <span>Repeat</span><span>→</span>
+              </div>
             </button>
           );
         })()}
@@ -444,18 +446,18 @@ export default function Pay() {
       </div>
 
       {/* Tabs */}
-      <div className={`flex gap-1 p-1 rounded-xl mb-4 overflow-x-auto ${darkMode ? "bg-white/5" : "bg-black/5"}`} style={{ WebkitOverflowScrolling: "touch" }}>
+      {/* Tab bar — horizontal scroll on mobile, no clipping */}
+      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-0.5" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
         {[
-          { key: "Transfer History", short: "History" },
-          { key: "Rate Alerts", short: "Alerts" },
-          { key: "Tools", short: "Tools" },
-          { key: "Protection", short: "Protect" },
-          { key: "Shipments", short: "Shipments" },
-        ].map(({ key, short }) => (
+          { key: "Transfer History", icon: "🕐" },
+          { key: "Rate Alerts",      icon: "🔔" },
+          { key: "Tools",            icon: "🛠" },
+          { key: "Protection",       icon: "🛡" },
+          { key: "Shipments",        icon: "📦" },
+        ].map(({ key, icon }) => (
           <button key={key} onClick={() => setActiveTab(key)}
-            className={`flex-shrink-0 flex-1 py-2 rounded-lg text-xs font-semibold transition-all whitespace-nowrap px-2 ${activeTab === key ? "bg-primary text-secondary" : muted}`}>
-            <span className="sm:hidden">{short}</span>
-            <span className="hidden sm:inline">{key}</span>
+            className={`flex-shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border ${activeTab === key ? "bg-primary text-secondary border-primary" : `${darkMode ? "border-white/10 text-white/50 bg-white/5" : "border-black/10 text-[#1a2a4a]/50 bg-black/5"}`}`}>
+            <span>{icon}</span><span>{key}</span>
           </button>
         ))}
       </div>
@@ -544,7 +546,7 @@ export default function Pay() {
                 </button>
               </div>
             </div>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden" style={{ height: 60 }}>
             <ResponsiveContainer width="100%" height={60}>
               <AreaChart data={RATE_HISTORY} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <defs><linearGradient id="rg3" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>

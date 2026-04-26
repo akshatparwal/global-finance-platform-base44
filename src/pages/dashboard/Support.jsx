@@ -126,7 +126,7 @@ export default function Support() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col" style={{ height: "calc(100vh - 120px)" }}>
+    <div className="max-w-2xl mx-auto flex flex-col" style={{ height: "calc(100vh - 80px)" }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div>
@@ -230,8 +230,10 @@ export default function Support() {
         </div>
       )}
 
-      {/* Input */}
-      <div className={`flex gap-2 items-end flex-shrink-0 border rounded-2xl px-3 py-2 ${inputBg}`}>
+      {/* Input — sticky above keyboard on mobile */}
+      <div className={`flex gap-2 items-end flex-shrink-0 border rounded-2xl px-3 py-2 ${inputBg}`}
+        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+      >
         <textarea
           ref={inputRef}
           value={input}
