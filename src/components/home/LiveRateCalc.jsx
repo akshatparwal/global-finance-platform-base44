@@ -30,7 +30,7 @@ export default function LiveRateCalc({ taglish }) {
       className="rounded-3xl overflow-hidden border"
       style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #2a1800 60%, #5a3800 100%)", borderColor: "rgba(201,123,34,0.2)" }}
     >
-      <div className="px-7 py-8 sm:px-10 sm:py-10">
+      <div className="px-4 py-6 sm:px-10 sm:py-10">
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(201,123,34,0.7)" }}>
@@ -47,19 +47,19 @@ export default function LiveRateCalc({ taglish }) {
         </div>
 
         {/* Amount input */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-4">
           <div className="flex items-center gap-2 flex-1 rounded-2xl px-4 py-3" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}>
-            <span className="text-white/50 font-bold text-sm">🇺🇸 USD</span>
+            <span className="text-white/50 font-bold text-sm flex-shrink-0">🇺🇸 USD</span>
             <input
               type="number"
               inputMode="decimal"
               value={usd}
               onChange={e => setUsd(e.target.value)}
-              className="flex-1 bg-transparent outline-none text-white font-black text-xl text-right"
+              className="flex-1 bg-transparent outline-none text-white font-black text-xl text-right min-w-0"
               placeholder="0"
             />
           </div>
-          <ArrowRight className="w-5 h-5 flex-shrink-0" style={{ color: "#C97B22" }} />
+          <ArrowRight className="w-5 h-5 flex-shrink-0 self-center rotate-90 sm:rotate-0" style={{ color: "#C97B22" }} />
           <div className="flex-1 rounded-2xl px-4 py-3" style={{ background: "rgba(201,123,34,0.15)", border: "1px solid rgba(201,123,34,0.3)" }}>
             <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5" style={{ color: "rgba(201,123,34,0.7)" }}>🇵🇭 PHP</p>
             <p className="text-white font-black text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₱{php}</p>
