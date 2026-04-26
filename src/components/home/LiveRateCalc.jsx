@@ -40,7 +40,7 @@ export default function LiveRateCalc({ taglish }) {
               {taglish ? "Magkano ang matatanggap nila?" : "How much will they receive?"}
             </h3>
           </div>
-          <button onClick={refetch} className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
+          <button onClick={refetch} className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full !min-h-0" style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
             <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
             {loading ? "..." : `₱${rate.toFixed(2)}`}
           </button>
