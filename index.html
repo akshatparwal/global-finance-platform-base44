@@ -60,7 +60,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="position:fixed;inset:0;background:#0D1F3C;display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="width:40px;height:40px;border:3px solid rgba(201,123,34,0.3);border-top-color:#C97B22;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
