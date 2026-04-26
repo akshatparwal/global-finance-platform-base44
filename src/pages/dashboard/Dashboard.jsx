@@ -201,7 +201,7 @@ export default function Dashboard() {
           <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-3xl sm:text-5xl font-black text-white mb-0.5 truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p className="text-2xl sm:text-5xl font-black text-white mb-0.5 break-all leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {primaryAmount}
               </p>
               <p className="text-white/50 text-xs">{secondaryAmount}</p>

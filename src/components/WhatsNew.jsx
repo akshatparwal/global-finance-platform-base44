@@ -84,7 +84,7 @@ export default function WhatsNew({ darkMode, onDismissed }) {
             </div>
 
             {/* Changes list */}
-            <div className="px-6 pb-3 space-y-3 max-h-72 overflow-y-auto">
+            <div className="px-6 pb-3 space-y-3 max-h-[40svh] overflow-y-auto">
               {CHANGES.map((c, i) => (
                 <motion.div
                   key={i}
@@ -102,7 +102,7 @@ export default function WhatsNew({ darkMode, onDismissed }) {
               ))}
             </div>
 
-            <div className="px-6 pb-8 pt-3">
+            <div className="px-6 pb-6 pt-3" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
               <button
                 onClick={dismiss}
                 className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 transition-opacity"

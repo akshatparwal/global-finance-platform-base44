@@ -55,7 +55,7 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row" style={{ minHeight: "100svh" }}>
 
         {/* LEFT: full-bleed photo */}
-        <div className="relative flex-1 overflow-hidden min-h-[55svh] landscape:min-h-[100svh] lg:min-h-0">
+        <div className="relative flex-1 overflow-hidden min-h-[50svh] landscape:min-h-[100svh] lg:min-h-0">
           <img
             src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=1400&q=90"
             alt="Filipino family celebration"
@@ -64,20 +64,20 @@ export default function Home() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 38%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.08) 100%)" }} />
 
           {/* Logo */}
-          <div className="absolute top-7 left-7 flex items-center gap-2.5 z-10 bg-black/40 backdrop-blur-sm rounded-2xl px-3 py-2">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/15 backdrop-blur-sm flex items-center justify-center">
+          <div className="absolute top-4 left-4 sm:top-7 sm:left-7 flex items-center gap-2 z-10 bg-black/40 backdrop-blur-sm rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden bg-white/15 flex items-center justify-center">
               <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <div className="font-extrabold text-white text-sm sm:text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Kinnect<span className="text-[#C97B22]">Fi</span>
               </div>
-              <div className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Neobank</div>
+              <div className="text-white/40 text-[7px] sm:text-[8px] uppercase tracking-widest hidden xs:block">Cross-Border Neobank</div>
             </div>
           </div>
 
           {/* Hero copy */}
-          <div className="absolute bottom-0 left-0 right-0 px-8 pb-10 lg:px-12 lg:pb-14 z-10">
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-7 sm:px-8 sm:pb-10 lg:px-12 lg:pb-14 z-10">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`hero-text-${taglish}`}
@@ -87,26 +87,26 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
               >
                 {taglish ? (
-                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <h1 className="text-2xl sm:text-4xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-2 sm:mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Ang pera mo,{" "}
                     <span className="text-[#C97B22]">konektado</span>{" "}
                     sa puso mo.
                   </h1>
                 ) : (
-                  <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <h1 className="text-2xl sm:text-4xl lg:text-[3.5rem] font-black text-white leading-[1.06] mb-2 sm:mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Your money,{" "}
                     <span className="text-[#C97B22]">connected</span>{" "}
                     to your heart.
                   </h1>
                 )}
                 {/* Live rate badge in hero */}
-                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" style={{ background: "rgba(201,123,34,0.18)", border: "1px solid rgba(201,123,34,0.35)" }}>
+                <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full" style={{ background: "rgba(201,123,34,0.18)", border: "1px solid rgba(201,123,34,0.35)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-white/60 text-[11px] font-semibold">Live rate:</span>
-                  <span className="text-[#C97B22] text-[13px] font-black">₱{liveRate}/USD</span>
-                  <span className="text-white/40 text-[10px]">· $0 fee</span>
+                  <span className="text-white/60 text-[10px] sm:text-[11px] font-semibold">Live rate:</span>
+                  <span className="text-[#C97B22] text-[12px] sm:text-[13px] font-black">₱{liveRate}/USD</span>
+                  <span className="text-white/40 text-[9px] sm:text-[10px]">· $0 fee</span>
                 </div>
-                <p className="text-white/75 text-base mb-7 max-w-sm leading-relaxed">
+                <p className="text-white/75 text-sm sm:text-base mb-5 sm:mb-7 max-w-sm leading-relaxed hidden sm:block">
                   {taglish
                     ? "Ipadala ang pera sa pamilya mo — mabilis, ligtas, at walang bayad."
                     : "Send money home instantly, securely, and with zero hidden fees."}
@@ -115,22 +115,22 @@ export default function Home() {
             </AnimatePresence>
 
             {/* Social proof */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex -space-x-2">
                 {[
                   "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/98148142a_i_pravatar_cc_100_c2961a44.png",
                   "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/d889dd544_i_pravatar_cc_100_70a8a187.png",
                   "https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/994bcae68_i_pravatar_cc_100_22c8e547.png",
                 ].map((src, i) => (
-                  <img key={i} src={src} className="w-8 h-8 rounded-full border-2 border-white/30 object-cover" />
+                  <img key={i} src={src} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white/30 object-cover" />
                 ))}
               </div>
               <div>
                 <div className="flex gap-0.5 mb-0.5">
                   {[...Array(5)].map((_, i) => <span key={i} className="text-[#C97B22] text-xs">★</span>)}
                 </div>
-                <p className="text-white/65 text-[11px] font-semibold uppercase tracking-wider">
-                  {taglish ? "Pinagkakatiwalaan ng 10,000+ Pilipino sa buong mundo" : "Trusted by 10,000+ Filipinos worldwide"}
+                <p className="text-white/65 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
+                  {taglish ? "10,000+ Pilipino sa buong mundo" : "Trusted by 10,000+ Filipinos worldwide"}
                 </p>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function Home() {
           style={{ background: panelBg, transition: "background 0.4s", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)", overflowY: "auto" }}
         >
           {/* Top toolbar */}
-          <div className="flex items-center justify-between px-7 pt-7 pb-2">
+          <div className="flex items-center justify-between px-4 sm:px-7 pt-4 sm:pt-7 pb-2">
             <button
               onClick={() => setDarkHero(!darkHero)}
               className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
@@ -174,8 +174,8 @@ export default function Home() {
           </div>
 
           {/* Slide content */}
-          <div className="flex-1 flex flex-col justify-center px-7 py-6">
-            <div className="flex justify-center mb-6">
+          <div className="flex-1 flex flex-col justify-center px-4 sm:px-7 py-4 sm:py-6">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={slideIdx}
@@ -183,7 +183,7 @@ export default function Home() {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96, y: -8 }}
                   transition={{ duration: 0.38 }}
-                  className="w-44 h-44 rounded-2xl overflow-hidden shadow-2xl"
+                  className="w-32 h-32 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shadow-2xl"
                 >
                   <img src={slide.img} alt={txt.title} className="w-full h-full object-cover" />
                 </motion.div>
@@ -197,12 +197,12 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.3 }}
-                className="text-center mb-8"
+                className="text-center mb-5 sm:mb-8"
               >
-                <h2 className="text-[1.45rem] font-black mb-2.5 leading-snug" style={{ color: panelText, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <h2 className="text-lg sm:text-[1.45rem] font-black mb-2 leading-snug" style={{ color: panelText, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {txt.title}
                 </h2>
-                <p className="text-sm leading-relaxed max-w-xs mx-auto" style={{ color: panelMuted }}>
+                <p className="text-xs sm:text-sm leading-relaxed max-w-xs mx-auto hidden sm:block" style={{ color: panelMuted }}>
                   {txt.desc}
                 </p>
               </motion.div>
@@ -211,12 +211,12 @@ export default function Home() {
             <Link
               to="/auth"
               aria-label={taglish ? "Magsimula na sa KinnectFi" : "Get started with KinnectFi — create your free account"}
-              className="flex items-center justify-center gap-2 font-bold rounded-xl py-4 px-6 text-base mb-3 hover:opacity-90 transition-opacity"
+              className="flex items-center justify-center gap-2 font-bold rounded-xl py-3.5 sm:py-4 px-6 text-sm sm:text-base mb-2.5 sm:mb-3 hover:opacity-90 transition-opacity"
               style={{ background: "#C97B22", color: "#fff" }}
             >
               {taglish ? "Magsimula Na →" : "Get Started →"}
             </Link>
-            <p className="text-center text-[11px] mb-7" style={{ color: panelMuted }}>
+            <p className="text-center text-[11px] mb-4 sm:mb-7" style={{ color: panelMuted }}>
               <Link to="/auth" aria-label="Sign in to your existing KinnectFi account" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
                 {taglish ? "May account ka na? Maligayang pagbabalik!" : "Already have an account? Welcome back!"}
               </Link>
@@ -236,15 +236,16 @@ export default function Home() {
 
           {/* Bottom status bar */}
           <div
-            className="flex items-center justify-between px-6 py-3.5 border-t text-[10px] font-semibold uppercase tracking-wider"
+            className="flex items-center justify-between px-4 sm:px-6 py-3 border-t text-[10px] font-semibold uppercase tracking-wider"
             style={{ borderColor: panelBorder, background: darkHero ? "rgba(0,0,0,0.25)" : "rgba(13,31,60,0.04)" }}
           >
             <div className="flex items-center gap-1.5" style={{ color: panelMuted }}>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-              {taglish ? "Secured ng 256-bit Encryption" : "Secured by 256-bit Encryption"}
+              <span className="hidden sm:inline">{taglish ? "Secured ng 256-bit Encryption" : "Secured by 256-bit Encryption"}</span>
+              <span className="sm:hidden">256-bit Secure</span>
             </div>
             <div className="flex items-center gap-3" style={{ color: panelMuted }}>
-              <span>PHP/USD <span className="font-black" style={{ color: "#C97B22" }}>₱{liveRate}</span></span>
+              <span>₱<span className="font-black" style={{ color: "#C97B22" }}>{liveRate}</span>/USD</span>
               <span>{taglish ? "Bayad" : "Fee"} <span className="font-black" style={{ color: "#C97B22" }}>$0</span></span>
             </div>
           </div>
@@ -253,12 +254,12 @@ export default function Home() {
 
       {/* ── Features Strip ── */}
       <section style={{ backgroundColor: "#F5EFE3" }} className="px-6 py-16 max-w-5xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C97B22" }}>Why KinnectFi</p>
-          <h2 className="text-3xl sm:text-4xl font-black leading-tight mb-3" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-3" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Built for the OFW. <span style={{ color: "#C97B22" }}>Zero compromises.</span>
           </h2>
-          <p className="text-base max-w-md mx-auto" style={{ color: "rgba(13,31,60,0.55)" }}>
+          <p className="text-sm sm:text-base max-w-md mx-auto" style={{ color: "rgba(13,31,60,0.55)" }}>
             Every feature is designed around the real needs of Filipino families sending love across oceans.
           </p>
         </div>
@@ -310,10 +311,10 @@ export default function Home() {
         </div>
 
         {/* How it works */}
-        <div className="rounded-3xl overflow-hidden mb-16" style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #3d2e00 60%, #8a6a00 100%)" }}>
-          <div className="px-8 py-10 sm:px-12">
+        <div className="rounded-3xl overflow-hidden mb-10 sm:mb-16" style={{ background: "linear-gradient(135deg, #0D1F3C 0%, #3d2e00 60%, #8a6a00 100%)" }}>
+          <div className="px-5 py-8 sm:px-12 sm:py-10">
             <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(201,123,34,0.7)" }}>How it works</p>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white mb-6 sm:mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Send padala in <span style={{ color: "#C97B22" }}>3 simple steps</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -352,7 +353,7 @@ export default function Home() {
       </div>
 
       {/* Trust bar */}
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pb-4">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-3 sm:gap-6 lg:gap-10 pb-4">
           {[
             { icon: "🔒", label: "256-bit Encryption" },
             { icon: "🏦", label: "FDIC-Insured Partners" },
@@ -360,9 +361,9 @@ export default function Home() {
             { icon: "🇵🇭", label: "10,000+ OFW Families" },
             { icon: "💸", label: "$0 Transfer Fees" },
           ].map((t, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-lg">{t.icon}</span>
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "rgba(13,31,60,0.45)" }}>{t.label}</span>
+            <div key={i} className="flex items-center gap-2 justify-center sm:justify-start">
+              <span className="text-base sm:text-lg">{t.icon}</span>
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider" style={{ color: "rgba(13,31,60,0.45)" }}>{t.label}</span>
             </div>
           ))}
         </div>
