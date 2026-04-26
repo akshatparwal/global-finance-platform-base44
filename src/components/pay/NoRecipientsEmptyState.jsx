@@ -16,26 +16,23 @@ export default function NoRecipientsEmptyState({ darkMode }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`border rounded-2xl p-6 mb-4 ${card}`}
+      className={`border rounded-xl p-3 mb-3 ${card}`}
     >
-      <div className="flex flex-col items-center text-center py-4">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-          <Heart className="w-8 h-8 text-primary" />
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <Heart className="w-4 h-4 text-primary" />
         </div>
-        <h3 className={`font-extrabold text-lg mb-2 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          Who are you sending padala to?
-        </h3>
-        <p className={`text-sm ${muted} mb-5 max-w-xs leading-relaxed`}>
-          Add your family member's bank or e-wallet details once — then send with one tap every time.
-        </p>
+        <div className="flex-1 min-w-0">
+          <p className={`text-xs font-bold ${text}`}>No recipients yet</p>
+          <p className={`text-[10px] ${muted}`}>Add a family member to get started</p>
+        </div>
         <button
           onClick={() => navigate("/dashboard/recipients")}
-          className="flex items-center gap-2 bg-primary text-secondary font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90 active:scale-95 transition-all"
+          className="flex items-center gap-1.5 bg-primary text-secondary font-bold px-3 py-1.5 rounded-lg text-xs hover:opacity-90 active:scale-95 transition-all flex-shrink-0"
         >
-          <UserPlus className="w-4 h-4" />
-          Add First Recipient →
+          <UserPlus className="w-3 h-3" />
+          Add →
         </button>
-        <p className={`text-[11px] ${muted} mt-3`}>Takes 30 seconds · Saved securely</p>
       </div>
     </motion.div>
   );
