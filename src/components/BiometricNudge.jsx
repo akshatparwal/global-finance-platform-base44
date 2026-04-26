@@ -3,7 +3,7 @@
  * Appears once post-login if the browser supports WebAuthn and the user hasn't dismissed.
  */
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { Fingerprint, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -64,7 +64,11 @@ export default function BiometricNudge({ darkMode, whatsNewDismissed }) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 280 }}
-          className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[199] w-[calc(100%-2rem)] max-w-sm"
+          className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[199] w-[calc(100%-2rem)] max-w-sm cursor-grab active:cursor-grabbing"
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ top: 0, bottom: 0.4 }}
+          onDragEnd={(_, info) => { if (info.offset.y > 60) dismiss(); }}
         >
           <div className={`rounded-2xl shadow-2xl border px-5 py-4 backdrop-blur-xl ${darkMode ? "bg-[#1a2332]/95 border-white/15" : "bg-white/95 border-black/10"}`}>
             {done ? (

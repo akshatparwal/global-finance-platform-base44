@@ -46,6 +46,7 @@ export default function Pay() {
   })();
   const [sendAmount, setSendAmount] = useState(prefill.get("amount") || "");
   const [amountError, setAmountError] = useState("");
+  const LAST_RECIPIENT_KEY = "kf_last_recipient_id";
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const prefillName = prefill.get("recipient") || "";
   const prefillBank = prefill.get("bank") || "";
@@ -82,16 +83,22 @@ export default function Pay() {
   useEffect(() => {
     base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
     base44.entities.Recipient.list("-transfer_count", 6).then(r => {
-      setRecipients(r);
-      setRecipientsLoading(false);
-      // Auto-select recipient if pre-filled from Send Again
-      if (prefillName) {
-        const match = r.find(rec =>
-          (rec.full_name || "").toLowerCase() === prefillName.toLowerCase() ||
-          (rec.nickname || "").toLowerCase() === prefillName.toLowerCase()
-        );
-        if (match) setSelectedRecipient(match);
-      }
+    setRecipients(r);
+    setRecipientsLoading(false);
+    // Auto-select recipient if pre-filled from Send Again
+    if (prefillName) {
+      const match = r.find(rec =>
+        (rec.full_name || "").toLowerCase() === prefillName.toLowerCase() ||
+        (rec.nickname || "").toLowerCase() === prefillName.toLowerCase()
+      );
+      if (match) { setSelectedRecipient(match); return; }
+    }
+    // Restore last used recipient
+    const lastId = localStorage.getItem(LAST_RECIPIENT_KEY);
+    if (lastId) {
+      const last = r.find(rec => rec.id === lastId);
+      if (last) setSelectedRecipient(last);
+    }
     }).catch(() => setRecipientsLoading(false));
     base44.entities.ScheduledTransfer.filter({ is_active: true }).then(setScheduled).catch(() => {});
     setAlertsLoading(true);
@@ -185,7 +192,10 @@ export default function Pay() {
     };
     setTransfers(prev => [optimisticTransfer, ...prev]);
     setSendAmount("");
-    setSelectedRecipient(null);
+    // Persist last recipient for next session (don't clear selection)
+    if (selectedRecipient?.id) {
+      localStorage.setItem(LAST_RECIPIENT_KEY, selectedRecipient.id);
+    }
 
     try {
       const saved = await base44.entities.Transfer.create({
@@ -298,10 +308,10 @@ export default function Pay() {
         <div className="flex items-center gap-3 mb-6 overflow-x-auto">
           <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {recipientsLoading && [1,2,3].map(i => (
-              <div key={i} className="flex flex-col items-center gap-1 flex-shrink-0">
-                <div className={`w-10 h-10 rounded-full animate-pulse ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
-                <div className={`w-8 h-2 rounded animate-pulse ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
+            {recipientsLoading && [1,2,3,4].map(i => (
+              <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <div className={`w-11 h-11 rounded-full animate-pulse ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
+                <div className={`w-10 h-2 rounded-full animate-pulse ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
               </div>
             ))}
             {!recipientsLoading && recipients.length === 0 && (
@@ -335,33 +345,69 @@ export default function Pay() {
           </div>
         )}
 
-        <div className="space-y-3 mb-4">
-          <div>
-            <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Ipadala" : "You Send"}</label>
-            <div className={`flex items-center border rounded-xl overflow-hidden transition-colors ${amountError ? "border-red-500" : inputBg}`}>
-              <div className="bg-[#0d1526] text-white px-3 h-12 flex items-center gap-1 flex-shrink-0 border-r border-white/10">
-                <span>🇺🇸</span><span className="text-xs font-bold">USD</span>
-              </div>
-              <input value={sendAmount} onChange={e => handleAmountChange(e.target.value)}
-                placeholder="0.00" inputMode="decimal" className="flex-1 bg-transparent px-4 h-12 text-xl font-black outline-none" />
-            </div>
-            {amountError && (
-              <div className="flex items-center gap-1.5 mt-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                <p className="text-red-400 text-xs font-semibold">{amountError}</p>
-              </div>
-            )}
-            <p className={`text-[10px] ${muted} mt-1`}>Min $${MIN_AMOUNT} · Max $${MAX_AMOUNT.toLocaleString()} per transfer</p>
+        {/* Revolut-style big amount display */}
+        <div className={`rounded-2xl p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
+          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-2 block`}>{taglish ? "Ipadala (USD)" : "You Send (USD)"}</label>
+          <div
+            className={`text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 60 }}
+          >
+            ${sendAmount || <span className="opacity-20">0</span>}
           </div>
-          <div>
-            <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1.5 block`}>{taglish ? "Matatanggap" : "They Receive"}</label>
-            <div className={`flex items-center border rounded-xl overflow-hidden ${inputBg}`}>
-              <div className="bg-primary text-secondary px-3 h-12 flex items-center gap-1 flex-shrink-0 border-r border-primary/30">
-                <span>🇵🇭</span><span className="text-xs font-bold">PHP</span>
-              </div>
-              <div className="flex-1 px-4 h-12 flex items-center text-xl font-black">₱{receive}</div>
-            </div>
+          {/* Hidden native numeric input */}
+          <input
+            value={sendAmount}
+            onChange={e => handleAmountChange(e.target.value)}
+            inputMode="numeric"
+            type="number"
+            min={MIN_AMOUNT}
+            max={MAX_AMOUNT}
+            placeholder="0"
+            className="sr-only"
+            aria-label="Amount to send in USD"
+          />
+          <div className={`h-px my-3 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
+          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>{taglish ? "Matatanggap (PHP)" : "They Receive (PHP)"}</label>
+          <div className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            ₱{sendAmount ? parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "0.00"}
           </div>
+          {amountError && (
+            <div className="flex items-center justify-center gap-1.5 mt-2">
+              <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+              <p className="text-red-400 text-xs font-semibold">{amountError}</p>
+            </div>
+          )}
+          <p className={`text-[10px] ${muted} mt-2`}>Min $${MIN_AMOUNT} · Max $${MAX_AMOUNT.toLocaleString()}</p>
+        </div>
+
+        {/* Numpad */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {[1,2,3,4,5,6,7,8,9,".",0,"⌫"].map((d, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                if (d === "⌫") {
+                  const next = sendAmount.slice(0, -1);
+                  setSendAmount(next);
+                  if (amountError) setAmountError(validateAmount(next));
+                } else {
+                  const next = String(sendAmount) + String(d);
+                  // Prevent double dots
+                  if (d === "." && sendAmount.includes(".")) return;
+                  // Limit to 2 decimal places
+                  if (sendAmount.includes(".") && sendAmount.split(".")[1]?.length >= 2) return;
+                  handleAmountChange(next);
+                }
+              }}
+              className={`h-14 rounded-2xl text-xl font-bold transition-all active:scale-95 select-none
+                ${d === "⌫"
+                  ? `${darkMode ? "text-white/50 bg-white/5" : "text-[#1a2a4a]/50 bg-black/5"}`
+                  : `${darkMode ? "bg-white/8 text-white hover:bg-white/12" : "bg-black/6 text-[#1a2a4a] hover:bg-black/10"} border ${darkMode ? "border-white/5" : "border-black/5"}`
+                }`}
+            >
+              {d}
+            </button>
+          ))}
         </div>
 
         <div className={`flex items-center justify-between py-3 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-4`}>
@@ -377,16 +423,6 @@ export default function Pay() {
 
         <div className="mb-4">
           <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
-        </div>
-
-        {/* Quick amount presets */}
-        <div className="flex gap-2 mb-4">
-          {[50, 100, 200, 500].map(amt => (
-            <button key={amt} onClick={() => { setSendAmount(String(amt)); setAmountError(""); }}
-              className={`flex-1 py-2 rounded-xl text-sm font-bold border transition-all active:scale-95 ${parseFloat(sendAmount) === amt ? "bg-primary text-secondary border-primary" : darkMode ? "border-white/10 text-white/60 hover:border-white/30" : "border-black/10 text-[#1a2a4a]/60 hover:border-black/30"}`}>
-              ${amt}
-            </button>
-          ))}
         </div>
 
         {/* Note/memo field */}

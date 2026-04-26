@@ -3,7 +3,7 @@
  * Persisted in localStorage so it only appears on new releases.
  */
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { X, Sparkles } from "lucide-react";
 
 const CURRENT_VERSION = "3.0.0";
@@ -43,6 +43,8 @@ export default function WhatsNew({ darkMode, onDismissed }) {
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
 
+  const sheetY = useMotionValue(0);
+
   return (
     <AnimatePresence>
       {show && (
@@ -52,10 +54,19 @@ export default function WhatsNew({ darkMode, onDismissed }) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 60, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 280 }}
-            className={`w-full sm:max-w-md ${bg} rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden`}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.3 }}
+            style={{ y: sheetY }}
+            onDragEnd={(_, info) => { if (info.offset.y > 80) dismiss(); else sheetY.set(0); }}
+            className={`w-full sm:max-w-md ${bg} rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing`}
           >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-0">
+              <div className="w-10 h-1 rounded-full bg-white/20" />
+            </div>
             {/* Header */}
-            <div className="px-6 pt-6 pb-4 flex items-start justify-between">
+            <div className="px-6 pt-4 pb-4 flex items-start justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary" />

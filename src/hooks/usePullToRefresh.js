@@ -9,7 +9,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
  * @param {Function} onRefresh  async callback called when pull threshold is met
  * @param {number}   threshold  px of pull required (default 70)
  */
-export function usePullToRefresh(onRefresh, threshold = 70) {
+export function usePullToRefresh(onRefresh, threshold = 90) {
   const containerRef = useRef(null);
   const [pullY, setPullY] = useState(0);       // 0–threshold, spring-damped
   const [phase, setPhase] = useState("idle");  // idle | pulling | ready | refreshing
@@ -18,7 +18,8 @@ export function usePullToRefresh(onRefresh, threshold = 70) {
 
   const handleTouchStart = useCallback((e) => {
     const el = containerRef.current;
-    if (!el || el.scrollTop > 0) return;
+    // Require scrollTop === 0 AND only a clear downward intent (single touch)
+    if (!el || el.scrollTop > 2) return;
     startY.current = e.touches[0].clientY;
     isTracking.current = true;
   }, []);
@@ -26,13 +27,14 @@ export function usePullToRefresh(onRefresh, threshold = 70) {
   const handleTouchMove = useCallback((e) => {
     if (!isTracking.current || !startY.current) return;
     const el = containerRef.current;
-    if (!el || el.scrollTop > 0) { isTracking.current = false; return; }
+    if (!el || el.scrollTop > 2) { isTracking.current = false; return; }
 
     const raw = e.touches[0].clientY - startY.current;
-    if (raw <= 0) return;
+    // Require at least 12px of intentional downward pull before activating
+    if (raw <= 12) return;
 
     // Rubber-band damping: the further you pull, the harder it gets
-    const damped = threshold * (1 - Math.exp(-raw / (threshold * 1.8)));
+    const damped = threshold * (1 - Math.exp(-(raw - 12) / (threshold * 2.2)));
     setPullY(damped);
     setPhase(damped >= threshold * 0.85 ? "ready" : "pulling");
     e.preventDefault();

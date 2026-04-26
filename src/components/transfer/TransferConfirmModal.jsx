@@ -2,8 +2,8 @@
  * TransferConfirmModal — Revolut/Wise-style review screen before sending.
  * Shows: amount, recipient, rate, fee, arrival time, PIN entry.
  */
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { X, Shield, Clock, ChevronRight, Check, Loader2 } from "lucide-react";
 
 export default function TransferConfirmModal({ transfer, onConfirm, onClose, darkMode }) {
@@ -11,6 +11,7 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const dragY = useRef(0);
 
   const bg = "bg-[#0d1526]";
   const muted = "text-white/50";
@@ -38,6 +39,8 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
   const fee = 0.00;
   const totalDeducted = (parseFloat(amount) + fee).toFixed(2);
 
+  const sheetY = useMotionValue(0);
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-black/70 backdrop-blur-sm px-0 sm:px-4">
       <motion.div
@@ -45,11 +48,20 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 80, opacity: 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="w-full sm:max-w-sm bg-[#0d1526] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.3 }}
+        style={{ y: sheetY }}
+        onDragEnd={(_, info) => { if (info.offset.y > 80) onClose(); else sheetY.set(0); }}
+        className="w-full sm:max-w-sm bg-[#0d1526] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing"
         style={{ paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
       >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-white/20" />
+        </div>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between px-6 pt-3 pb-4">
           <div>
             <p className="text-white/40 text-[10px] uppercase tracking-widest">Review Transfer</p>
             <h3 className="text-white font-extrabold text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
