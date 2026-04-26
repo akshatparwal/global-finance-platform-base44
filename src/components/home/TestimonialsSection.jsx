@@ -83,7 +83,7 @@ export default function TestimonialsSection({ taglish }) {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className="h-1.5 rounded-full transition-all duration-300"
+              className="h-1.5 rounded-full transition-all duration-300 !min-h-0"
               style={{ width: i === active ? 28 : 7, background: i === active ? "#C97B22" : "rgba(255,255,255,0.2)" }}
             />
           ))}
