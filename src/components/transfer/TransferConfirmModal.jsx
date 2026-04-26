@@ -3,34 +3,18 @@
  * Shows: amount, recipient, rate, fee, arrival time, PIN entry.
  */
 import { useState, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { X, Shield, Clock, ChevronRight, Check, Loader2 } from "lucide-react";
+import { motion, useMotionValue } from "framer-motion";
+import { X, Shield, Clock, Loader2 } from "lucide-react";
 
 export default function TransferConfirmModal({ transfer, onConfirm, onClose, darkMode }) {
   const { amount, receive, rate, recipient, bank } = transfer;
-  const [pin, setPin] = useState("");
-  const [pinError, setPinError] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const dragY = useRef(0);
 
   const bg = "bg-[#0d1526]";
   const muted = "text-white/50";
 
-  const handlePinInput = (digit) => {
-    if (pin.length >= 4) return;
-    const next = pin + digit;
-    setPin(next);
-    setPinError(false);
-    if (next.length === 4) {
-      // Auto-confirm after PIN entered (accept any 4-digit PIN for demo)
-      setTimeout(() => handleConfirm(next), 200);
-    }
-  };
-
-  const handleDelete = () => setPin(p => p.slice(0, -1));
-
-  const handleConfirm = async (enteredPin = pin) => {
-    if (enteredPin.length < 4) { setPinError(true); return; }
+  const handleConfirm = async () => {
     setConfirming(true);
     await onConfirm();
     setConfirming(false);
@@ -114,73 +98,23 @@ export default function TransferConfirmModal({ transfer, onConfirm, onClose, dar
             ))}
           </div>
 
-          {/* PIN pad — native input for mobile autofill */}
-          <div className="mb-4">
-            <p className="text-white/50 text-xs text-center mb-3">Enter your 4-digit transaction PIN</p>
-            {/* Hidden native input for mobile keyboard / autofill */}
-            <input
-              type="password"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={4}
-              value={pin}
-              onChange={e => {
-                const v = e.target.value.replace(/\D/g, "").slice(0, 4);
-                setPin(v);
-                setPinError(false);
-                if (v.length === 4) setTimeout(() => handleConfirm(v), 200);
-              }}
-              className="sr-only"
-              aria-label="Transaction PIN"
-            />
-            {/* Dots */}
-            <div className="flex justify-center gap-3 mb-4">
-              {[0, 1, 2, 3].map(i => (
-                <motion.div
-                  key={i}
-                  animate={{ scale: pin.length > i ? 1.2 : 1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    pin.length > i ? "bg-primary" : "bg-white/20"
-                  } ${pinError ? "bg-red-500" : ""}`}
-                />
-              ))}
-            </div>
-            {pinError && (
-              <p className="text-red-400 text-xs text-center mb-3">Incorrect PIN. Please try again.</p>
-            )}
-
-            {/* Numpad */}
-            <div className="grid grid-cols-3 gap-2">
-              {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((d, i) => (
-                <button
-                  key={i}
-                  onClick={() => d === "⌫" ? handleDelete() : d !== "" && handlePinInput(String(d))}
-                  disabled={confirming}
-                  className={`h-14 rounded-2xl text-xl font-bold transition-all active:scale-95 ${
-                    d === "" ? "invisible" :
-                    d === "⌫" ? "text-white/50 hover:bg-white/10 bg-transparent" :
-                    "text-white bg-white/5 hover:bg-white/10 border border-white/5"
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Trust indicators */}
           <div className="flex items-center justify-center gap-4 text-white/30 text-[10px]">
             <div className="flex items-center gap-1"><Shield className="w-3 h-3" /> 256-bit encrypted</div>
             <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> 30-sec delivery</div>
           </div>
 
-          {confirming && (
-            <div className="mt-4 flex items-center justify-center gap-2 text-primary">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm font-bold">Processing transfer...</span>
-            </div>
-          )}
+          {/* Confirm button */}
+          <button
+            onClick={handleConfirm}
+            disabled={confirming}
+            className="w-full mt-4 bg-primary text-secondary font-black py-4 rounded-xl text-lg hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60"
+          >
+            {confirming
+              ? <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing…</span>
+              : "Confirm & Send →"
+            }
+          </button>
         </div>
       </motion.div>
     </div>

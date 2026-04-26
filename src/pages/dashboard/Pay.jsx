@@ -10,11 +10,13 @@ import { sfx } from "@/utils/sounds";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { AnimatePresence } from "framer-motion";
 import TransferConfirmModal from "@/components/transfer/TransferConfirmModal";
+import SendAuthGate from "@/components/transfer/SendAuthGate";
 import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 import CurrencyConverter from "@/components/pay/CurrencyConverter";
 import SendAnimation from "@/components/transfer/SendAnimation";
 import TransferTracker from "@/components/transfer/TransferTracker";
 import NoRecipientsEmptyState from "@/components/pay/NoRecipientsEmptyState";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 const RATE_HISTORY = [
   { date: "Apr 1",  rate: 55.80 }, { date: "Apr 5",  rate: 55.95 }, { date: "Apr 8",  rate: 56.10 },
@@ -38,6 +40,7 @@ import CreateScheduledForm from "@/components/pay/CreateScheduledForm";
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
+  const isOnline = useOnlineStatus();
   const navigate = useNavigate();
   const [showScheduledForm, setShowScheduledForm] = useState(false);
   // Pre-fill from "Send Again" navigation
@@ -58,6 +61,7 @@ export default function Pay() {
   const [recipientSearch, setRecipientSearch] = useState("");
   const [transferNote, setTransferNote] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
   const [completedTransfer, setCompletedTransfer] = useState(null);
   const [showSendAnim, setShowSendAnim] = useState(false);
   const [sendAnimData, setSendAnimData] = useState({ amount: "", recipient: "" });
@@ -163,11 +167,26 @@ export default function Pay() {
     if (amountError) setAmountError(validateAmount(cleaned));
   };
 
-  // Step 1: validate then open confirm modal
+  // Format the raw amount string for display (Wise/Revolut style)
+  const formatAmountDisplay = (raw) => {
+    if (!raw) return "";
+    const parts = raw.split(".");
+    const intPart = parseInt(parts[0] || "0", 10).toLocaleString("en-US");
+    if (parts.length === 2) return `${intPart}.${parts[1]}`;
+    return intPart;
+  };
+
+  // Step 1: validate then show auth gate
   const handleSend = () => {
     const error = validateAmount(sendAmount);
     if (error) { setAmountError(error); return; }
     haptic.medium();
+    setShowAuthGate(true);
+  };
+
+  // Step 1b: auth passed → show confirm modal
+  const handleAuthPassed = () => {
+    setShowAuthGate(false);
     setShowConfirm(true);
   };
 
@@ -241,6 +260,16 @@ export default function Pay() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Offline banner */}
+      {!isOnline && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 mb-4" role="alert">
+          <span className="text-xl flex-shrink-0">📶</span>
+          <div>
+            <p className="text-yellow-400 text-sm font-bold">You're offline</p>
+            <p className="text-yellow-400/70 text-xs">Transfers are disabled until you reconnect.</p>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -354,7 +383,7 @@ export default function Pay() {
             className={`text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 60 }}
           >
-            ${sendAmount || <span className="opacity-20">0</span>}
+            {sendAmount ? `$${formatAmountDisplay(sendAmount)}` : <span className="opacity-20">$0</span>}
           </div>
           {/* Hidden native numeric input */}
           <input
@@ -438,10 +467,10 @@ export default function Pay() {
           />
         </div>
 
-        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending}
+        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
-          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
-          {sending ? "SENDING..." : taglish ? "SURIIN AT MAGPADALA →" : "REVIEW & SEND →"}
+          className={`w-full py-4 rounded-xl font-bold text-lg text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
+          {!isOnline ? "📶 OFFLINE — RECONNECT TO SEND" : sending ? "SENDING..." : taglish ? "SURIIN AT MAGPADALA →" : "REVIEW & SEND →"}
         </button>
       </div>
 
@@ -726,6 +755,17 @@ export default function Pay() {
       <AnimatePresence>
         {trackedTransfer && (
           <TransferTracker transfer={trackedTransfer} onClose={() => setTrackedTransfer(null)} darkMode={darkMode} />
+        )}
+      </AnimatePresence>
+
+      {/* Auth gate */}
+      <AnimatePresence>
+        {showAuthGate && (
+          <SendAuthGate
+            onAuthorized={handleAuthPassed}
+            onCancel={() => setShowAuthGate(false)}
+            darkMode={darkMode}
+          />
         )}
       </AnimatePresence>
 

@@ -52,10 +52,10 @@ export default function Home() {
 
   return (
     <div style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
-      <section className="flex flex-col lg:flex-row min-h-screen lg:max-h-[900px]" style={{ minHeight: "100vh" }}>
+      <section className="flex flex-col lg:flex-row" style={{ minHeight: "100svh" }}>
 
         {/* LEFT: full-bleed photo */}
-        <div className="relative flex-1 overflow-hidden min-h-[65vh] lg:min-h-0">
+        <div className="relative flex-1 overflow-hidden min-h-[55svh] landscape:min-h-[100svh] lg:min-h-0">
           <img
             src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=1400&q=90"
             alt="Filipino family celebration"
@@ -140,7 +140,7 @@ export default function Home() {
         {/* RIGHT: info panel */}
         <div
           className="flex-shrink-0 w-full lg:w-[400px] xl:w-[440px] flex flex-col"
-          style={{ background: panelBg, transition: "background 0.4s", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+          style={{ background: panelBg, transition: "background 0.4s", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)", overflowY: "auto" }}
         >
           {/* Top toolbar */}
           <div className="flex items-center justify-between px-7 pt-7 pb-2">

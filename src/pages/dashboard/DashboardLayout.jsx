@@ -12,6 +12,7 @@ import SessionTimeoutWarning from "@/components/SessionTimeoutWarning";
 import BiometricNudge from "@/components/BiometricNudge";
 import { useTabStack } from "@/hooks/useTabStack";
 import PWAInstallNudge from "@/components/PWAInstallNudge";
+import { useSwipeTabs } from "@/hooks/useSwipeTabs";
 
 const NAV = [
   { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard",          color: "text-blue-400",    bg: "bg-blue-500/15" },
@@ -85,6 +86,20 @@ export default function DashboardLayout() {
     }
     setMobileOpen(false);
   }, [activeTab, resetTab, switchTab, navigate]);
+
+  // Tab order for swipe navigation
+  const TAB_ORDER = ["/dashboard", "/dashboard/insights", "/dashboard/pay", "/dashboard/cards", "/dashboard/profile"];
+
+  const swipeHandlers = useSwipeTabs({
+    onSwipeLeft: () => {
+      const idx = TAB_ORDER.indexOf(activeTab);
+      if (idx < TAB_ORDER.length - 1) handleTabClick(TAB_ORDER[idx + 1]);
+    },
+    onSwipeRight: () => {
+      const idx = TAB_ORDER.indexOf(activeTab);
+      if (idx > 0) handleTabClick(TAB_ORDER[idx - 1]);
+    },
+  });
 
   const bgMain = darkMode ? "bg-[#0a0f1a]" : "bg-[#f5efe6]";
   const bgSidebar = darkMode ? "bg-[#0d1526]" : "bg-[#1a2a4a]";
@@ -222,6 +237,8 @@ export default function DashboardLayout() {
         <main
           ref={mainRef}
           onScroll={() => { saveScroll(mainRef.current?.scrollTop ?? 0); }}
+          onTouchStart={swipeHandlers.onTouchStart}
+          onTouchEnd={swipeHandlers.onTouchEnd}
           className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
         >
           <AnimatePresence mode="wait" initial={false}>
