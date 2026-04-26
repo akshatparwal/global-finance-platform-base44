@@ -258,7 +258,7 @@ export default function Dashboard() {
                   <span className="text-base">{w.flag}</span>
                   <div><div className="text-white font-bold text-xs">{w.currency_code}</div><div className="text-white/40 text-[9px]">{w.currency_name}</div></div>
                 </div>
-                <span className="bg-primary/30 text-primary text-sm font-black px-3 py-1.5 rounded-full tracking-tight border border-primary/20">⚡ {w.yield_pct}</span>
+                <span className="bg-primary/30 text-primary text-xs font-black px-2 py-1 rounded-full tracking-tight border border-primary/20">⚡ {w.yield_pct}</span>
               </div>
               <div>
                 <div className="text-white/40 text-[9px] uppercase tracking-wider mb-0.5">{taglish ? "Balanse" : "Balance"}</div>
