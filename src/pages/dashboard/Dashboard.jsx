@@ -14,9 +14,10 @@ import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/compone
 import EmptyState from "@/components/ui/EmptyState";
 import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
-import FundWalletModal from "@/components/wallet/FundWalletModal";
+import FundWalletModal from "@/components/wallet/FundWalletModal.jsx";
 import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
 import PostOnboardingCard from "@/components/dashboard/PostOnboardingCard";
+import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [showFundWallet, setShowFundWallet] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
   const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
+  const { walletAddress, usdcBalance, refetchBalance } = usePrivyWallet();
   const liveRate = rates?.USDPHP || 56.24;
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
@@ -249,28 +251,48 @@ export default function Dashboard() {
               <EmptyState darkMode={darkMode} illustration="👛" title="No wallets yet" description="Your USD and PHP wallets will appear here." size="sm" />
             </div>
           ) : null}
-          {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
+          {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => {
+            // For USD wallet: show real on-chain USDC balance if available
+            const displayBalance = w.currency_code === "USD" && usdcBalance !== null
+              ? usdcBalance
+              : w.balance;
+            const isOnChain = w.currency_code === "USD" && usdcBalance !== null;
+            return (
             <div key={w.currency_code} className="kf-hero-card rounded-2xl p-4 relative overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
               style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
               onClick={() => navigate("/dashboard/pay")}>
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-1.5">
                   <span className="text-base">{w.flag}</span>
-                  <div><div className="text-white font-bold text-xs">{w.currency_code}</div><div className="text-white/40 text-[9px]">{w.currency_name}</div></div>
+                  <div>
+                    <div className="text-white font-bold text-xs">{w.currency_code}</div>
+                    <div className="text-white/40 text-[9px]">{w.currency_name}</div>
+                  </div>
                 </div>
-                <span className="bg-primary/30 text-primary text-xs font-black px-2 py-1 rounded-full tracking-tight border border-primary/20">⚡ {w.yield_pct}</span>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="bg-primary/30 text-primary text-xs font-black px-2 py-1 rounded-full tracking-tight border border-primary/20">⚡ {w.yield_pct}</span>
+                  {isOnChain && (
+                    <span className="bg-blue-500/20 text-blue-300 text-[8px] font-black px-1.5 py-0.5 rounded-full">ON-CHAIN</span>
+                  )}
+                </div>
               </div>
               <div>
                 <div className="text-white/40 text-[9px] uppercase tracking-wider mb-0.5">{taglish ? "Balanse" : "Balance"}</div>
                 <div className="text-white font-black text-lg leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  {w.currency_code === "USD" ? `$${w.balance.toFixed(2)}` : `₱${w.balance.toLocaleString("en-PH", {minimumFractionDigits: 0})}`}
+                  {w.currency_code === "USD" ? `$${displayBalance.toFixed(2)}` : `₱${w.balance.toLocaleString("en-PH", {minimumFractionDigits: 0})}`}
                 </div>
+                {w.currency_code === "USD" && walletAddress && (
+                  <div className="text-white/30 text-[8px] mt-1 font-mono truncate">
+                    {walletAddress.slice(0, 8)}…{walletAddress.slice(-6)}
+                  </div>
+                )}
                 {bahay && w.currency_code === "USD" && (
-                  <div className="text-white/40 text-xs mt-1">≈ ₱{(w.balance * liveRate).toLocaleString("en-PH", {maximumFractionDigits: 0})}</div>
+                  <div className="text-white/40 text-xs mt-1">≈ ₱{(displayBalance * liveRate).toLocaleString("en-PH", {maximumFractionDigits: 0})}</div>
                 )}
               </div>
             </div>
-          )) : null}
+            );
+          }) : null}
         </div>
       </div>
 

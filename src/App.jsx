@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { PrivyProvider } from '@privy-io/react-auth';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -66,17 +67,49 @@ const AuthenticatedApp = () => {
   );
 };
 
+const PRIVY_CONFIG = {
+  appId: "cmoalm0b300vx0djsqojffdy7",
+  config: {
+    // Embedded wallets only — Base chain (USDC)
+    embeddedWallets: {
+      createOnLogin: "all-users",
+      noPromptOnSignature: true,
+    },
+    defaultChain: {
+      id: 8453,
+      name: "Base",
+      network: "base",
+      nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+      rpcUrls: { default: { http: ["https://mainnet.base.org"] } },
+    },
+    supportedChains: [
+      {
+        id: 8453,
+        name: "Base",
+        network: "base",
+        nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+        rpcUrls: { default: { http: ["https://mainnet.base.org"] } },
+      },
+    ],
+    // Disable Privy's own login UI — Base44 handles auth
+    loginMethods: [],
+    appearance: { theme: "dark" },
+  },
+};
+
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
-      </AuthProvider>
+      <PrivyProvider appId={PRIVY_CONFIG.appId} config={PRIVY_CONFIG.config}>
+        <AuthProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </AuthProvider>
+      </PrivyProvider>
     </ErrorBoundary>
   )
 }
