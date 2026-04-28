@@ -13,6 +13,8 @@ import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
 import LiveMarkets from "@/components/insights/LiveMarkets";
+import YieldCard from "@/components/dashboard/YieldCard";
+import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
 const padalaData = [
   { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
@@ -59,6 +61,7 @@ export default function Insights() {
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
   const rateChange = rates?.USDPHP_change_pct || 0;
+  const { usdcBalance } = usePrivyWallet();
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
@@ -303,6 +306,14 @@ export default function Insights() {
               </div>
             );
           })()}
+
+          {/* Live yield card — driven by on-chain USDC balance */}
+          <YieldCard
+            balance={usdcBalance !== null ? usdcBalance : (wallets.find(w => w.currency_code === "USD")?.balance || 0)}
+            walletCreatedDate={wallets.find(w => w.currency_code === "USD")?.created_date || null}
+            yieldPctStr={wallets.find(w => w.currency_code === "USD")?.yield_pct || "4.5%"}
+            darkMode={darkMode}
+          />
 
           <div className="flex justify-between items-center"><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Savings Goals</h3><button onClick={handleCreateGoal} className="text-primary text-sm font-bold hover:underline">+ Create Goal</button></div>
           {goalsLoading ? (
