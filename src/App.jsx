@@ -91,8 +91,8 @@ const PRIVY_CONFIG = {
         rpcUrls: { default: { http: ["https://mainnet.base.org"] } },
       },
     ],
-    // Disable Privy's own login UI — Base44 handles auth
-    loginMethods: [],
+    // Base44 handles auth; Privy is used only for embedded wallets
+    loginMethods: ["email"],
     appearance: { theme: "dark" },
   },
 };
