@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Copy, Check, Building2, Zap, ArrowDownToLine, CheckCircle, Wallet } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { processDeposit } from "@/functions/processDeposit";
 import { haptic } from "@/utils/haptic";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
@@ -162,17 +162,15 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                       onClick={async () => {
                         haptic.medium();
                         setDepositing(true);
-                        await new Promise(r => setTimeout(r, 1500));
-                        try {
-                          const wallets = await base44.entities.WalletBalance.filter({ currency_code: "USD" });
-                          if (wallets.length > 0) {
-                            await base44.entities.WalletBalance.update(wallets[0].id, {
-                              balance: (wallets[0].balance || 0) + parseFloat(instantAmount),
-                            });
-                          }
-                        } catch {}
+                        const res = await processDeposit({
+                          amount: parseFloat(instantAmount),
+                          method: "instant",
+                          currency_code: "USD",
+                        });
                         setDepositing(false);
-                        setInstantSuccess(true);
+                        if (res?.data?.success) {
+                          setInstantSuccess(true);
+                        }
                       }}
                       className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
                     >

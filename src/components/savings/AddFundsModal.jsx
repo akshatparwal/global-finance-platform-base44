@@ -6,6 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Zap, RefreshCw, ChevronDown, Check, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { processInvestment } from "@/functions/processInvestment";
 import confetti from "canvas-confetti";
 import { haptic } from "@/utils/haptic";
 import { sfx } from "@/utils/sounds";
@@ -49,21 +50,26 @@ export default function AddFundsModal({ goal, onClose, onUpdated, darkMode }) {
     if (parsedAmount <= 0) return;
     setSaving(true);
 
-    const contributions = [
-      ...(goal.contributions || []),
-      { amount: parsedAmount, note: note || "Manual contribution", date: new Date().toISOString() },
-    ];
+    // Use backend function for proper balance deduction + audit trail
+    const res = await processInvestment({
+      goal_id: goal.id,
+      amount: parsedAmount,
+      note: note || "Manual contribution",
+    });
 
+    // Also save auto-save rules regardless
     await base44.entities.SavingsGoal.update(goal.id, {
-      current_amount: newTotal,
       auto_save_enabled: autoSave,
       auto_save_amount: parseFloat(autoAmount) || 0,
       auto_save_frequency: autoFreq,
       round_up_enabled: roundUp,
-      contributions,
     });
 
     setSaving(false);
+    if (!res?.data?.success) {
+      alert(res?.data?.error || "Contribution failed. Please check your balance.");
+      return;
+    }
     setSuccess(true);
     haptic.success();
     sfx.coin();
@@ -77,7 +83,7 @@ export default function AddFundsModal({ goal, onClose, onUpdated, darkMode }) {
     }
 
     setTimeout(() => {
-      onUpdated({ ...goal, current_amount: newTotal, auto_save_enabled: autoSave, auto_save_amount: parseFloat(autoAmount) || 0, auto_save_frequency: autoFreq, round_up_enabled: roundUp, contributions });
+      onUpdated({ ...goal, current_amount: newTotal, auto_save_enabled: autoSave, auto_save_amount: parseFloat(autoAmount) || 0, auto_save_frequency: autoFreq, round_up_enabled: roundUp });
       onClose();
     }, pct >= 100 ? 2200 : 1200);
   };

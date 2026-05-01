@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import TransferEstimator from "@/components/dashboard/TransferEstimator";
 import { useToast } from "@/components/ui/use-toast";
+import { processTransfer } from "@/functions/processTransfer";
 import { haptic } from "@/utils/haptic";
 import { sfx } from "@/utils/sounds";
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
@@ -198,63 +199,62 @@ export default function Pay() {
     const recipientName = selectedRecipient?.nickname || selectedRecipient?.full_name || "Family";
     const recipientBank = selectedRecipient?.bank || "GCash";
 
+    // Optimistic UI
     const optimisticId = `optimistic-${Date.now()}`;
-    const optimisticTransfer = {
-      id: optimisticId,
+    setTransfers(prev => [{
+      id: optimisticId, amount_usd: amt, amount_php: parseFloat(receive),
+      recipient_name: recipientName, recipient_bank: recipientBank,
+      status: "pending", created_date: new Date().toISOString(),
+    }, ...prev]);
+    setSendAmount("");
+    if (selectedRecipient?.id) localStorage.setItem(LAST_RECIPIENT_KEY, selectedRecipient.id);
+
+    const res = await processTransfer({
       amount_usd: amt,
-      amount_php: parseFloat(receive),
+      recipient_id: selectedRecipient?.id,
       recipient_name: recipientName,
       recipient_bank: recipientBank,
-      status: "pending",
-      created_date: new Date().toISOString(),
-    };
-    setTransfers(prev => [optimisticTransfer, ...prev]);
-    setSendAmount("");
-    // Persist last recipient for next session (don't clear selection)
-    if (selectedRecipient?.id) {
-      localStorage.setItem(LAST_RECIPIENT_KEY, selectedRecipient.id);
-    }
+      rate,
+      note: transferNote || undefined,
+      category: "remittance",
+    });
 
-    try {
-      const saved = await base44.entities.Transfer.create({
-        amount_usd: amt,
-        amount_php: parseFloat(receive),
-        recipient_name: recipientName,
-        recipient_bank: recipientBank,
-        status: "completed",
-        rate,
-        fee: 0,
-        note: transferNote || undefined,
-      });
-      setTransferNote("");
-      const finalTransfer = { ...saved, status: "completed" };
-      // Send confirmation email — fetch user fresh if not yet loaded
-      const u = alertUser || await base44.auth.me().catch(() => null);
-      if (u?.email) {
-        base44.integrations.Core.SendEmail({
-          to: u.email,
-          from_name: "KinnectFi",
-          subject: `✅ Transfer Confirmed — $${amt.toFixed(2)} to ${recipientName}`,
-          body: `Hi ${u.full_name || "there"},\n\nYour transfer has been sent successfully!\n\n📤 Amount Sent: $${amt.toFixed(2)} USD\n🇵🇭 Received: ₱${parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 })} PHP\n👤 To: ${recipientName}\n🏦 Via: ${recipientBank}\n💱 Rate: ₱${rate.toFixed(2)}/USD\n💸 Fee: $0.00\n📋 Ref: KF-${saved.id?.slice(0,8).toUpperCase()}\n\nThank you for using KinnectFi — the neobank built for Filipino families.\n\n— The KinnectFi Team`,
-        }).catch(() => {});
-      }
-      setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
-      haptic.success();
-      sfx.success();
-      // Show send animation then receipt
-      setSendAnimData({ amount: amt.toFixed(2), recipient: recipientName });
-      setShowSendAnim(true);
-      // Store for after animation
-      setCompletedTransfer(finalTransfer);
-    } catch {
+    if (!res?.data?.success) {
+      // Rollback optimistic update
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
       setSendAmount(String(amt));
+      setSending(false);
       haptic.error();
       sfx.error();
-      toast({ title: "Transfer failed", description: "Please try again.", variant: "destructive" });
-    } finally {
-      setSending(false);
+      toast({
+        title: res?.data?.kyc_required ? "KYC Required" : "Transfer failed",
+        description: res?.data?.error || "Please try again.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    const finalTransfer = res.data.transfer;
+    setTransferNote("");
+    setTransfers(prev => prev.map(t => t.id === optimisticId ? finalTransfer : t));
+    haptic.success();
+    sfx.success();
+
+    // Send confirmation email
+    const u = alertUser || await base44.auth.me().catch(() => null);
+    if (u?.email) {
+      base44.integrations.Core.SendEmail({
+        to: u.email,
+        from_name: "KinnectFi",
+        subject: `✅ Transfer Confirmed — $${amt.toFixed(2)} to ${recipientName}`,
+        body: `Hi ${u.full_name || "there"},\n\nYour transfer has been sent successfully!\n\n📤 Amount Sent: $${amt.toFixed(2)} USD\n🇵🇭 Received: ₱${parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 })} PHP\n👤 To: ${recipientName}\n🏦 Via: ${recipientBank}\n💱 Rate: ₱${rate.toFixed(2)}/USD\n💸 Fee: $0.00\n📋 Ref: ${finalTransfer.reference_id || "KF-" + finalTransfer.id?.slice(0,8).toUpperCase()}\n\nThank you for using KinnectFi — the neobank built for Filipino families.\n\n— The KinnectFi Team`,
+      }).catch(() => {});
+    }
+
+    setSendAnimData({ amount: amt.toFixed(2), recipient: recipientName });
+    setShowSendAnim(true);
+    setCompletedTransfer(finalTransfer);
+    setSending(false);
   };
 
   return (
