@@ -108,6 +108,8 @@ export default function Support() {
         role: "assistant",
         content: typeof response === "string" ? response : response?.text || "Sorry, I couldn't process that. Please try again.",
         timestamp: Date.now(),
+        id: Date.now().toString(),
+        feedback: null,
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err) {
@@ -124,6 +126,18 @@ export default function Support() {
 
   // Persist messages on every change
   useEffect(() => { saveHistory(messages); }, [messages]);
+
+  const handleFeedback = async (msgId, rating, msgContent) => {
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, feedback: rating } : m));
+    if (rating === "down") {
+      await base44.integrations.Core.SendEmail({
+        to: "support@kinnectfi.com",
+        from_name: "KinnectFi Kaya Feedback",
+        subject: `👎 Unhelpful Kaya Response — ${user?.email || "unknown user"}`,
+        body: `A user rated a Kaya response as unhelpful.\n\nUser: ${user?.full_name || "Unknown"} (${user?.email || "no email"})\nTime: ${new Date().toISOString()}\n\nKaya's response:\n"${msgContent}"\n\nFull conversation:\n${messages.map(m => `${m.role === "user" ? "User" : "Kaya"}: ${m.content}`).join("\n\n")}`,
+      }).catch(() => {});
+    }
+  };
 
   const handleReset = () => {
     const fresh = [WELCOME_MESSAGE];
@@ -206,7 +220,12 @@ export default function Support() {
       >
         <AnimatePresence initial={false}>
           {messages.map((msg, i) => (
-            <ChatMessage key={i} message={msg} darkMode={darkMode} />
+            <ChatMessage
+              key={i}
+              message={msg}
+              darkMode={darkMode}
+              onFeedback={msg.role === "assistant" && msg.id ? (rating) => handleFeedback(msg.id, rating, msg.content) : null}
+            />
           ))}
         </AnimatePresence>
 
