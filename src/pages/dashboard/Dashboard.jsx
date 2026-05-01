@@ -19,6 +19,7 @@ import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
 import PostOnboardingCard from "@/components/dashboard/PostOnboardingCard";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import WalletCard from "@/components/dashboard/WalletCard";
+import { useYieldAccrual } from "@/hooks/useYieldAccrual";
 
 const COMMUNITY = [
   { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
@@ -99,9 +100,15 @@ export default function Dashboard() {
   const pulling = phase === "pulling" || phase === "ready";
   const refreshing = phase === "refreshing";
 
-  const totalUSD = wallets.find(w => w.currency_code === "USD")?.balance || 0;
+  const usdWallet = wallets.find(w => w.currency_code === "USD");
+  const totalUSD = usdWallet?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
-  const netWorth = totalUSD + (totalPHP / liveRate);
+  const { yieldEarned, dailyYield } = useYieldAccrual({
+    balance: totalUSD,
+    walletCreatedDate: usdWallet?.created_date,
+    yieldPctStr: usdWallet?.yield_pct,
+  });
+  const netWorth = totalUSD + yieldEarned + (totalPHP / liveRate);
   // Bahay mode: PHP-centric display
   const primaryAmount = bahay ? `₱ ${(netWorth * liveRate).toLocaleString("en-PH", { minimumFractionDigits: 2 })}` : `$ ${netWorth.toFixed(2)}`;
   const secondaryAmount = bahay ? `$ ${netWorth.toFixed(2)}` : `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
@@ -211,6 +218,11 @@ export default function Dashboard() {
               <p className="text-white/30 text-[10px] mt-0.5">
                 {ratesLoading ? "Fetching rate..." : `₱${liveRate.toFixed(2)}/USD · Live${lastUpdatedLabel ? ` · ${lastUpdatedLabel}` : ""}`}
               </p>
+              {totalUSD > 0 && yieldEarned > 0 && (
+                <p className="text-emerald-400 text-[10px] mt-1 font-semibold">
+                  ⚡ +${yieldEarned.toFixed(4)} yield earned · +${dailyYield.toFixed(4)}/day
+                </p>
+              )}
             </div>
             <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">
               <TrendingUp className="w-3 h-3 text-emerald-400" />
