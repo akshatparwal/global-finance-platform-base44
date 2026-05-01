@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { Send, RefreshCw, BookOpen, Phone, ChevronRight } from "lucide-react";
+import { Send, RefreshCw, BookOpen, Phone, ChevronRight, Flag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { AnimatePresence } from "framer-motion";
 import ChatMessage from "@/components/support/ChatMessage";
 import SuggestedPrompts from "@/components/support/SuggestedPrompts";
+import { useLiveRates } from "@/hooks/useLiveRates";
 
-const SYSTEM_PROMPT = `You are Kaya, KinnectFi's friendly and knowledgeable AI support assistant. KinnectFi is a cross-border neobank built for Filipino OFWs (Overseas Filipino Workers) to send money home instantly with zero fees.
+const buildSystemPrompt = (liveRate) => `You are Kaya, KinnectFi's friendly and knowledgeable AI support assistant. KinnectFi is a cross-border neobank built for Filipino OFWs (Overseas Filipino Workers) to send money home instantly with zero fees.
 
 Key facts you know:
-- Current USD/PHP rate is approximately ₱56.24 (live rate, varies)
+- Current USD/PHP rate is ${liveRate ? `₱${liveRate.toFixed(2)} (live, just fetched)` : "approximately ₱56.24 (live rate, varies)"}
 - Transfers to GCash, Maya, BDO, BPI, Metrobank, UnionBank, PNB, RCBC, Landbank are supported
 - Transfers arrive in 30 seconds to 2 minutes for GCash/Maya, 1-2 hours for bank transfers
 - KinnectFi charges ZERO transfer fees
@@ -20,6 +21,8 @@ Key facts you know:
 - The app supports English and Taglish
 
 Be concise, warm, and helpful. Use Filipino cultural references when appropriate. If you don't know something specific, say so honestly and suggest contacting live support. Keep responses under 150 words unless the user asks for detail. Use emojis sparingly but naturally.`;
+
+const SYSTEM_PROMPT = buildSystemPrompt(null); // fallback, overridden at send time
 
 const WELCOME_MESSAGE = {
   role: "assistant",
@@ -50,8 +53,12 @@ export default function Support() {
   const [loading, setLoading] = useState(false);
   const [showPrompts, setShowPrompts] = useState(true);
   const [user, setUser] = useState(null);
+  const [flagging, setFlagging] = useState(false);
+  const [flagged, setFlagged] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const { rates } = useLiveRates();
+  const liveRate = rates?.USDPHP;
 
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/8";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
@@ -91,8 +98,9 @@ export default function Support() {
         ? `The user's name is ${user.full_name || "there"}.${user.onboarding_completed ? " They are fully verified." : " They have not completed KYC yet."}\n\n`
         : "";
 
+      const systemPrompt = buildSystemPrompt(liveRate);
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `${SYSTEM_PROMPT}\n\n${contextPrompt}Conversation so far:\n${history}\n\nUser: ${userText}\n\nKaya:`,
+        prompt: `${systemPrompt}\n\n${contextPrompt}Conversation so far:\n${history}\n\nUser: ${userText}\n\nKaya:`,
         model: "gemini_3_flash",
       });
 
@@ -123,6 +131,7 @@ export default function Support() {
     saveHistory(fresh);
     setShowPrompts(true);
     setInput("");
+    setFlagged(false);
   };
 
   return (
@@ -151,8 +160,8 @@ export default function Support() {
 
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-2 mb-4 flex-shrink-0">
-        <button
-          onClick={() => navigate("/HowItWorks")}
+        <a
+          href="mailto:support@kinnectfi.com?subject=Help%20Center%20FAQ&body=Hi%2C%20I%20have%20a%20question%20about%20KinnectFi."
           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${card} hover:border-primary/30`}
         >
           <BookOpen className="w-4 h-4 text-primary flex-shrink-0" />
@@ -161,7 +170,7 @@ export default function Support() {
             <p className={`text-[10px] ${muted} truncate`}>Guides & FAQs</p>
           </div>
           <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
-        </button>
+        </a>
         <div className={`flex flex-col rounded-xl border overflow-hidden ${card}`}>
           <a
             href="https://wa.me/14155238886?text=Hi%2C%20I%20need%20help%20with%20my%20KinnectFi%20account"
@@ -222,6 +231,37 @@ export default function Support() {
         )}
         <div ref={bottomRef} />
       </div>
+
+      {/* Escalate / Flag issue */}
+      {messages.length > 2 && !loading && (
+        <div className="flex-shrink-0 flex justify-center mb-2">
+          {flagged ? (
+            <span className={`text-xs font-semibold px-4 py-2 rounded-full ${darkMode ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-500/10 text-emerald-600"}`}>
+              ✓ Issue flagged — our team will follow up via email
+            </span>
+          ) : (
+            <button
+              disabled={flagging}
+              onClick={async () => {
+                setFlagging(true);
+                const transcript = messages.map(m => `${m.role === "user" ? "User" : "Kaya"}: ${m.content}`).join("\n\n");
+                await base44.integrations.Core.SendEmail({
+                  to: "support@kinnectfi.com",
+                  from_name: "KinnectFi Kaya Escalation",
+                  subject: `🚩 Unresolved Support Issue — ${user?.email || "unknown user"}`,
+                  body: `A user flagged an unresolved issue in the Kaya chat.\n\nUser: ${user?.full_name || "Unknown"} (${user?.email || "no email"})\nTime: ${new Date().toISOString()}\n\n--- Transcript ---\n\n${transcript}`,
+                }).catch(() => {});
+                setFlagged(true);
+                setFlagging(false);
+              }}
+              className={`flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${darkMode ? "border-white/10 text-white/40 hover:border-red-400/40 hover:text-red-400" : "border-black/10 text-[#1a2a4a]/40 hover:border-red-400/40 hover:text-red-500"} disabled:opacity-40`}
+            >
+              <Flag className="w-3 h-3" />
+              {flagging ? "Flagging..." : "Kaya couldn't help — escalate to team"}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Suggested prompts */}
       {showPrompts && !loading && (
