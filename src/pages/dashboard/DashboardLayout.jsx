@@ -130,7 +130,7 @@ export default function DashboardLayout() {
         {/* Nav */}
         <nav className="flex-1 px-3 space-y-0.5">
           {NAV.map(({ label, icon: NavIcon, path, color, bg }) => {
-            const active = activeTab === path;
+            const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
             return (
               <button key={path} onClick={() => handleTabClick(path)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-white/10 text-white" : "text-white/55 hover:text-white hover:bg-white/5"}`}>
