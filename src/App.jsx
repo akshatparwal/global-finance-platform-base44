@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
-import HowItWorks from './pages/HowItWorks';
 import Layout from './components/Layout';
 import Auth from './pages/Auth';
 import DashboardLayout from './pages/dashboard/DashboardLayout';
@@ -46,7 +45,6 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/HowItWorks" element={<HowItWorks />} />
         {/* Add your page Route elements here */}
       </Route>
       <Route path="/auth" element={<Auth />} />
