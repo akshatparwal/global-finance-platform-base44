@@ -100,16 +100,16 @@ const PRIVY_CONFIG = {
 function App() {
   return (
     <ErrorBoundary>
-      <PrivyProvider appId={PRIVY_CONFIG.appId} config={PRIVY_CONFIG.config}>
-        <AuthProvider>
+      <AuthProvider>
+        <PrivyProvider appId={PRIVY_CONFIG.appId} config={PRIVY_CONFIG.config}>
           <QueryClientProvider client={queryClientInstance}>
             <Router>
               <AuthenticatedApp />
             </Router>
             <Toaster />
           </QueryClientProvider>
-        </AuthProvider>
-      </PrivyProvider>
+        </PrivyProvider>
+      </AuthProvider>
     </ErrorBoundary>
   )
 }
