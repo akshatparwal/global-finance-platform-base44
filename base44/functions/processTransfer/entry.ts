@@ -1,15 +1,15 @@
 /**
  * processTransfer — Execute a money transfer (remittance)
- * 
+ *
  * Payload:
  *   amount_usd: number
- *   recipient_id?: string  (Recipient entity id — preferred)
- *   recipient_name: string (fallback if no id)
+ *   recipient_id?: string
+ *   recipient_name: string
  *   recipient_bank: string
- *   rate: number           (USD/PHP rate at time of transfer)
+ *   rate: number  (USD/PHP rate)
  *   note?: string
  *   category?: string
- * 
+ *
  * Returns: { success, transfer, wallet }
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
@@ -47,15 +47,24 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Exchange rate is required.' }, { status: 400 });
   }
 
-  // ── Check balance ──
-  const wallets = await base44.asServiceRole.entities.WalletBalance.filter({ currency_code: 'USD' });
-  const userWallet = wallets.find(w => w.created_by === user.email);
+  // ── KYC gate — block ALL transfers until onboarding complete ──
+  if (!user.onboarding_completed) {
+    return Response.json({
+      error: 'Identity verification required before sending money. Please complete KYC in your profile.',
+      kyc_required: true,
+    }, { status: 403 });
+  }
 
-  if (!userWallet) {
+  // ── Check USD balance ──
+  const allWallets = await base44.asServiceRole.entities.WalletBalance.filter({});
+  const userWallets = allWallets.filter(w => w.created_by === user.email);
+  const usdWallet = userWallets.find(w => w.currency_code === 'USD');
+
+  if (!usdWallet) {
     return Response.json({ error: 'No USD wallet found. Please add funds first.' }, { status: 400 });
   }
 
-  const currentBalance = userWallet.balance || 0;
+  const currentBalance = usdWallet.balance || 0;
   if (currentBalance < amount_usd) {
     return Response.json({
       error: `Insufficient funds. Your balance is $${currentBalance.toFixed(2)}, transfer is $${amount_usd.toFixed(2)}.`,
@@ -76,23 +85,33 @@ Deno.serve(async (req) => {
     }
   }
 
-  // ── KYC gate ──
-  if (!user.onboarding_completed && amount_usd > 500) {
-    return Response.json({
-      error: 'KYC required for transfers above $500. Please complete identity verification.',
-      kyc_required: true,
-    }, { status: 403 });
-  }
-
   // ── Compute amounts ──
-  const fee = 0; // KinnectFi zero-fee promise
+  const fee = 0;
   const amount_php = parseFloat((amount_usd * rate).toFixed(2));
-  const newBalance = parseFloat((currentBalance - amount_usd).toFixed(2));
+  const newUsdBalance = parseFloat((currentBalance - amount_usd).toFixed(2));
 
-  // ── Deduct from wallet (optimistic, then confirm) ──
-  const updatedWallet = await base44.asServiceRole.entities.WalletBalance.update(userWallet.id, {
-    balance: newBalance,
+  // ── Deduct from USD wallet ──
+  const updatedUsdWallet = await base44.asServiceRole.entities.WalletBalance.update(usdWallet.id, {
+    balance: newUsdBalance,
   });
+
+  // ── Credit PHP wallet ──
+  const phpWallet = userWallets.find(w => w.currency_code === 'PHP');
+  if (phpWallet) {
+    const newPhpBalance = parseFloat(((phpWallet.balance || 0) + amount_php).toFixed(2));
+    await base44.asServiceRole.entities.WalletBalance.update(phpWallet.id, {
+      balance: newPhpBalance,
+    });
+  } else {
+    // Auto-create PHP wallet and credit it
+    await base44.asServiceRole.entities.WalletBalance.create({
+      currency_code: 'PHP',
+      currency_name: 'Philippine Peso',
+      flag: '🇵🇭',
+      balance: amount_php,
+      yield_pct: '2.1%',
+    });
+  }
 
   // ── Record transfer ──
   const transfer = await base44.asServiceRole.entities.Transfer.create({
@@ -125,7 +144,7 @@ Deno.serve(async (req) => {
   const userGoals = goals.filter(g => g.created_by === user.email);
   for (const goal of userGoals) {
     const roundUp = parseFloat((Math.ceil(amount_usd) - amount_usd).toFixed(2));
-    if (roundUp > 0 && newBalance >= roundUp) {
+    if (roundUp > 0 && newUsdBalance >= roundUp) {
       const newGoalAmount = parseFloat(((goal.current_amount || 0) + roundUp).toFixed(2));
       await base44.asServiceRole.entities.SavingsGoal.update(goal.id, {
         current_amount: newGoalAmount,
@@ -140,8 +159,8 @@ Deno.serve(async (req) => {
   return Response.json({
     success: true,
     transfer,
-    wallet: updatedWallet,
-    new_balance: newBalance,
+    wallet: updatedUsdWallet,
+    new_balance: newUsdBalance,
     message: `$${amount_usd.toFixed(2)} sent to ${resolvedName} — ₱${amount_php.toLocaleString()} delivered.`,
   });
 });

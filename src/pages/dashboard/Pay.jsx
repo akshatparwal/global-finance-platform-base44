@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -77,6 +77,7 @@ export default function Pay() {
   const [alertDirection, setAlertDirection] = useState("above");
   const [alertSaving, setAlertSaving] = useState(false);
   const [alertUser, setAlertUser] = useState(null);
+  const [kycRequired, setKycRequired] = useState(false);
   const triggeredRef = useRef(new Set());
   const rate = rates?.USDPHP || 56.24;
   const receive = sendAmount ? (parseFloat(sendAmount) * rate).toFixed(2) : "0.00";
@@ -112,6 +113,7 @@ export default function Pay() {
     ]).then(([a, u]) => {
       setRateAlerts(a);
       setAlertUser(u);
+      if (u && !u.onboarding_completed) setKycRequired(true);
       a.filter(al => al.triggered).forEach(al => triggeredRef.current.add(al.id));
       setAlertsLoading(false);
     }).catch(() => setAlertsLoading(false));
@@ -281,6 +283,21 @@ export default function Pay() {
           <span className="text-primary text-[9px] sm:text-[10px] font-bold">{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</span>
         </div>
       </div>
+
+      {/* KYC gate banner */}
+      {kycRequired && (
+        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-orange-500/10 border border-orange-500/30 mb-4">
+          <span className="text-orange-400 text-xl flex-shrink-0">🪪</span>
+          <div className="flex-1">
+            <p className="text-orange-400 text-sm font-bold">Identity Verification Required</p>
+            <p className="text-orange-400/70 text-xs mt-0.5">Complete KYC in your profile to unlock transfers. This keeps your money safe.</p>
+          </div>
+          <button onClick={() => window.location.href = "/dashboard/profile"}
+            className="text-orange-400 text-xs font-bold border border-orange-400/40 px-3 py-1.5 rounded-lg hover:bg-orange-400/10 flex-shrink-0">
+            Verify →
+          </button>
+        </div>
+      )}
 
       {/* Best time banner — compact single line */}
       <div className={`border rounded-xl px-3 py-2.5 mb-4 flex items-center justify-between gap-2 ${card}`}>
@@ -466,10 +483,10 @@ export default function Pay() {
           />
         </div>
 
-        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline}
+        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline || kycRequired}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
           className={`w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
-          {!isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : taglish ? "Suriin at Magpadala →" : "Review & Send →"}
+          {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : taglish ? "Suriin at Magpadala →" : "Review & Send →"}
         </button>
       </div>
 

@@ -247,11 +247,14 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {loading ? <WalletSkeleton darkMode={darkMode} /> : wallets.length === 0 ? (
-            <div className="col-span-2">
-              <EmptyState darkMode={darkMode} illustration="👛" title="No wallets yet" description="Your USD and PHP wallets will appear here." size="sm" />
+          {loading ? <WalletSkeleton darkMode={darkMode} /> : null}
+          {!loading && wallets.length === 0 && (
+            <div className="col-span-2 text-center py-6">
+              <p className={`text-sm font-semibold mb-1 ${textMain}`}>No wallets yet</p>
+              <p className={`text-xs ${muted} mb-3`}>Add funds to create your USD wallet and start sending.</p>
+              <button onClick={() => setShowFundWallet(true)} className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs">Add Funds →</button>
             </div>
-          ) : null}
+          )}
           {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
             <WalletCard
               key={w.currency_code}
@@ -317,16 +320,16 @@ export default function Dashboard() {
           </div>
         )}
         {!loading && transfers.length === 0 && (
-          <div className={`border rounded-2xl mb-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
-            <EmptyState
-              darkMode={darkMode}
-              illustration="📬"
-              title="No padala yet"
-              description="Send your first transfer to see your activity here."
-              ctaLabel="Send Now →"
-              onCta={() => navigate("/dashboard/pay")}
-              size="sm"
-            />
+          <div className={`border rounded-2xl mb-4 px-5 py-6 flex items-center gap-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+            <span className="text-3xl flex-shrink-0">📬</span>
+            <div className="flex-1 min-w-0">
+              <p className={`font-bold text-sm mb-0.5 ${textMain}`}>No transfers yet</p>
+              <p className={`text-xs ${muted}`}>Send money home to your family — zero fees, live rates.</p>
+            </div>
+            <button onClick={() => navigate("/dashboard/pay")}
+              className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs flex-shrink-0 active:scale-95 transition-transform">
+              Send →
+            </button>
           </div>
         )}
         {!loading && transfers.length > 0 && (
