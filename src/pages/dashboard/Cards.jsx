@@ -22,7 +22,7 @@ const SUBSCRIPTIONS = [
   { emoji: "🎵", label: "Spotify", sub: "Music & Podcasts · Renews Apr 20", amount: "$9.99" },
 ];
 
-const CARD_TABS = ["My Card", "Transactions", "Loyalty", "Controls", "Subscriptions"];
+const CARD_TABS = ["My Card", "Transactions", "Controls"];
 
 // Generate realistic card data
 function generateCardData() {
@@ -356,10 +356,10 @@ export default function Cards() {
       </button>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
+      <div className="flex gap-1 mb-6">
         {CARD_TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-shrink-0 flex-1 min-w-[72px] py-3 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
+            className={`flex-1 py-3 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${activeTab === t ? "border-primary text-primary" : `border-transparent ${muted}`}`}>
             {t}
           </button>
         ))}
@@ -404,7 +404,7 @@ export default function Cards() {
         <CardTransactionFeed cardLast4={cardData?.last4} darkMode={darkMode} />
       )}
 
-      {activeTab === "Loyalty" && (
+      {activeTab === "_Loyalty_removed" && (
         <div className="rounded-2xl p-6 bg-[#0d1526] border border-white/10">
           <div className="flex justify-between items-start mb-4 gap-3">
             <div>
@@ -526,7 +526,7 @@ export default function Cards() {
         </div>
       )}
 
-      {activeTab === "Subscriptions" && (
+      {activeTab === "_Subscriptions_removed" && (
         <div className={`border rounded-2xl p-5 ${card}`}>
           <h3 className={`font-bold mb-1 ${textMain}`}>Subscriptions · <span className={muted}>Mga Serbisyo</span></h3>
           <div className="space-y-1 mt-4">

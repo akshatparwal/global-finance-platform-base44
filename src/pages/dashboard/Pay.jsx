@@ -36,7 +36,7 @@ const AVATAR_COLORS = ["bg-purple-500","bg-blue-500","bg-red-500","bg-yellow-500
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 10000;
 
-const PAY_TABS = ["Transfer History", "Rate Alerts", "Tools", "Protection", "Shipments"];
+const PAY_TABS = ["Transfer History", "Rate Alerts"];
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
@@ -474,17 +474,13 @@ export default function Pay() {
       </div>
 
       {/* Tabs */}
-      {/* Tab bar — horizontal scroll on mobile, no clipping */}
-      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-0.5" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+      <div className="flex gap-1.5 mb-4">
         {[
           { key: "Transfer History", icon: "🕐" },
           { key: "Rate Alerts",      icon: "🔔" },
-          { key: "Tools",            icon: "🛠" },
-          { key: "Protection",       icon: "🛡" },
-          { key: "Shipments",        icon: "📦" },
         ].map(({ key, icon }) => (
           <button key={key} onClick={() => setActiveTab(key)}
-            className={`flex-shrink-0 flex items-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border ${activeTab === key ? "bg-primary text-secondary border-primary" : `${darkMode ? "border-white/10 text-white/50 bg-white/5" : "border-black/10 text-[#1a2a4a]/50 bg-black/5"}`}`}>
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border ${activeTab === key ? "bg-primary text-secondary border-primary" : `${darkMode ? "border-white/10 text-white/50 bg-white/5" : "border-black/10 text-[#1a2a4a]/50 bg-black/5"}`}`}>
             <span>{icon}</span><span>{key}</span>
           </button>
         ))}
@@ -675,7 +671,7 @@ export default function Pay() {
         </div>
       )}
 
-      {activeTab === "Tools" && (
+      {activeTab === "_Tools_removed" && (
         <div className="space-y-4">
           <CurrencyConverter darkMode={darkMode} />
           <div className={`border rounded-2xl p-5 ${card}`}>
@@ -696,7 +692,7 @@ export default function Pay() {
         </div>
       )}
 
-      {activeTab === "Protection" && (
+      {activeTab === "_Protection_removed" && (
         <div className={`border rounded-2xl p-6 ${card}`}>
           <h3 className="font-bold mb-4">Transfer Protection</h3>
           <div className="space-y-3">
@@ -717,7 +713,7 @@ export default function Pay() {
         </div>
       )}
 
-      {activeTab === "Shipments" && (
+      {activeTab === "_Shipments_removed" && (
         <div className={`border rounded-2xl p-6 ${card}`}>
           <h3 className="font-bold mb-2">Balikbayan Box Tracker</h3>
           <p className={`text-sm ${muted} mb-4`}>Track your Balikbayan box shipments alongside your money transfers.</p>

@@ -12,7 +12,6 @@ import AIInsights from "@/components/dashboard/AIInsights";
 import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
-import LiveMarkets from "@/components/insights/LiveMarkets";
 import YieldCard from "@/components/dashboard/YieldCard";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
@@ -46,7 +45,7 @@ const STOCKS = [
   { code: "PLDT", name: "PLDT Inc.", type: "Telecommunications", price: "₱1,450.00", change: "-0.3%", up: false },
 ];
 
-const TABS = ["Activity", "Goals", "Analytics", "Markets"];
+const TABS = ["Activity", "Goals", "Analytics"];
 
 export default function Insights() {
   const { darkMode, taglish, bahay } = useOutletContext() || {};
@@ -366,14 +365,7 @@ export default function Insights() {
         <SpendAnalytics transfers={transfers} darkMode={darkMode} />
       )}
 
-      {activeTab === "Markets" && (
-        <LiveMarkets
-          darkMode={darkMode}
-          liveRate={liveRate}
-          rateChange={rateChange}
-          ratesLoading={ratesLoading}
-        />
-      )}
+
     </div>
   );
 }

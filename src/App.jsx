@@ -22,8 +22,6 @@ import Support from './pages/dashboard/Support';
 import Recipients from './pages/dashboard/Recipients';
 import ErrorBoundaryPage from './components/ErrorBoundaryPage';
 
-// Add page imports here
-
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
