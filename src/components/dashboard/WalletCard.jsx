@@ -3,6 +3,7 @@
  */
 import { useNavigate } from "react-router-dom";
 import { useYieldAccrual } from "@/hooks/useYieldAccrual";
+import TnalakPattern from "@/components/dashboard/TnalakPattern";
 
 export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, taglish }) {
   const displayBalance = w.currency_code === "USD" && usdcBalance !== null ? usdcBalance : w.balance;
@@ -20,6 +21,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, ta
       style={{ background: w.currency_code === "USD" ? "linear-gradient(135deg, #1a2a4a, #3d2e00)" : "linear-gradient(135deg, #0d1a3a, #1a3a6a)" }}
       onClick={() => navigate("/dashboard/pay")}
     >
+      <TnalakPattern opacity={0.07} />
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-1.5">
           <span className="text-base">{w.flag}</span>

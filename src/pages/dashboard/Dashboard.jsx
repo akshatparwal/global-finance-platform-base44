@@ -10,6 +10,8 @@ import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
 import CommunityStories from "@/components/dashboard/CommunityStories";
+import CelebrationsWidget from "@/components/dashboard/CelebrationsWidget";
+import { useCountUp } from "@/hooks/useCountUp";
 import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
 import SpendingPulse from "@/components/dashboard/SpendingPulse";
@@ -109,7 +111,8 @@ export default function Dashboard() {
     yieldPctStr: usdWallet?.yield_pct,
   });
   const netWorth = totalUSD + yieldEarned + (totalPHP / liveRate);
-  const primaryAmount = `$ ${netWorth.toFixed(2)}`;
+  const { value: animatedNetWorth, ref: netWorthRef } = useCountUp(netWorth, 1000, 200);
+  const primaryAmount = `$ ${(loading ? 0 : animatedNetWorth).toFixed(2)}`;
   const secondaryAmount = `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
   const greeting = (() => {
@@ -170,6 +173,9 @@ export default function Dashboard() {
         </div>
       </div>
       <div ref={containerRef} className="space-y-4 overflow-y-auto">
+      {/* Celebrations Widget — Philippine cultural milestones */}
+      <CelebrationsWidget darkMode={darkMode} taglish={taglish} />
+
       {/* Dynamic holiday banner */}
       {(() => {
         const holiday = getUpcomingHoliday();
@@ -204,14 +210,14 @@ export default function Dashboard() {
       )}
 
       {/* Net Worth Card */}
-      <div className="kf-hero-card relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
+      <div ref={netWorthRef} className="kf-hero-card relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
         <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
           <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-2xl sm:text-5xl font-black text-white mb-0.5 break-all leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                {primaryAmount}
+                ${loading ? "0.00" : animatedNetWorth.toFixed(2)}
               </p>
               <p className="text-white/50 text-xs">{secondaryAmount}</p>
               <p className="text-white/30 text-[10px] mt-0.5">

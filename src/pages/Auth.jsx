@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, HelpCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, HelpCircle, Eye, EyeOff, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const LANGUAGES = [
@@ -23,6 +23,30 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [emailValid, setEmailValid] = useState(null); // null | true | false
+  const [emailTouched, setEmailTouched] = useState(false);
+
+  // Password strength: 0-5
+  const getPasswordStrength = (pw) => {
+    if (!pw) return 0;
+    let s = 0;
+    if (pw.length >= 6) s++;
+    if (pw.length >= 10) s++;
+    if (/[A-Z]/.test(pw)) s++;
+    if (/[0-9]/.test(pw)) s++;
+    if (/[^A-Za-z0-9]/.test(pw)) s++;
+    return s;
+  };
+  const passwordStrength = getPasswordStrength(password);
+  const strengthLabels = ["", "Weak", "Fair", "Good", "Strong", "Very Strong"];
+  const strengthColors = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-emerald-400", "bg-emerald-500"];
+
+  const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+  useEffect(() => {
+    if (emailTouched && email) setEmailValid(validateEmail(email));
+    else if (emailTouched && !email) setEmailValid(false);
+  }, [email, emailTouched]);
 
   const progress = {
     [STEPS.LANGUAGE]: 1, [STEPS.SIGNIN]: 2,
@@ -149,10 +173,32 @@ export default function Auth() {
             <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Your email</h1>
             <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
             <label className="text-white/70 text-sm mb-2 block">Your primary email</label>
-            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="maria@email.com" type="email"
-              onKeyDown={e => e.key === "Enter" && email.trim() && setStep(STEPS.SIGNUP_PASSWORD)}
-              className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:border-primary" />
-            <button onClick={() => email.trim() && setStep(STEPS.SIGNUP_PASSWORD)} disabled={!email.trim()}
+            <div className="relative mb-2">
+              <input
+                value={email}
+                onChange={e => { setEmail(e.target.value); setEmailTouched(true); }}
+                onBlur={() => setEmailTouched(true)}
+                placeholder="maria@email.com"
+                type="email"
+                onKeyDown={e => e.key === "Enter" && emailValid && setStep(STEPS.SIGNUP_PASSWORD)}
+                className={`w-full bg-white/10 border text-white placeholder-white/30 rounded-xl px-4 py-3 pr-10 focus:outline-none transition-colors ${emailTouched && emailValid === false ? "border-red-400" : emailTouched && emailValid === true ? "border-emerald-400" : "border-white/10 focus:border-primary"}`}
+              />
+              {emailTouched && emailValid !== null && (
+                <span className="absolute right-3 top-3.5">
+                  {emailValid
+                    ? <CheckCircle className="w-4 h-4 text-emerald-400" />
+                    : <XCircle className="w-4 h-4 text-red-400" />}
+                </span>
+              )}
+            </div>
+            {emailTouched && emailValid === false && (
+              <p className="text-red-400 text-xs mb-3">Please enter a valid email address.</p>
+            )}
+            {emailTouched && emailValid === true && (
+              <p className="text-emerald-400 text-xs mb-3">Looks good! ✓</p>
+            )}
+            {!(emailTouched && emailValid !== null) && <div className="mb-4" />}
+            <button onClick={() => emailValid && setStep(STEPS.SIGNUP_PASSWORD)} disabled={!emailValid}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-40">
               Continue
             </button>
@@ -165,7 +211,7 @@ export default function Auth() {
             <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Secure it</h1>
             <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
             <label className="text-white/70 text-sm mb-2 block">Create a secure password</label>
-            <div className="relative mb-4">
+            <div className="relative mb-3">
               <input value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="Min. 6 characters" type={showPassword ? "text" : "password"}
                 onKeyDown={e => e.key === "Enter" && password.length >= 6 && handleSignUp()}
@@ -174,6 +220,21 @@ export default function Auth() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {/* Password strength meter */}
+            {password.length > 0 && (
+              <div className="mb-4">
+                <div className="flex gap-1 mb-1">
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${i <= passwordStrength ? strengthColors[passwordStrength] : "bg-white/10"}`} />
+                  ))}
+                </div>
+                <p className={`text-xs font-semibold ${passwordStrength >= 4 ? "text-emerald-400" : passwordStrength >= 3 ? "text-yellow-400" : "text-orange-400"}`}>
+                  {strengthLabels[passwordStrength]}
+                  {passwordStrength < 3 && " — try adding numbers, symbols, or uppercase"}
+                </p>
+              </div>
+            )}
+            {!password.length && <div className="mb-4" />}
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <button onClick={handleSignUp} disabled={password.length < 6 || loading}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">

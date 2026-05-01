@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
+import BestTimeToSend from "@/components/dashboard/BestTimeToSend";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import TransferEstimator from "@/components/dashboard/TransferEstimator";
@@ -299,18 +300,8 @@ export default function Pay() {
         </div>
       )}
 
-      {/* Best time banner — compact single line */}
-      <div className={`border rounded-xl px-3 py-2.5 mb-4 flex items-center justify-between gap-2 ${card}`}>
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-primary text-sm flex-shrink-0">🕐</span>
-          <div className="min-w-0 flex items-center gap-1 flex-wrap">
-            <span className={`text-xs font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>{taglish ? "Pinakamabuting Oras" : "Best Time"}</span>
-            <span className="text-primary text-xs font-bold">↑ +₱0.42</span>
-            <span className={`text-xs ${muted} hidden sm:inline`}>vs. last week</span>
-          </div>
-        </div>
-        <span className="bg-emerald-500/20 text-emerald-500 text-[9px] font-bold uppercase px-2 py-1 rounded-full flex-shrink-0">OPTIMAL</span>
-      </div>
+      {/* Best Time to Send — intelligent rate-aware badge */}
+      <BestTimeToSend rate={rate} ratesLoading={ratesLoading} darkMode={darkMode} taglish={taglish} />
 
       {/* Send form */}
       <div className={`border rounded-2xl p-3 sm:p-4 mb-4 ${card}`}>

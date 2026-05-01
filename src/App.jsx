@@ -18,6 +18,7 @@ import Cards from './pages/dashboard/Cards.jsx';
 import Profile from './pages/dashboard/Profile';
 import Transactions from './pages/dashboard/Transactions';
 import Support from './pages/dashboard/Support';
+import KinnectFiStory from './pages/dashboard/KinnectFiStory';
 import Recipients from './pages/dashboard/Recipients';
 import ErrorBoundaryPage from './components/ErrorBoundaryPage';
 
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
         <Route path="support" element={<ErrorBoundaryPage><Support /></ErrorBoundaryPage>} />
         <Route path="profile" element={<ErrorBoundaryPage><Profile /></ErrorBoundaryPage>} />
         <Route path="recipients" element={<ErrorBoundaryPage><Recipients /></ErrorBoundaryPage>} />
+        <Route path="story" element={<ErrorBoundaryPage><KinnectFiStory /></ErrorBoundaryPage>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

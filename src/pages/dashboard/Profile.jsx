@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useOutletContext } from "react-router-dom";
-import { Shield, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2 } from "lucide-react";
+import { Shield, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Gift, Mail, TrendingUp, Star, Share2, PlayCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import SecurityHub from "@/components/security/SecurityHub";
 import PointsRedemption from "@/components/dashboard/PointsRedemption";
 import EditProfileForm from "@/components/profile/EditProfileForm";
@@ -27,6 +28,7 @@ const PROFILE_TABS = ["General","Family","Referrals","Security","Support"];
 
 export default function Profile() {
   const { darkMode } = useOutletContext() || {};
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("General");
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -328,6 +330,13 @@ export default function Profile() {
                   ))}
                 </div>
                 <p className="text-white/60 text-xs mt-2">Every transfer is a reminder of your love for your family. 🇵🇭</p>
+                <button
+                  onClick={() => navigate("/dashboard/story")}
+                  className="mt-3 w-full flex items-center justify-center gap-2 bg-white/20 border border-white/30 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-white/30 transition-colors active:scale-[0.98]"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  View Full Story →
+                </button>
               </div>
             );
           })()}

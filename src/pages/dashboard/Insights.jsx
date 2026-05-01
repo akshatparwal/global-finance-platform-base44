@@ -11,6 +11,7 @@ import RateAlertsPanel from "@/components/dashboard/RateAlertsPanel";
 import AIInsights from "@/components/dashboard/AIInsights";
 import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
+import KatuwangWallet from "@/components/dashboard/KatuwangWallet";
 import EmptyState from "@/components/ui/EmptyState";
 import YieldCard from "@/components/dashboard/YieldCard";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
@@ -305,6 +306,9 @@ export default function Insights() {
               </div>
             );
           })()}
+
+          {/* Katuwang Wallet — Shared Family Savings Pod */}
+          <KatuwangWallet darkMode={darkMode} taglish={taglish} onContribute={() => setShowCreateGoal(true)} />
 
           {/* Live yield card — driven by on-chain USDC balance */}
           <YieldCard
