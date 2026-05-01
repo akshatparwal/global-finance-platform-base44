@@ -48,7 +48,7 @@ const STOCKS = [
 const TABS = ["Activity", "Goals", "Analytics"];
 
 export default function Insights() {
-  const { darkMode, taglish, bahay } = useOutletContext() || {};
+  const { darkMode, taglish } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("Activity");
   const [goals, setGoals] = useState([]);
   const [goalsLoading, setGoalsLoading] = useState(true);

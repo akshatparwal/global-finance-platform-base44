@@ -29,7 +29,7 @@ const COMMUNITY = [
 ];
 
 export default function Dashboard() {
-  const { darkMode, taglish, bahay } = useOutletContext() || {};
+  const { darkMode, taglish } = useOutletContext() || {};
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [wallets, setWallets] = useState([]);
@@ -109,9 +109,8 @@ export default function Dashboard() {
     yieldPctStr: usdWallet?.yield_pct,
   });
   const netWorth = totalUSD + yieldEarned + (totalPHP / liveRate);
-  // Bahay mode: PHP-centric display
-  const primaryAmount = bahay ? `₱ ${(netWorth * liveRate).toLocaleString("en-PH", { minimumFractionDigits: 2 })}` : `$ ${netWorth.toFixed(2)}`;
-  const secondaryAmount = bahay ? `$ ${netWorth.toFixed(2)}` : `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
+  const primaryAmount = `$ ${netWorth.toFixed(2)}`;
+  const secondaryAmount = `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -267,14 +266,13 @@ export default function Dashboard() {
               <button onClick={() => setShowFundWallet(true)} className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs">Add Funds →</button>
             </div>
           )}
-          {!loading && wallets.length > 0 ? (bahay ? [...wallets].reverse() : wallets).map(w => (
+          {!loading && wallets.length > 0 ? wallets.map(w => (
             <WalletCard
               key={w.currency_code}
               w={w}
               usdcBalance={usdcBalance}
               walletAddress={walletAddress}
               liveRate={liveRate}
-              bahay={bahay}
               taglish={taglish}
             />
           )) : null}

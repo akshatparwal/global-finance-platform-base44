@@ -4,7 +4,7 @@
 import { useNavigate } from "react-router-dom";
 import { useYieldAccrual } from "@/hooks/useYieldAccrual";
 
-export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, bahay, taglish }) {
+export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, taglish }) {
   const displayBalance = w.currency_code === "USD" && usdcBalance !== null ? usdcBalance : w.balance;
   const isOnChain = w.currency_code === "USD" && usdcBalance !== null;
   const { yieldEarned, apyPct } = useYieldAccrual(
@@ -52,9 +52,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, ba
             {walletAddress.slice(0, 8)}…{walletAddress.slice(-6)}
           </div>
         )}
-        {bahay && w.currency_code === "USD" && (
-          <div className="text-white/40 text-xs mt-1">≈ ₱{(displayBalance * liveRate).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</div>
-        )}
+
       </div>
     </div>
   );
