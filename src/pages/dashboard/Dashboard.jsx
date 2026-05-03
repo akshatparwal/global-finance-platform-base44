@@ -74,7 +74,7 @@ export default function Dashboard() {
     }
     setWallets(walletData);
     const allTransfers = transfersResult.data || [];
-    setTransfers(allTransfers.filter(t => t.category !== "yield").slice(0, 5));
+    setTransfers(allTransfers.filter(t => t.category !== "yield" && t.category !== "savings").slice(0, 5));
     setOffline(walletsResult.fromCache || transfersResult.fromCache);
     setLoading(false);
   }, []);
