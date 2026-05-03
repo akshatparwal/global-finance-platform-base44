@@ -55,7 +55,7 @@ export default function Dashboard() {
     const [u, walletsResult, transfersResult] = await Promise.all([
       base44.auth.me().catch(() => null),
       fetchWithCache("wallets", () => base44.entities.WalletBalance.list()).catch(() => ({ data: [], fromCache: false })),
-      fetchWithCache("transfers_dash", () => base44.entities.Transfer.list("-created_date", 5)).catch(() => ({ data: [], fromCache: false })),
+      fetchWithCache("transfers_dash", () => base44.entities.Transfer.list("-created_date", 10)).catch(() => ({ data: [], fromCache: false })),
     ]);
     if (u) {
       setUser(u);
