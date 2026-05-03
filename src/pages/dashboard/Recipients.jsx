@@ -136,7 +136,7 @@ export default function Recipients() {
   useEffect(() => {
     Promise.all([
       base44.entities.Recipient.list("-created_date"),
-      base44.entities.Transfer.list("-created_date", 50),
+      base44.entities.Transfer.filter({ category: "remittance" }, "-created_date", 200),
     ]).then(([r, t]) => {
       setRecipients(r);
       setTransfers(t);

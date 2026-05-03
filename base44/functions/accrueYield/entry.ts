@@ -24,6 +24,8 @@ Deno.serve(async (req) => {
   const results = [];
 
   for (const wallet of wallets) {
+    // Only accrue yield on USD wallets — PHP yield doesn't apply
+    if (wallet.currency_code !== 'USD') continue;
     if (!wallet.balance || wallet.balance <= 0) continue;
     if (!wallet.yield_pct) continue;
 

@@ -3,7 +3,7 @@ import { AnimatePresence } from "framer-motion";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import AddFundsModal from "@/components/savings/AddFundsModal";
 import CreateGoalModal from "@/components/savings/CreateGoalModal";
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
@@ -16,35 +16,30 @@ import EmptyState from "@/components/ui/EmptyState";
 import YieldCard from "@/components/dashboard/YieldCard";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
-const padalaData = [
-  { date: "Feb 21", rate: 55.2 }, { date: "Feb 28", rate: 55.6 }, { date: "Mar 7", rate: 55.9 },
-  { date: "Mar 14", rate: 56.0 }, { date: "Mar 21", rate: 56.24 },
-];
+const OUTBOUND_CATEGORIES = ["remittance", "bills", "subscriptions", "savings", "other"];
 
-const spendingData = [
-  { month: "Oct", spending: 1480, budget: 1600 }, { month: "Nov", spending: 1620, budget: 1600 },
-  { month: "Dec", spending: 1890, budget: 1600 }, { month: "Jan", spending: 1320, budget: 1600 },
-  { month: "Feb", spending: 1510, budget: 1600 }, { month: "Mar", spending: 1210, budget: 1600 },
-];
-
-const BUDGETS = [
-  { icon: "❤️", label: "Remittances", spent: 850, total: 1000, color: "bg-primary" },
-  { icon: "👨‍👩‍👧", label: "Family Support", spent: 150, total: 300, color: "bg-emerald-500" },
-  { icon: "📦", label: "Shipping & Boxes", spent: 45, total: 200, color: "bg-emerald-500" },
-  { icon: "📈", label: "Savings & Investments", spent: 420, total: 500, color: "bg-primary" },
-];
-
-const GOALS = [
-  { emoji: "🏠", label: "Dream Home", sub: "Save for your dream home back home", amount: "$12,500" },
-  { emoji: "🎓", label: "Children's Education", sub: "Invest in the next generation", amount: "$8,000" },
-  { emoji: "🛡️", label: "Emergency Fund", sub: "6 months of expenses, ready", amount: "$6,500" },
-];
-
-const STOCKS = [
-  { code: "SM", name: "SM Investments", type: "Retail, Banking & Property", price: "₱920.00", change: "+1.2%", up: true },
-  { code: "BDO", name: "BDO Unibank", type: "Banking", price: "₱142.50", change: "+0.8%", up: true },
-  { code: "PLDT", name: "PLDT Inc.", type: "Telecommunications", price: "₱1,450.00", change: "-0.3%", up: false },
-];
+// Build last-6-months spending chart from real transfers
+function buildMonthlySpendData(transfers) {
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({
+      month: d.toLocaleDateString("en-US", { month: "short" }),
+      year: d.getFullYear(),
+      monthIdx: d.getMonth(),
+      spending: 0,
+    });
+  }
+  transfers
+    .filter(t => OUTBOUND_CATEGORIES.includes(t.category))
+    .forEach(t => {
+      const d = new Date(t.created_date);
+      const entry = months.find(m => m.monthIdx === d.getMonth() && m.year === d.getFullYear());
+      if (entry) entry.spending += t.amount_usd || 0;
+    });
+  return months.map(({ month, spending }) => ({ month, spending: parseFloat(spending.toFixed(2)) }));
+}
 
 const TABS = ["Activity", "Goals", "Analytics"];
 
@@ -60,7 +55,6 @@ export default function Insights() {
   const [transfers, setTransfers] = useState([]);
   const { rates, loading: ratesLoading } = useLiveRates();
   const liveRate = rates?.USDPHP || 56.24;
-  const rateChange = rates?.USDPHP_change_pct || 0;
   const { usdcBalance } = usePrivyWallet();
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
@@ -73,7 +67,7 @@ export default function Insights() {
       .then(g => { setGoals(g); setGoalsLoading(false); })
       .catch(() => setGoalsLoading(false));
     base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
-    base44.entities.Transfer.list("-created_date", 10).then(t => { setTransfers(t); setActivityLoading(false); }).catch(() => setActivityLoading(false));
+    base44.entities.Transfer.list("-created_date", 100).then(t => { setTransfers(t); setActivityLoading(false); }).catch(() => setActivityLoading(false));
   }, []);
 
   const handleGoalUpdated = (updatedGoal) => {
@@ -114,7 +108,8 @@ export default function Insights() {
         const now = new Date();
         const thisMonth = transfers.filter(t => {
           const d = new Date(t.created_date);
-          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            && OUTBOUND_CATEGORIES.includes(t.category);
         });
         const monthTotal = thisMonth.reduce((s, t) => s + (t.amount_usd || 0), 0);
         const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" }).toUpperCase();
@@ -128,7 +123,7 @@ export default function Insights() {
           const months = new Set(transfers.map(t => { const d = new Date(t.created_date); return `${d.getFullYear()}-${d.getMonth()}`; }));
           return months.size;
         })());
-        const allRemittance = transfers.filter(t => !t.category || t.category === "remittance").reduce((s,t) => s+(t.amount_usd||0),0);
+        const allRemittance = transfers.filter(t => t.category === "remittance").reduce((s,t) => s+(t.amount_usd||0),0);
         const dynamicBudget = Math.max(Math.round((allRemittance / allTimeMonths) * 1.25 / 50) * 50, 200);
         const MONTHLY_BUDGET = dynamicBudget + 300 + 500 + 200;
         const pctUsed = Math.min(Math.round((monthTotal / MONTHLY_BUDGET) * 100), 100);
@@ -161,32 +156,39 @@ export default function Insights() {
             </div>
           </div>
 
-          <div className={`border rounded-2xl p-6 ${card}`}>
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary" />
-                <h3 className="font-bold">Transfer Trends</h3>
-                <span className={`text-xs ${muted}`}>Historical performance of the PHP/USD exchange rate.</span>
+          {(() => {
+            const monthlyData = buildMonthlySpendData(transfers);
+            const hasData = monthlyData.some(m => m.spending > 0);
+            return (
+              <div className={`border rounded-2xl p-6 ${card}`}>
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    <h3 className="font-bold">Monthly Spending Trend</h3>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-primary border border-primary/30 px-2 py-1 rounded-lg">
+                    <Calendar className="w-3 h-3" /> LAST 6 MONTHS
+                  </div>
+                </div>
+                {hasData ? (
+                  <div className="overflow-hidden">
+                    <ResponsiveContainer width="100%" height={120}>
+                      <AreaChart data={monthlyData}>
+                        <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
+                        <XAxis dataKey="month" tick={{ fontSize: 10, fill: darkMode ? "rgba(255,255,255,0.4)" : "rgba(26,42,74,0.5)" }} axisLine={false} tickLine={false} />
+                        <Tooltip contentStyle={{ background: "#1a2332", border: "none", borderRadius: 8, color: "white" }} formatter={v => [`$${v.toFixed(2)}`, "Spent"]} />
+                        <Area type="monotone" dataKey="spending" stroke="hsl(var(--primary))" fill="url(#rg)" strokeWidth={2} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-[120px]">
+                    <p className={`text-sm ${muted}`}>No spending data yet — send your first transfer to see trends.</p>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-primary border border-primary/30 px-2 py-1 rounded-lg">
-                <Calendar className="w-3 h-3" /> LAST 30 DAYS
-              </div>
-            </div>
-            <div className="overflow-hidden">
-            <ResponsiveContainer width="100%" height={120}>
-              <AreaChart data={padalaData}>
-                <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: darkMode ? "rgba(255,255,255,0.4)" : "rgba(26,42,74,0.5)" }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: "#1a2332", border: "none", borderRadius: 8, color: "white" }} />
-                <Area type="monotone" dataKey="rate" stroke="hsl(var(--primary))" fill="url(#rg)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-            </div>
-            <div className="mt-2 flex items-center gap-2 bg-primary/10 rounded-lg p-2">
-              <Info className="w-3 h-3 text-primary" />
-              <span className="text-xs text-primary">OPTIMAL SENDING WINDOW — Rates often peak around the 15th and 30th. Convert USD slightly before these dates for maximum value.</span>
-            </div>
-          </div>
+            );
+          })()}
 
           <div className="space-y-3">
             {BUDGETS_REAL.map((b, i) => {
@@ -238,9 +240,10 @@ export default function Insights() {
       {activeTab === "Goals" && (
         <div className="space-y-6">
           {(() => {
-            const totalPhpSent = transfers.reduce((s, t) => s + (t.amount_php || (t.amount_usd || 0) * 56.24), 0);
-            const uniqueRecipients = [...new Set(transfers.map(t => t.recipient_name).filter(Boolean))];
-            const transferCount = transfers.length;
+            const remittanceTransfers = transfers.filter(t => t.category === "remittance");
+            const totalPhpSent = remittanceTransfers.reduce((s, t) => s + (t.amount_php || (t.amount_usd || 0) * liveRate), 0);
+            const uniqueRecipients = [...new Set(remittanceTransfers.map(t => t.recipient_name).filter(Boolean))];
+            const transferCount = remittanceTransfers.length;
             return (
               <div className={`border rounded-2xl p-6 ${card}`}>
                 <div className="flex items-center gap-2 mb-4"><span>👨‍👩‍👧</span><h3 className="font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Family Financial Health</h3></div>
@@ -260,7 +263,7 @@ export default function Insights() {
                       <span className="text-primary text-xs font-bold">{uniqueRecipients.length} CONNECTED</span>
                     </div>
                     {uniqueRecipients.slice(0, 3).map((name, i) => {
-                      const recTx = transfers.filter(t => t.recipient_name === name);
+                      const recTx = remittanceTransfers.filter(t => t.recipient_name === name);
                       const recTotal = recTx.reduce((s, t) => s + (t.amount_php || (t.amount_usd || 0) * 56.24), 0);
                       const last = recTx[0];
                       return (
