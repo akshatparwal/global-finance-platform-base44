@@ -37,11 +37,13 @@ export default function Transactions() {
     return unsub;
   }, []);
 
+  const OUTBOUND_CATEGORIES = ["remittance", "bills", "subscriptions", "other", "savings"];
   const totalThisMonth = transfers
     .filter(t => {
       const d = new Date(t.created_date);
       const now = new Date();
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+        && OUTBOUND_CATEGORIES.includes(t.category);
     })
     .reduce((s, t) => s + (t.amount_usd || 0), 0);
 
@@ -91,7 +93,7 @@ export default function Transactions() {
       <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
         {[
           { label: "This Month", value: `$${totalThisMonth.toFixed(2)}`, sub: "spent" },
-          { label: "Remittances", value: `${transfers.filter(t => t.category === "remittance").length}`, sub: "transfers" },
+          { label: "Remittances", value: `${transfers.filter(t => t.category === "remittance" && (() => { const d = new Date(t.created_date); const now = new Date(); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); })()).length}`, sub: "this month" },
           { label: "Avg Fee", value: "$0.00", sub: "per transfer" },
         ].map((s, i) => (
           <div

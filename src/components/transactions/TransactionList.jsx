@@ -113,7 +113,13 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
 
   const grouped = useMemo(() => groupByDate(filtered), [filtered]);
 
-  const totalSpent = filtered.reduce((s, t) => s + (t.amount_usd || 0), 0);
+  const INBOUND_CATEGORIES = ["deposit", "yield"];
+  const totalSpent = filtered
+    .filter(t => !INBOUND_CATEGORIES.includes(t.category))
+    .reduce((s, t) => s + (t.amount_usd || 0), 0);
+  const totalInbound = filtered
+    .filter(t => INBOUND_CATEGORIES.includes(t.category))
+    .reduce((s, t) => s + (t.amount_usd || 0), 0);
 
   const activeFiltersCount = (categoryFilter !== "all" ? 1 : 0) + (dateFilter !== "all" ? 1 : 0);
 
@@ -205,7 +211,10 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
         <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl border mb-3 ${card}`}>
           <span className={`text-xs font-semibold ${muted}`}>{filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-black ${text}`}>-${totalSpent.toFixed(2)}</span>
+            <span className={`text-sm font-black ${text}`}>
+              {totalInbound > 0 && <span className="text-emerald-400">+${totalInbound.toFixed(2)} </span>}
+              {totalSpent > 0 && <span>-${totalSpent.toFixed(2)}</span>}
+            </span>
             <button
               onClick={() => exportCSV(filtered)}
               className="flex items-center gap-1 text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70 transition-opacity"
@@ -301,7 +310,14 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
 
                   {/* Amount + status */}
                   <div className="text-right flex-shrink-0">
-                    <p className={`text-sm font-black ${text}`}>-${tx.amount_usd?.toFixed(2)}</p>
+                    {(() => {
+                      const isInbound = tx.category === "deposit" || tx.category === "yield";
+                      return (
+                        <p className={`text-sm font-black ${isInbound ? "text-emerald-400" : text}`}>
+                          {isInbound ? "+" : "-"}${tx.amount_usd?.toFixed(2)}
+                        </p>
+                      );
+                    })()}
                     <p className={`text-[9px] font-bold uppercase ${statusMeta.color}`}>{tx.status}</p>
                   </div>
                 </button>

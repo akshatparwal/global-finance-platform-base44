@@ -145,8 +145,16 @@ export default function Recipients() {
   }, []);
 
   const transfersForRecipient = (rec) =>
-    transfers.filter(t => t.recipient_name?.toLowerCase() === rec.nickname?.toLowerCase() ||
-                          t.recipient_name?.toLowerCase() === rec.full_name?.toLowerCase());
+    transfers.filter(t => {
+      // Primary: match by recipient_id if stored on transfer
+      if (t.recipient_id && rec.id && t.recipient_id === rec.id) return true;
+      // Fallback: exact name match (case-insensitive) against both nickname and full_name
+      const tName = (t.recipient_name || "").trim().toLowerCase();
+      return (
+        (rec.nickname && tName === rec.nickname.trim().toLowerCase()) ||
+        (rec.full_name && tName === rec.full_name.trim().toLowerCase())
+      );
+    });
 
   const handleSave = async (formData) => {
     if (editingRec) {

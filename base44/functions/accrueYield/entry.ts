@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
       status: 'completed',
       rate: 1,
       fee: 0,
-      category: 'savings',
+      category: 'yield',
       note: `Daily ${apy}% APY yield on $${wallet.balance.toFixed(2)} ${wallet.currency_code}`,
       reference_id: `YLD-${wallet.id.slice(0,6)}-${Date.now().toString(36).toUpperCase()}`,
     });

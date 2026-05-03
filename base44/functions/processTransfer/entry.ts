@@ -64,7 +64,14 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'No USD wallet found. Please add funds first.' }, { status: 400 });
   }
 
-  const currentBalance = usdWallet.balance || 0;
+  // ── Re-read balance fresh to guard against race condition ──
+  const freshWallets = await base44.asServiceRole.entities.WalletBalance.filter({ id: usdWallet.id });
+  const freshWallet = freshWallets[0];
+  if (!freshWallet) {
+    return Response.json({ error: 'Wallet not found.' }, { status: 400 });
+  }
+
+  const currentBalance = freshWallet.balance || 0;
   if (currentBalance < amount_usd) {
     return Response.json({
       error: `Insufficient funds. Your balance is $${currentBalance.toFixed(2)}, transfer is $${amount_usd.toFixed(2)}.`,
@@ -90,8 +97,8 @@ Deno.serve(async (req) => {
   const amount_php = parseFloat((amount_usd * rate).toFixed(2));
   const newUsdBalance = parseFloat((currentBalance - amount_usd).toFixed(2));
 
-  // ── Deduct from USD wallet ──
-  const updatedUsdWallet = await base44.asServiceRole.entities.WalletBalance.update(usdWallet.id, {
+  // ── Deduct from USD wallet (use freshWallet.id) ──
+  const updatedUsdWallet = await base44.asServiceRole.entities.WalletBalance.update(freshWallet.id, {
     balance: newUsdBalance,
   });
 
@@ -119,6 +126,7 @@ Deno.serve(async (req) => {
     amount_php,
     recipient_name: resolvedName,
     recipient_bank: resolvedBank,
+    recipient_id: recipient_id || undefined,
     status: 'completed',
     rate,
     fee,
