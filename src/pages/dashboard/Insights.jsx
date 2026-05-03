@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import AddFundsModal from "@/components/savings/AddFundsModal";
@@ -61,8 +61,12 @@ export default function Insights() {
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   const navigate = useNavigate();
+  const dataFetched = useRef(false);
 
   useEffect(() => {
+    // Only fetch once per mount — avoids re-fetch on tab switch within the same session
+    if (dataFetched.current) return;
+    dataFetched.current = true;
     base44.entities.SavingsGoal.list()
       .then(g => { setGoals(g); setGoalsLoading(false); })
       .catch(() => setGoalsLoading(false));

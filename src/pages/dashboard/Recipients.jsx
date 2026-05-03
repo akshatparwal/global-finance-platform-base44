@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Edit2, Trash2, Send, Check, ChevronRight } from "lucide-react";
@@ -144,17 +144,33 @@ export default function Recipients() {
     }).catch(() => setLoading(false));
   }, []);
 
-  const transfersForRecipient = (rec) =>
-    transfers.filter(t => {
-      // Primary: match by recipient_id if stored on transfer
-      if (t.recipient_id && rec.id && t.recipient_id === rec.id) return true;
-      // Fallback: exact name match (case-insensitive) against both nickname and full_name
-      const tName = (t.recipient_name || "").trim().toLowerCase();
-      return (
-        (rec.nickname && tName === rec.nickname.trim().toLowerCase()) ||
-        (rec.full_name && tName === rec.full_name.trim().toLowerCase())
-      );
+  // Pre-build a map of recipient id/name → transfers to avoid O(n²) re-computation
+  const transfersByRecipient = useMemo(() => {
+    const byId = {};
+    const byName = {};
+    transfers.forEach(t => {
+      if (t.recipient_id) {
+        if (!byId[t.recipient_id]) byId[t.recipient_id] = [];
+        byId[t.recipient_id].push(t);
+      }
+      const name = (t.recipient_name || "").trim().toLowerCase();
+      if (name) {
+        if (!byName[name]) byName[name] = [];
+        byName[name].push(t);
+      }
     });
+    return { byId, byName };
+  }, [transfers]);
+
+  const transfersForRecipient = (rec) => {
+    const seen = new Set();
+    const result = [];
+    const addUnique = (txs) => txs?.forEach(t => { if (!seen.has(t.id)) { seen.add(t.id); result.push(t); } });
+    if (rec.id) addUnique(transfersByRecipient.byId[rec.id]);
+    if (rec.nickname) addUnique(transfersByRecipient.byName[rec.nickname.trim().toLowerCase()]);
+    if (rec.full_name) addUnique(transfersByRecipient.byName[rec.full_name.trim().toLowerCase()]);
+    return result;
+  };
 
   const handleSave = async (formData) => {
     if (editingRec) {

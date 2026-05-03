@@ -1,21 +1,35 @@
 /**
- * accrueYield — Scheduled daily job: credit yield to all active wallets
+ * accrueYield — Scheduled daily job: credit yield to all active USD wallets
  * 
  * Runs once per day (via automation).
- * Admin-only endpoint.
+ * Protected by shared secret when called externally; passes through for scheduler (no user).
  * 
- * Logic: For each wallet with a yield_pct, compute 1 day of compound interest
+ * Logic: For each USD wallet with a yield_pct, compute 1 day of compound interest
  * and add it to the balance. Records a YieldCredit transfer for audit.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const SCHEDULER_SECRET = Deno.env.get('SCHEDULER_SECRET') || '';
+
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
-  // This function is called by the scheduler (no user context) — use service role
   const user = await base44.auth.me().catch(() => null);
-  if (user && user.role !== 'admin') {
-    return Response.json({ error: 'Forbidden' }, { status: 403 });
+
+  if (user) {
+    // Called by a logged-in user — must be admin
+    if (user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } else {
+    // No user context — validate shared secret to allow scheduler/webhook calls
+    // If SCHEDULER_SECRET is set, require it; otherwise allow (development mode)
+    if (SCHEDULER_SECRET) {
+      const providedSecret = req.headers.get('x-scheduler-secret') || '';
+      if (providedSecret !== SCHEDULER_SECRET) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
   }
 
   const wallets = await base44.asServiceRole.entities.WalletBalance.list();
@@ -24,7 +38,7 @@ Deno.serve(async (req) => {
   const results = [];
 
   for (const wallet of wallets) {
-    // Only accrue yield on USD wallets — PHP yield doesn't apply
+    // Only accrue yield on USD wallets
     if (wallet.currency_code !== 'USD') continue;
     if (!wallet.balance || wallet.balance <= 0) continue;
     if (!wallet.yield_pct) continue;

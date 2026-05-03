@@ -86,7 +86,8 @@ export default function Dashboard() {
     const unsub = base44.entities.Transfer.subscribe((event) => {
       if (event.type === "create") {
         const newTx = event.data;
-        if (newTx.category === "yield") return;
+        const EXCLUDED = ["yield", "deposit", "savings"];
+        if (EXCLUDED.includes(newTx.category)) return;
         setTransfers(prev => [newTx, ...prev].slice(0, 5));
         // Deduct from USD wallet balance immediately
         setWallets(prev => prev.map(w =>

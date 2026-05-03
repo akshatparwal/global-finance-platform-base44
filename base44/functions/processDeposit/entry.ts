@@ -11,6 +11,8 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const DAILY_DEPOSIT_LIMIT = 25000; // USD per calendar day
+
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
@@ -31,22 +33,37 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Invalid deposit method.' }, { status: 400 });
   }
 
+  // ── Daily deposit cap ──
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayDeposits = await base44.asServiceRole.entities.Transfer.filter({ category: 'deposit' });
+  const userTodayDeposits = todayDeposits.filter(t =>
+    t.created_by === user.email &&
+    new Date(t.created_date) >= todayStart
+  );
+  const todayTotal = userTodayDeposits.reduce((s, t) => s + (t.amount_usd || 0), 0);
+  if (todayTotal + amount > DAILY_DEPOSIT_LIMIT) {
+    const remaining = Math.max(DAILY_DEPOSIT_LIMIT - todayTotal, 0);
+    return Response.json({
+      error: `Daily deposit limit reached ($${DAILY_DEPOSIT_LIMIT.toLocaleString()}/day). You can deposit up to $${remaining.toFixed(2)} more today.`,
+      daily_limit_exceeded: true,
+      remaining_today: remaining,
+    }, { status: 400 });
+  }
+
   // Fee calculation
   const feeRate = method === 'instant' ? 0.015 : 0;
   const fee = parseFloat((amount * feeRate).toFixed(2));
   const netAmount = parseFloat((amount - fee).toFixed(2));
 
-  // Status based on method (ACH/wire take time in real world — simulated as pending -> completed)
-  const status = (method === 'instant' || method === 'crypto') ? 'completed' : 'completed'; // all instant for demo
+  const status = 'completed'; // all instant for demo
 
   // Find or create wallet
   const wallets = await base44.asServiceRole.entities.WalletBalance.filter({ currency_code });
-  // Filter to current user's wallets
   const userWallets = wallets.filter(w => w.created_by === user.email);
 
   let wallet;
   if (userWallets.length === 0) {
-    // Create wallet for this user
     wallet = await base44.asServiceRole.entities.WalletBalance.create({
       currency_code,
       currency_name: currency_code === 'USD' ? 'US Dollar' : 'Philippine Peso',

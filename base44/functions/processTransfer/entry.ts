@@ -6,13 +6,32 @@
  *   recipient_id?: string
  *   recipient_name: string
  *   recipient_bank: string
- *   rate: number  (USD/PHP rate)
+ *   rate: number  (USD/PHP rate — validated server-side against live rate ±2%)
  *   note?: string
  *   category?: string
  *
  * Returns: { success, transfer, wallet }
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+// Fetch live USD/PHP rate via LLM+internet (same as frontend useLiveRates)
+async function fetchLiveRate(base44) {
+  try {
+    const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
+      prompt: 'Get the current live mid-market USD to PHP (Philippine Peso) exchange rate right now.',
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          USDPHP: { type: 'number', description: '1 USD = X PHP' },
+        },
+      },
+    });
+    return result?.USDPHP || null;
+  } catch {
+    return null;
+  }
+}
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
@@ -43,11 +62,27 @@ Deno.serve(async (req) => {
   if (!recipient_name && !recipient_id) {
     return Response.json({ error: 'Recipient is required.' }, { status: 400 });
   }
-  if (!rate || rate <= 0) {
+  if (!rate || typeof rate !== 'number' || rate <= 0) {
     return Response.json({ error: 'Exchange rate is required.' }, { status: 400 });
   }
 
-  // ── KYC gate — block ALL transfers until onboarding complete ──
+  // ── Server-side rate validation ──
+  // Fetch live rate and reject if client rate deviates more than ±2%
+  const RATE_TOLERANCE = 0.02; // 2%
+  const FALLBACK_RATE = 56.24; // used only if live fetch fails
+  const liveRate = await fetchLiveRate(base44);
+  const referenceRate = liveRate || FALLBACK_RATE;
+  const deviation = Math.abs(rate - referenceRate) / referenceRate;
+  if (deviation > RATE_TOLERANCE) {
+    return Response.json({
+      error: `Exchange rate out of range. Please refresh and try again. (Got ₱${rate.toFixed(4)}, expected ~₱${referenceRate.toFixed(4)})`,
+      rate_error: true,
+    }, { status: 400 });
+  }
+  // Use the server-validated rate for PHP calculation
+  const validatedRate = referenceRate;
+
+  // ── KYC gate ──
   if (!user.onboarding_completed) {
     return Response.json({
       error: 'Identity verification required before sending money. Please complete KYC in your profile.',
@@ -79,25 +114,26 @@ Deno.serve(async (req) => {
     }, { status: 400 });
   }
 
-  // ── Resolve recipient ──
+  // ── Resolve recipient (single fetch, cached) ──
   let resolvedName = recipient_name;
   let resolvedBank = recipient_bank;
+  let resolvedRecipient = null;
 
   if (recipient_id) {
     const recipients = await base44.asServiceRole.entities.Recipient.filter({ id: recipient_id });
     if (recipients.length > 0) {
-      const r = recipients[0];
-      resolvedName = r.nickname || r.full_name;
-      resolvedBank = r.bank;
+      resolvedRecipient = recipients[0];
+      resolvedName = resolvedRecipient.nickname || resolvedRecipient.full_name;
+      resolvedBank = resolvedRecipient.bank;
     }
   }
 
-  // ── Compute amounts ──
+  // ── Compute amounts using server-validated rate ──
   const fee = 0;
-  const amount_php = parseFloat((amount_usd * rate).toFixed(2));
+  const amount_php = parseFloat((amount_usd * validatedRate).toFixed(2));
   const newUsdBalance = parseFloat((currentBalance - amount_usd).toFixed(2));
 
-  // ── Deduct from USD wallet (use freshWallet.id) ──
+  // ── Deduct from USD wallet ──
   const updatedUsdWallet = await base44.asServiceRole.entities.WalletBalance.update(freshWallet.id, {
     balance: newUsdBalance,
   });
@@ -110,7 +146,6 @@ Deno.serve(async (req) => {
       balance: newPhpBalance,
     });
   } else {
-    // Auto-create PHP wallet and credit it
     await base44.asServiceRole.entities.WalletBalance.create({
       currency_code: 'PHP',
       currency_name: 'Philippine Peso',
@@ -128,23 +163,19 @@ Deno.serve(async (req) => {
     recipient_bank: resolvedBank,
     recipient_id: recipient_id || undefined,
     status: 'completed',
-    rate,
+    rate: validatedRate,
     fee,
     category,
     note: note || undefined,
     reference_id: `KF-${Date.now().toString(36).toUpperCase()}`,
   });
 
-  // ── Update recipient stats ──
-  if (recipient_id) {
-    const recipients = await base44.asServiceRole.entities.Recipient.filter({ id: recipient_id });
-    if (recipients.length > 0) {
-      const r = recipients[0];
-      await base44.asServiceRole.entities.Recipient.update(recipient_id, {
-        total_sent_usd: (r.total_sent_usd || 0) + amount_usd,
-        transfer_count: (r.transfer_count || 0) + 1,
-      });
-    }
+  // ── Update recipient stats (reuse cached resolvedRecipient) ──
+  if (recipient_id && resolvedRecipient) {
+    await base44.asServiceRole.entities.Recipient.update(recipient_id, {
+      total_sent_usd: (resolvedRecipient.total_sent_usd || 0) + amount_usd,
+      transfer_count: (resolvedRecipient.transfer_count || 0) + 1,
+    });
   }
 
   // ── Check savings goal round-up ──
