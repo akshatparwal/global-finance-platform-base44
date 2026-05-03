@@ -87,7 +87,7 @@ export default function Pay() {
   const inputBg = darkMode ? "bg-[#0d1526] border-white/10 text-white placeholder-white/30" : "bg-[#f5efe6] border-black/10 text-[#1a2a4a]";
 
   useEffect(() => {
-    base44.entities.Transfer.list("-created_date", 10).then(setTransfers).catch(() => {});
+    base44.entities.Transfer.filter({ category: "remittance" }, "-created_date", 10).then(setTransfers).catch(() => {});
     base44.entities.Recipient.list("-transfer_count", 6).then(r => {
     setRecipients(r);
     setRecipientsLoading(false);
