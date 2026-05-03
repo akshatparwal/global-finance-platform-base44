@@ -10,7 +10,7 @@ export default function CardTransactionFeed({ cardLast4, darkMode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.entities.Transfer.list("-created_date", 8)
+    base44.entities.Transfer.filter({ category: "other" }, "-created_date", 8)
       .then(setTransfers)
       .catch(() => {})
       .finally(() => setLoading(false));
