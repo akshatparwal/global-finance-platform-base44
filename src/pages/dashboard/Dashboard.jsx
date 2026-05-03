@@ -355,11 +355,13 @@ export default function Dashboard() {
         {!loading && totalUSD > 0 && yieldEarned > 0 && (() => {
           const now = new Date();
           const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-          // Build daily breakdown for current month
-          const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
           const daysPassed = now.getDate();
           const dailyYieldAmt = dailyYield;
           const monthYield = dailyYieldAmt * daysPassed;
+          // Last month's yield
+          const daysInLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+          const lastMonthYield = dailyYieldAmt * daysInLastMonth;
+          const lastMonthLabel = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
           const dailyRows = Array.from({ length: daysPassed }, (_, i) => {
             const d = new Date(now.getFullYear(), now.getMonth(), i + 1);
             return { date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), amount: dailyYieldAmt };
@@ -380,11 +382,20 @@ export default function Dashboard() {
                     <p className="font-bold text-sm text-emerald-400">+${monthYield.toFixed(4)}</p>
                     <p className={`text-[10px] ${muted}`}>+${dailyYieldAmt.toFixed(4)}/day</p>
                   </div>
-                  <span className={`text-[10px] font-bold transition-transform ${yieldExpanded ? "rotate-180" : ""} ${muted}`}>▼</span>
+                  <span className={`text-[10px] font-bold transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""} ${muted}`}>▼</span>
                 </div>
               </button>
               {yieldExpanded && (
-                <div className="max-h-48 overflow-y-auto">
+                <div className="max-h-56 overflow-y-auto">
+                  {/* Last month summary row */}
+                  <div className={`flex items-center justify-between px-4 py-3 border-b ${darkMode ? "border-white/5 bg-white/3" : "border-black/5 bg-black/3"}`}>
+                    <div>
+                      <p className={`text-xs font-semibold ${textMain}`}>{lastMonthLabel}</p>
+                      <p className={`text-[10px] ${muted}`}>Previous month · {daysInLastMonth} days</p>
+                    </div>
+                    <p className="text-xs font-bold text-emerald-400">+${lastMonthYield.toFixed(4)}</p>
+                  </div>
+                  {/* Current month daily rows */}
                   {dailyRows.map((row, i) => (
                     <div key={i} className={`flex items-center justify-between px-4 py-2.5 border-b last:border-0 ${darkMode ? "border-white/5" : "border-black/5"}`}>
                       <p className={`text-xs ${muted}`}>{row.date}</p>
