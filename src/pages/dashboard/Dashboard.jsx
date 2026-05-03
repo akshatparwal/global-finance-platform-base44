@@ -55,7 +55,7 @@ export default function Dashboard() {
     const [u, walletsResult, transfersResult] = await Promise.all([
       base44.auth.me().catch(() => null),
       fetchWithCache("wallets", () => base44.entities.WalletBalance.list()).catch(() => ({ data: [], fromCache: false })),
-      fetchWithCache("transfers_dash", () => base44.entities.Transfer.list("-created_date", 10)).catch(() => ({ data: [], fromCache: false })),
+      fetchWithCache("transfers_dash", () => base44.entities.Transfer.list("-created_date", 20)).catch(() => ({ data: [], fromCache: false })),
     ]);
     if (u) {
       setUser(u);
@@ -73,7 +73,8 @@ export default function Dashboard() {
       } catch {}
     }
     setWallets(walletData);
-    setTransfers(transfersResult.data || []);
+    const allTransfers = transfersResult.data || [];
+    setTransfers(allTransfers.filter(t => t.category !== "yield").slice(0, 5));
     setOffline(walletsResult.fromCache || transfersResult.fromCache);
     setLoading(false);
   }, []);
@@ -85,6 +86,7 @@ export default function Dashboard() {
     const unsub = base44.entities.Transfer.subscribe((event) => {
       if (event.type === "create") {
         const newTx = event.data;
+        if (newTx.category === "yield") return;
         setTransfers(prev => [newTx, ...prev].slice(0, 5));
         // Deduct from USD wallet balance immediately
         setWallets(prev => prev.map(w =>
