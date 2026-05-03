@@ -40,6 +40,7 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFundWallet, setShowFundWallet] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
+  const [yieldExpanded, setYieldExpanded] = useState(false);
   const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const { walletAddress, usdcBalance, refetchBalance } = usePrivyWallet();
   const liveRate = rates?.USDPHP || 56.24;
@@ -105,7 +106,7 @@ export default function Dashboard() {
   const usdWallet = wallets.find(w => w.currency_code === "USD");
   const totalUSD = usdWallet?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
-  const { yieldEarned, dailyYield } = useYieldAccrual({
+  const { yieldEarned, dailyYield, apyPct } = useYieldAccrual({
     balance: totalUSD,
     walletCreatedDate: usdWallet?.created_date,
     yieldPctStr: usdWallet?.yield_pct,
@@ -225,7 +226,7 @@ export default function Dashboard() {
               </p>
               {totalUSD > 0 && yieldEarned > 0 && (
                 <p className="text-emerald-400 text-[10px] mt-1 font-semibold">
-                  ⚡ +${yieldEarned.toFixed(4)} yield earned · +${dailyYield.toFixed(4)}/day
+                  ⚡ +${yieldEarned.toFixed(4)} earned · +${dailyYield.toFixed(4)}/day · {apyPct}% APY
                 </p>
               )}
             </div>
@@ -348,6 +349,52 @@ export default function Dashboard() {
             </button>
           </div>
         )}
+        {/* Monthly Yield Credit Entry */}
+        {!loading && totalUSD > 0 && yieldEarned > 0 && (() => {
+          const now = new Date();
+          const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+          // Build daily breakdown for current month
+          const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+          const daysPassed = now.getDate();
+          const dailyYieldAmt = dailyYield;
+          const monthYield = dailyYieldAmt * daysPassed;
+          const dailyRows = Array.from({ length: daysPassed }, (_, i) => {
+            const d = new Date(now.getFullYear(), now.getMonth(), i + 1);
+            return { date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), amount: dailyYieldAmt };
+          }).reverse();
+          return (
+            <div className={`rounded-2xl border overflow-hidden mb-3 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+              <button
+                onClick={() => setYieldExpanded(e => !e)}
+                className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-emerald-500/5 ${yieldExpanded ? (darkMode ? "border-b border-white/5" : "border-b border-black/5") : ""}`}
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-lg flex-shrink-0">⚡</div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-semibold ${textMain}`}>Yield Credit</p>
+                  <p className={`text-[10px] font-medium ${muted}`}>{monthLabel} · {apyPct}% APY · {daysPassed} days</p>
+                </div>
+                <div className="text-right flex-shrink-0 flex items-center gap-2">
+                  <div>
+                    <p className="font-bold text-sm text-emerald-400">+${monthYield.toFixed(4)}</p>
+                    <p className={`text-[10px] ${muted}`}>+${dailyYieldAmt.toFixed(4)}/day</p>
+                  </div>
+                  <span className={`text-[10px] font-bold transition-transform ${yieldExpanded ? "rotate-180" : ""} ${muted}`}>▼</span>
+                </div>
+              </button>
+              {yieldExpanded && (
+                <div className="max-h-48 overflow-y-auto">
+                  {dailyRows.map((row, i) => (
+                    <div key={i} className={`flex items-center justify-between px-4 py-2.5 border-b last:border-0 ${darkMode ? "border-white/5" : "border-black/5"}`}>
+                      <p className={`text-xs ${muted}`}>{row.date}</p>
+                      <p className="text-xs font-semibold text-emerald-400">+${row.amount.toFixed(4)}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {!loading && transfers.length > 0 && (
           <div className={`rounded-2xl border overflow-hidden mb-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
             {transfers.map((t, i) => {
