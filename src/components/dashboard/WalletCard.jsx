@@ -31,7 +31,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, ta
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          {w.currency_code === "USD" && (
+          {w.yield_pct && w.currency_code !== "PHP" && (
             <span className="bg-primary/30 text-primary text-xs font-black px-2 py-1 rounded-full tracking-tight border border-primary/20">⚡ {w.yield_pct}</span>
           )}
           {isOnChain && (

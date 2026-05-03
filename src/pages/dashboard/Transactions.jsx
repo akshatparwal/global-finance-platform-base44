@@ -77,10 +77,12 @@ export default function Transactions() {
               ].join(","));
               const csv = [header, ...rows].join("\n");
               const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
               const a = document.createElement("a");
-              a.href = URL.createObjectURL(blob);
+              a.href = url;
               a.download = `KinnectFi-Transactions-${new Date().toISOString().slice(0,10)}.csv`;
               a.click();
+              URL.revokeObjectURL(url);
             }}
             className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary font-bold px-3 py-2 rounded-xl text-xs hover:bg-primary/20 transition-colors flex-shrink-0"
           >

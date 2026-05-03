@@ -12,7 +12,7 @@ import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
 import CommunityStories from "@/components/dashboard/CommunityStories";
 import CelebrationsWidget from "@/components/dashboard/CelebrationsWidget";
 import { useCountUp } from "@/hooks/useCountUp";
-import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton } from "@/components/ui/SkeletonLoader";
+import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton, Skeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
 import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
@@ -115,7 +115,6 @@ export default function Dashboard() {
   });
   const netWorth = totalUSD + yieldEarned + (totalPHP / liveRate);
   const { value: animatedNetWorth, ref: netWorthRef } = useCountUp(netWorth, 1000, 200);
-  const primaryAmount = `$ ${(loading ? 0 : animatedNetWorth).toFixed(2)}`;
   const secondaryAmount = `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
   const greeting = (() => {
@@ -213,7 +212,8 @@ export default function Dashboard() {
       )}
 
       {/* Net Worth Card */}
-      <div ref={netWorthRef} className="kf-hero-card relative rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
+      {loading ? <NetWorthSkeleton /> : null}
+      <div ref={netWorthRef} className={`kf-hero-card relative rounded-2xl overflow-hidden ${loading ? "hidden" : ""}`} style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
         <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
           <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>

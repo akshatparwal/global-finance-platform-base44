@@ -110,7 +110,7 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
               <Row label="Date" value={new Date(tx.created_date).toLocaleDateString("en-US", { weekday: "short", year: "numeric", month: "short", day: "numeric" })} muted={muted} text={text} divider={divider} />
               <Row label="Time" value={new Date(tx.created_date).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} muted={muted} text={text} divider={divider} />
               {tx.rate && <Row label="Your Rate" value={`₱${tx.rate?.toFixed(4)} / USD`} muted={muted} text={text} divider={divider} />}
-              {tx.rate && <Row label="Mid-market Rate" value={`₱${(tx.rate * 1.0 - 0.0).toFixed(4)} / USD`} valueClass="text-emerald-400" muted={muted} text={text} divider={divider} />}
+              {tx.rate && <Row label="Mid-market Rate" value={`₱${(tx.rate * 1.02).toFixed(4)} / USD`} valueClass="text-emerald-400" muted={muted} text={text} divider={divider} />}
               {tx.rate && (
                 <Row
                   label="vs. Competitors"

@@ -243,7 +243,7 @@ export default function DashboardLayout() {
                 }
               }}
             >
-              <Outlet context={{ darkMode, taglish }} />
+              <Outlet context={{ darkMode: darkMode === true, taglish: taglish === true }} />
             </motion.div>
           </AnimatePresence>
         </main>

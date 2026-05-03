@@ -114,13 +114,22 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                   <CopyRow label="Account Type"         value="Checking"                            darkMode={darkMode} />
                   <CopyRow label="Beneficiary Name"     value={user?.full_name || "KinnectFi User"} darkMode={darkMode} />
                 </div>
-                <div className="flex items-start gap-3 bg-primary/10 border border-primary/20 rounded-xl p-3">
+                <div className="flex items-start gap-3 bg-primary/10 border border-primary/20 rounded-xl p-3 mb-4">
                   <span className="text-primary text-lg flex-shrink-0">ℹ️</span>
                   <p className="text-primary text-xs leading-relaxed">
                     {method === "ach"
                       ? "Use these details to transfer from your US bank. ACH deposits typically arrive in 1–3 business days. No fees charged by KinnectFi."
                       : "Wire transfers from US banks arrive the same day if sent before 3PM ET. International wires take 1–2 business days."}
                   </p>
+                </div>
+                <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
+                  <span className="text-yellow-400 text-base flex-shrink-0">⏳</span>
+                  <div>
+                    <p className="text-yellow-400 text-xs font-bold mb-0.5">
+                      {method === "ach" ? "Funds arrive in 1–3 business days" : "Funds arrive same day (if sent before 3PM ET)"}
+                    </p>
+                    <p className="text-yellow-400/70 text-xs">Your balance will update automatically once the transfer is received. Use <strong>Instant Deposit</strong> for immediate access.</p>
+                  </div>
                 </div>
               </motion.div>
             )}

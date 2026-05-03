@@ -86,6 +86,13 @@ export default function Pay() {
   const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const inputBg = darkMode ? "bg-[#0d1526] border-white/10 text-white placeholder-white/30" : "bg-[#f5efe6] border-black/10 text-[#1a2a4a]";
 
+  // Re-check KYC whenever Pay page becomes visible (user may have completed it on Profile)
+  useEffect(() => {
+    base44.auth.me().catch(() => null).then(u => {
+      if (u) setKycRequired(!u.onboarding_completed);
+    });
+  }, []);
+
   useEffect(() => {
     base44.entities.Transfer.filter({ category: "remittance" }, "-created_date", 10).then(setTransfers).catch(() => {});
     base44.entities.Recipient.list("-transfer_count", 6).then(r => {
@@ -114,7 +121,7 @@ export default function Pay() {
     ]).then(([a, u]) => {
       setRateAlerts(a);
       setAlertUser(u);
-      if (u && !u.onboarding_completed) setKycRequired(true);
+      setKycRequired(!!(u && !u.onboarding_completed));
       a.filter(al => al.triggered).forEach(al => triggeredRef.current.add(al.id));
       setAlertsLoading(false);
     }).catch(() => setAlertsLoading(false));
