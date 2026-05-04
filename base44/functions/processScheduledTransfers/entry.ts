@@ -54,13 +54,30 @@ Deno.serve(async (req) => {
     const newBalance = parseFloat(((userWallet.balance || 0) - s.amount).toFixed(2));
     await base44.asServiceRole.entities.WalletBalance.update(userWallet.id, { balance: newBalance });
 
+    // Fetch live rate for this transfer
+    let liveRate = 56.24; // fallback
+    try {
+      const rateResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+        prompt: 'Get the current live mid-market USD to PHP (Philippine Peso) exchange rate right now.',
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: 'object',
+          properties: { USDPHP: { type: 'number' } },
+        },
+      });
+      if (rateResult?.USDPHP) liveRate = rateResult.USDPHP;
+    } catch { /* use fallback */ }
+
+    const amount_php = parseFloat((s.amount * liveRate).toFixed(2));
+
     // Record transfer
     await base44.asServiceRole.entities.Transfer.create({
       amount_usd: s.amount,
+      amount_php,
       recipient_name: s.label,
       recipient_bank: 'Auto-Padala',
       status: 'completed',
-      rate: 56.24, // Would use live rate in production
+      rate: liveRate,
       fee: 0,
       category: 'remittance',
       note: `Scheduled: ${s.label}`,

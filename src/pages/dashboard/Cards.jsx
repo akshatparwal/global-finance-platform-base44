@@ -5,6 +5,7 @@ import {
   DollarSign, Zap, AlertTriangle, Plus, X, Check, Copy, Loader2, MapPin, Package
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { issueVirtualCard } from "@/functions/issueVirtualCard";
 import { motion, AnimatePresence } from "framer-motion";
 import CardTransactionFeed from "@/components/cards/CardTransactionFeed";
 
@@ -24,18 +25,6 @@ const SUBSCRIPTIONS = [
 
 const CARD_TABS = ["My Card", "Transactions", "Controls"];
 
-// Generate realistic card data
-function generateCardData() {
-  const rand4 = () => Math.floor(1000 + Math.random() * 9000).toString();
-  const groups = ["4582", rand4(), rand4(), rand4()];
-  const card_number = groups.join(" ");
-  const last4 = groups[3];
-  const expMonth = String(Math.floor(1 + Math.random() * 12)).padStart(2, "0");
-  const expYear = (new Date().getFullYear() + 3).toString().slice(-2);
-  const expiry = `${expMonth}/${expYear}`;
-  const cvv = String(Math.floor(100 + Math.random() * 900));
-  return { card_number, last4, expiry, cvv };
-}
 
 function BottomSheet({ open, onClose, title, children, darkMode }) {
   if (!open) return null;
@@ -115,26 +104,20 @@ export default function Cards() {
     setTimeout(() => setSuccessMsg(""), 3000);
   };
 
-  // Issue virtual card — generates data and persists
+  // Issue virtual card — generated server-side with crypto.getRandomValues
   const handleIssue = async () => {
     if (issued || issuing) return;
     setIssuing(true);
-    await new Promise(r => setTimeout(r, 1200)); // Revolut-style 1.2s "issuance" delay
-    const data = generateCardData();
-    const newCard = await base44.entities.VirtualCard.create({
-      ...data,
-      is_frozen: false,
-      contactless_enabled: true,
-      instant_settlement: false,
-      spending_limit: 5000,
-      status: "active",
-      physical_requested: false,
-      physical_status: "none",
-    });
-    setCardData(newCard);
-    setShowDetails(true);
+    const res = await issueVirtualCard({});
+    if (res?.data?.success) {
+      setCardData(res.data.card);
+      setShowDetails(true);
+      showSuccess("Virtual card issued in seconds! ✓");
+    } else if (res?.data?.card) {
+      // Already existed (409) — just load it
+      setCardData(res.data.card);
+    }
     setIssuing(false);
-    showSuccess("Virtual card issued in seconds! ✓");
   };
 
   // Persist toggle to backend

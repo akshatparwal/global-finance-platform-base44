@@ -42,6 +42,7 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(user?.phone_verified || false);
+  const [otpError, setOtpError] = useState(false);
   const [recipientName, setRecipientName] = useState(user?.first_recipient_name || "");
   const [recipientBank, setRecipientBank] = useState(user?.first_recipient_bank || "");
 
@@ -106,18 +107,28 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
     setOtpSent(true);
   };
 
+  const DEMO_OTP = "1234";
+
   const handleVerifyOtp = async () => {
-    // Accept "1234" as demo code, or any 4+ digit code
-    if (otp.length >= 4) {
+    // Verify against the expected demo OTP — in production replace with a real SMS API check
+    if (otp === DEMO_OTP) {
+      setOtpError(false);
       setOtpVerified(true);
       await base44.auth.updateMe({ phone_number: phone, phone_verified: true });
+    } else {
+      setOtpError(true);
+      setOtp("");
     }
   };
 
   const handleFinish = async () => {
     setSaving(true);
+    // onboarding_completed requires doc upload at minimum — phone + selfie are optional but doc is required
+    const kycReady = docUploaded || !!user?.kyc_doc_url;
     await base44.auth.updateMe({
-      onboarding_completed: true,
+      // Only mark completed if at least a KYC document was uploaded; otherwise leave false
+      // so the KYC gate in processTransfer still blocks transfers until verified
+      onboarding_completed: kycReady,
       onboarding_step: STEPS.length - 1,
       first_recipient_name: recipientName,
       first_recipient_bank: recipientBank,
@@ -316,9 +327,10 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
                       <span className="text-primary text-sm">Code sent! Enter <strong>1234</strong> to verify (demo).</span>
                     </div>
                     <label className="text-white/60 text-xs uppercase tracking-wider mb-2 block">Verification Code</label>
-                    <input value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
+                    <input value={otp} onChange={e => { setOtpError(false); setOtp(e.target.value.replace(/\D/g, "")); }}
                       placeholder="1234" inputMode="numeric" maxLength={6}
-                      className={`${inputCls} text-center text-2xl font-black tracking-widest mb-4`} />
+                      className={`${inputCls} text-center text-2xl font-black tracking-widest mb-2 ${otpError ? "border-red-500" : ""}`} />
+                    {otpError && <p className="text-red-400 text-xs text-center mb-3">Incorrect code. Please try again.</p>}
                     <button onClick={handleVerifyOtp} disabled={otp.length < 4}
                       className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 disabled:opacity-40 transition-opacity">
                       Verify Code

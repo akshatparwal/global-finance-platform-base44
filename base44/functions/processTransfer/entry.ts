@@ -138,22 +138,8 @@ Deno.serve(async (req) => {
     balance: newUsdBalance,
   });
 
-  // ── Credit PHP wallet ──
-  const phpWallet = userWallets.find(w => w.currency_code === 'PHP');
-  if (phpWallet) {
-    const newPhpBalance = parseFloat(((phpWallet.balance || 0) + amount_php).toFixed(2));
-    await base44.asServiceRole.entities.WalletBalance.update(phpWallet.id, {
-      balance: newPhpBalance,
-    });
-  } else {
-    await base44.asServiceRole.entities.WalletBalance.create({
-      currency_code: 'PHP',
-      currency_name: 'Philippine Peso',
-      flag: '🇵🇭',
-      balance: amount_php,
-      yield_pct: '2.1%',
-    });
-  }
+  // NOTE: Outbound remittances do NOT credit the sender's PHP wallet.
+  // PHP is delivered to the recipient's bank in the Philippines, not held here.
 
   // ── Record transfer ──
   const transfer = await base44.asServiceRole.entities.Transfer.create({
