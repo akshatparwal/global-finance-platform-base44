@@ -356,27 +356,50 @@ export default function Insights() {
           ) : (
           <div className="grid grid-cols-1 gap-3">
             {goals.map((g,i) => {
-              const pct = g.target_amount > 0 ? Math.round(((g.current_amount || 0) / g.target_amount) * 100) : 0;
+              const pct = g.target_amount > 0 ? Math.min(Math.round(((g.current_amount || 0) / g.target_amount) * 100), 100) : 0;
+              const remaining = Math.max((g.target_amount || 0) - (g.current_amount || 0), 0);
+              const isComplete = pct >= 100;
               return (
-              <div key={g.id || i} className={`border rounded-xl p-4 flex items-center gap-4 ${card}`}>
-                <span className="text-3xl flex-shrink-0">{g.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <h4 className="font-bold text-sm">{g.label}</h4>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {g.auto_save_enabled && <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">⚡ AUTO</span>}
-                      {g.round_up_enabled && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">↑ ROUND-UP</span>}
+              <div key={g.id || i} className={`border rounded-xl p-4 ${card}`}>
+                {/* Header row */}
+                <div className="flex items-start gap-3 mb-3">
+                  <span className="text-2xl flex-shrink-0 mt-0.5">{g.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-bold text-sm truncate">{g.label}</h4>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {g.auto_save_enabled && <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">⚡ AUTO</span>}
+                        {g.round_up_enabled && <span className="text-[9px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">↑ ROUND-UP</span>}
+                        {isComplete && <span className="text-[9px] font-bold text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded-full">🎉 DONE</span>}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs mt-0.5">
+                      <span className={muted}>${(g.current_amount || 0).toLocaleString()} <span className={muted}>of ${g.target_amount.toLocaleString()}</span></span>
+                      <span className={`font-black text-sm ${isComplete ? "text-yellow-500" : "text-primary"}`}>{pct}%</span>
                     </div>
                   </div>
-                  <div className={`w-full h-1.5 rounded-full mb-1 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
-                  <p className={`text-xs ${muted}`}>{pct}% · ${(g.current_amount || 0).toLocaleString()} of ${g.target_amount.toLocaleString()}</p>
                 </div>
-                <button
-                  onClick={() => setAddFundsGoal(g)}
-                  className="flex-shrink-0 bg-primary text-secondary text-xs font-black px-3 py-2 rounded-xl active:scale-95 transition-transform hover:opacity-90"
-                >
-                  + Add
-                </button>
+
+                {/* Progress bar */}
+                <div className={`w-full h-2.5 rounded-full mb-2 ${darkMode ? "bg-white/10" : "bg-black/10"}`}>
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-yellow-500" : "bg-primary"}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                {/* Footer row */}
+                <div className="flex items-center justify-between">
+                  <p className={`text-xs ${muted}`}>
+                    {isComplete ? "Goal reached! 🎉" : `$${remaining.toLocaleString()} to go`}
+                  </p>
+                  <button
+                    onClick={() => setAddFundsGoal(g)}
+                    className="bg-primary text-secondary text-xs font-black px-3 py-1.5 rounded-xl active:scale-95 transition-transform hover:opacity-90"
+                  >
+                    + Add
+                  </button>
+                </div>
               </div>
               );
             })}
