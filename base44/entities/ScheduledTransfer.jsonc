@@ -35,6 +35,10 @@
     "is_active": {
       "type": "boolean",
       "default": true
+    },
+    "last_executed_date": {
+      "type": "string",
+      "description": "ISO date (YYYY-MM-DD) of the last successful execution \u2014 used to prevent same-day double-runs"
     }
   },
   "required": [

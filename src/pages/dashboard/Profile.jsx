@@ -27,12 +27,12 @@ import {
 const PROFILE_TABS = ["General","Family","Referrals","Security","Support"];
 
 export default function Profile() {
-  const { darkMode } = useOutletContext() || {};
+  const { darkMode, taglish, setTaglish: onSetTaglish } = useOutletContext() || {};
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("General");
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [activeLang, setActiveLang] = useState("EN");
+  const [activeLang, setActiveLang] = useState(() => (taglish ? "TG" : "EN"));
   const [transfers, setTransfers] = useState([]);
   // Referrals state
   const [referrals, setReferrals] = useState([]);
@@ -283,28 +283,32 @@ export default function Profile() {
             />
           )}
 
-          {/* Language & Theme */}
+          {/* Language & Theme — EN/TG only, persisted to localStorage via DashboardLayout */}
           <div className={`border rounded-xl p-4 ${card}`}>
             <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3"><span className="text-lg">🌐</span><div><p className="font-semibold text-sm">Wika / Language</p><p className={`text-xs ${muted}`}>{activeLang === "EN" ? "English (US)" : activeLang === "TG" ? "Taglish" : activeLang === "CEB" ? "Cebuano" : "Ilocano"}</p></div></div>
+              <div className="flex items-center gap-3">
+                <span className="text-lg">🌐</span>
+                <div>
+                  <p className="font-semibold text-sm">Wika / Language</p>
+                  <p className={`text-xs ${muted}`}>{activeLang === "EN" ? "English (US)" : "Taglish"}</p>
+                </div>
+              </div>
               <div className="flex gap-1">
-                {["EN","TG","CEB","ILO"].map(l => (
-                  <button key={l} onClick={() => setActiveLang(l)}
-                    className={`text-[10px] font-bold px-2 py-1 rounded transition-colors ${l === activeLang ? "bg-primary text-secondary" : `${darkMode ? "bg-white/10 text-white/50 hover:bg-white/20" : "bg-black/10 text-black/50 hover:bg-black/20"}`}`}>{l}</button>
+                {[{ code: "EN", taglish: false }, { code: "TG", taglish: true }].map(({ code, taglish: tg }) => (
+                  <button key={code} onClick={() => { setActiveLang(code); onSetTaglish(tg); }}
+                    className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${code === activeLang ? "bg-primary text-secondary" : `${darkMode ? "bg-white/10 text-white/50 hover:bg-white/20" : "bg-black/10 text-black/50 hover:bg-black/20"}`}`}>{code}</button>
                 ))}
               </div>
             </div>
-            <div className="mt-2 flex items-center gap-2 bg-primary/10 rounded-lg p-2">
-              <span className="text-primary">⚡</span>
-              <span className="text-primary text-xs">Language Multiplier: Active! Using localized languages like Taglish/Cebuano grants you a <strong>1.2x points multiplier</strong> on all transactions.</span>
-            </div>
           </div>
 
-          {/* Year story — real stats */}
+          {/* Year story — real stats (remittance only, excludes deposits and yield) */}
           {transfers.length > 0 && (() => {
-            const totalSent = transfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
-            const totalPHP = transfers.reduce((s, t) => s + (t.amount_php || 0), 0);
-            const uniqueRecipients = [...new Set(transfers.map(t => t.recipient_name).filter(Boolean))].length;
+            const OUTBOUND = ["remittance", "bills", "subscriptions", "savings", "other"];
+            const sentTransfers = transfers.filter(t => OUTBOUND.includes(t.category));
+            const totalSent = sentTransfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
+            const totalPHP = sentTransfers.reduce((s, t) => s + (t.amount_php || 0), 0);
+            const uniqueRecipients = [...new Set(sentTransfers.map(t => t.recipient_name).filter(Boolean))].length;
             return (
               <div className="rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
                 <p className="text-white/70 text-xs uppercase tracking-wider mb-1">✦ YOUR 2026 KINNECTFI STORY</p>
@@ -375,13 +379,13 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Points earned */}
+          {/* Points earned — canonical: referral points only (transfer points shown in General tab) */}
           <div className={`border rounded-2xl p-5 flex items-center gap-4 ${card}`}>
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Gift className="w-6 h-6 text-primary" /></div>
             <div className="flex-1">
-              <p className={`text-xs uppercase tracking-wider font-bold ${muted} mb-0.5`}>Total Points Earned</p>
-              <p className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{pointsEarned.toLocaleString()} <span className={`text-sm font-normal ${muted}`}>pts</span></p>
-              <p className={`text-xs ${muted}`}>≈ ${(pointsEarned / 1000).toFixed(2)} in transfer credits</p>
+              <p className={`text-xs uppercase tracking-wider font-bold ${muted} mb-0.5`}>Referral Points Earned</p>
+              <p className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{(joined * 500).toLocaleString()} <span className={`text-sm font-normal ${muted}`}>pts</span></p>
+              <p className={`text-xs ${muted}`}>500 pts × {joined} joined referral{joined !== 1 ? "s" : ""}</p>
             </div>
           </div>
 

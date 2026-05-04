@@ -73,8 +73,9 @@ export default function Dashboard() {
       } catch {}
     }
     setWallets(walletData);
+    const EXCLUDED = ["yield", "deposit", "savings"];
     const allTransfers = transfersResult.data || [];
-    setTransfers(allTransfers.filter(t => t.category !== "yield" && t.category !== "savings").slice(0, 5));
+    setTransfers(allTransfers.filter(t => !EXCLUDED.includes(t.category) && t.recipient_name !== "Deposit").slice(0, 5));
     setOffline(walletsResult.fromCache || transfersResult.fromCache);
     setLoading(false);
   }, []);

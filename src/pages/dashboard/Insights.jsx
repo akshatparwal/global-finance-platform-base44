@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import AddFundsModal from "@/components/savings/AddFundsModal";
@@ -61,18 +61,30 @@ export default function Insights() {
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
 
   const navigate = useNavigate();
-  const dataFetched = useRef(false);
+  const lastFetchedAt = useRef(0);
+  const STALE_MS = 60_000; // re-fetch if data is older than 60 seconds
+
+  const fetchAll = useCallback(async () => {
+    setActivityLoading(true);
+    setGoalsLoading(true);
+    await Promise.all([
+      base44.entities.SavingsGoal.list()
+        .then(g => { setGoals(g); setGoalsLoading(false); })
+        .catch(() => setGoalsLoading(false)),
+      base44.entities.WalletBalance.list().then(setWallets).catch(() => {}),
+      base44.entities.Transfer.list("-created_date", 100)
+        .then(t => { setTransfers(t); setActivityLoading(false); })
+        .catch(() => setActivityLoading(false)),
+    ]);
+    lastFetchedAt.current = Date.now();
+  }, []);
 
   useEffect(() => {
-    // Only fetch once per mount — avoids re-fetch on tab switch within the same session
-    if (dataFetched.current) return;
-    dataFetched.current = true;
-    base44.entities.SavingsGoal.list()
-      .then(g => { setGoals(g); setGoalsLoading(false); })
-      .catch(() => setGoalsLoading(false));
-    base44.entities.WalletBalance.list().then(setWallets).catch(() => {});
-    base44.entities.Transfer.list("-created_date", 100).then(t => { setTransfers(t); setActivityLoading(false); }).catch(() => setActivityLoading(false));
-  }, []);
+    // Re-fetch if stale (>60s) — catches transfers made in other tabs/windows
+    if (Date.now() - lastFetchedAt.current > STALE_MS) {
+      fetchAll();
+    }
+  });
 
   const handleGoalUpdated = (updatedGoal) => {
     setGoals(prev => prev.map(g => g.id === updatedGoal.id ? updatedGoal : g));

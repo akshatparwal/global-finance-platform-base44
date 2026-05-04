@@ -126,13 +126,25 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
     // onboarding_completed requires doc upload at minimum — phone + selfie are optional but doc is required
     const kycReady = docUploaded || !!user?.kyc_doc_url;
     await base44.auth.updateMe({
-      // Only mark completed if at least a KYC document was uploaded; otherwise leave false
-      // so the KYC gate in processTransfer still blocks transfers until verified
       onboarding_completed: kycReady,
       onboarding_step: STEPS.length - 1,
       first_recipient_name: recipientName,
       first_recipient_bank: recipientBank,
     }).catch(() => {});
+
+    // Create a Recipient entity from the first recipient data collected in onboarding
+    const finalName = recipientName || user?.first_recipient_name;
+    const finalBank = recipientBank || user?.first_recipient_bank;
+    if (finalName && finalBank) {
+      await base44.entities.Recipient.create({
+        nickname: finalName,
+        full_name: finalName,
+        bank: finalBank,
+        emoji: "❤️",
+        relationship: "other",
+      }).catch(() => {}); // non-fatal — don't block completion
+    }
+
     setSaving(false);
     onComplete();
   };

@@ -24,6 +24,8 @@ Deno.serve(async (req) => {
   let skipped = 0;
   const results = [];
 
+  const todayDateStr = today.toISOString().slice(0, 10); // YYYY-MM-DD
+
   for (const s of scheduled) {
     let isDue = false;
 
@@ -39,6 +41,13 @@ Deno.serve(async (req) => {
     }
 
     if (!isDue) { skipped++; continue; }
+
+    // Guard: skip if already executed today (prevents double-run on re-triggers)
+    if (s.last_executed_date === todayDateStr) {
+      results.push({ id: s.id, label: s.label, status: 'skipped_already_ran_today' });
+      skipped++;
+      continue;
+    }
 
     // Find the user's USD wallet
     const wallets = await base44.asServiceRole.entities.WalletBalance.filter({ currency_code: 'USD' });
@@ -83,6 +92,9 @@ Deno.serve(async (req) => {
       note: `Scheduled: ${s.label}`,
       reference_id: `SCH-${s.id.slice(0,6)}-${Date.now().toString(36).toUpperCase()}`,
     });
+
+    // Mark as executed today to prevent double-run
+    await base44.asServiceRole.entities.ScheduledTransfer.update(s.id, { last_executed_date: todayDateStr });
 
     results.push({ id: s.id, label: s.label, amount: s.amount, status: 'executed' });
     executed++;
