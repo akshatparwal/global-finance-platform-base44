@@ -20,6 +20,7 @@ import TransferTracker from "@/components/transfer/TransferTracker";
 import NoRecipientsEmptyState from "@/components/pay/NoRecipientsEmptyState";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import CreateScheduledForm from "@/components/pay/CreateScheduledForm";
+import { warmRateCache } from "@/functions/warmRateCache";
 
 // RATE_HISTORY is built dynamically from real RateAlert triggered_at data + current live rate.
 // Falls back to a plausible 7-point curve seeded from the current rate if no history exists.
@@ -107,6 +108,12 @@ export default function Pay() {
     base44.auth.me().catch(() => null).then(u => {
       if (u) setKycRequired(!u.onboarding_completed);
     });
+  }, []);
+
+  // Pre-warm the backend rate cache in the background so processTransfer
+  // never needs to do a slow LLM fetch on the critical path.
+  useEffect(() => {
+    warmRateCache({}).catch(() => {}); // fire-and-forget, non-blocking
   }, []);
 
   useEffect(() => {
