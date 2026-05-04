@@ -34,14 +34,17 @@ Deno.serve(async (req) => {
   }
 
   // ── Daily deposit cap ──
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayDeposits = await base44.asServiceRole.entities.Transfer.filter({ category: 'deposit' });
-  const userTodayDeposits = todayDeposits.filter(t =>
-    t.created_by === user.email &&
-    new Date(t.created_date) >= todayStart
-  );
-  const todayTotal = userTodayDeposits.reduce((s, t) => s + (t.amount_usd || 0), 0);
+  // Use UTC midnight to avoid timezone skew on the server
+  const now = new Date();
+  const todayStartUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  // Filter server-side by both user and category to avoid fetching all deposits globally
+  const userTodayDeposits = await base44.asServiceRole.entities.Transfer.filter({
+    category: 'deposit',
+    created_by: user.email,
+  });
+  const todayTotal = userTodayDeposits
+    .filter(t => new Date(t.created_date) >= todayStartUTC)
+    .reduce((s, t) => s + (t.amount_usd || 0), 0);
   if (todayTotal + amount > DAILY_DEPOSIT_LIMIT) {
     const remaining = Math.max(DAILY_DEPOSIT_LIMIT - todayTotal, 0);
     return Response.json({

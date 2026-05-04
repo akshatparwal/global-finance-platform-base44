@@ -9,9 +9,13 @@ export default function CardTransactionFeed({ cardLast4, darkMode }) {
   const [transfers, setTransfers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Only show card-relevant categories — exclude system entries like yield credits and deposits
+  const CARD_CATEGORIES = ["remittance", "bills", "subscriptions", "other"];
+
   useEffect(() => {
-    base44.entities.Transfer.list("-created_date", 8)
-      .then(setTransfers)
+    // Fetch more than needed so we can filter and still show up to 8 meaningful rows
+    base44.entities.Transfer.list("-created_date", 30)
+      .then(all => setTransfers(all.filter(t => CARD_CATEGORIES.includes(t.category)).slice(0, 8)))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

@@ -22,7 +22,14 @@ export function useYieldAccrual({ balance = 0, walletCreatedDate = null, yieldPc
     const apyPct = parseFloat((yieldPctStr || `${DEFAULT_APY}%`).replace("%", "")) || DEFAULT_APY;
     const apyDecimal = apyPct / 100;
 
-    // Days the balance has been held (capped at 365 to avoid huge demo numbers)
+    // Only accrue yield when there is a positive balance.
+    // If balance is 0, return zeros immediately — no accrual on empty wallets.
+    if (!balance || balance <= 0) {
+      return { yieldEarned: 0, annualYield: 0, dailyYield: 0, apyPct, projectedBalance: 0 };
+    }
+
+    // Days since wallet creation, capped at 365 to avoid inflated demo numbers.
+    // In production, track the first-deposit date instead of wallet creation date.
     const createdMs = walletCreatedDate ? new Date(walletCreatedDate).getTime() : Date.now();
     const daysSince = Math.max(0, Math.min((Date.now() - createdMs) / 86_400_000, 365));
 

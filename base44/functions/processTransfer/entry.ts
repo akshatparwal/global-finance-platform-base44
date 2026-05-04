@@ -115,16 +115,16 @@ Deno.serve(async (req) => {
   }
 
   // ── Resolve recipient (single fetch, cached) ──
-  let resolvedName = recipient_name;
-  let resolvedBank = recipient_bank;
+  let resolvedName = recipient_name || 'Unknown Recipient';
+  let resolvedBank = recipient_bank || 'Bank Transfer';
   let resolvedRecipient = null;
 
   if (recipient_id) {
     const recipients = await base44.asServiceRole.entities.Recipient.filter({ id: recipient_id });
     if (recipients.length > 0) {
       resolvedRecipient = recipients[0];
-      resolvedName = resolvedRecipient.nickname || resolvedRecipient.full_name;
-      resolvedBank = resolvedRecipient.bank;
+      resolvedName = resolvedRecipient.nickname || resolvedRecipient.full_name || resolvedName;
+      resolvedBank = resolvedRecipient.bank || resolvedBank;
     }
   }
 
@@ -165,19 +165,31 @@ Deno.serve(async (req) => {
   }
 
   // ── Check savings goal round-up ──
-  const goals = await base44.asServiceRole.entities.SavingsGoal.filter({ round_up_enabled: true });
-  const userGoals = goals.filter(g => g.created_by === user.email);
-  for (const goal of userGoals) {
-    const roundUp = parseFloat((Math.ceil(amount_usd) - amount_usd).toFixed(2));
-    if (roundUp > 0 && newUsdBalance >= roundUp) {
-      const newGoalAmount = parseFloat(((goal.current_amount || 0) + roundUp).toFixed(2));
-      await base44.asServiceRole.entities.SavingsGoal.update(goal.id, {
-        current_amount: newGoalAmount,
-        contributions: [
-          ...(goal.contributions || []),
-          { amount: roundUp, note: 'Round-up from transfer', date: new Date().toISOString() },
-        ],
-      });
+  // Round-up is the cents gap between amount_usd and the next whole dollar.
+  // We re-read the wallet balance after the transfer deduction to get the true post-transfer balance.
+  const roundUp = parseFloat((Math.ceil(amount_usd) - amount_usd).toFixed(2));
+  if (roundUp > 0) {
+    // Re-read balance from DB (already deducted above) to avoid operating on stale in-memory value
+    const postWallets = await base44.asServiceRole.entities.WalletBalance.filter({ id: freshWallet.id });
+    const postBalance = postWallets[0]?.balance ?? newUsdBalance;
+
+    if (postBalance >= roundUp) {
+      const goals = await base44.asServiceRole.entities.SavingsGoal.filter({ round_up_enabled: true });
+      const userGoals = goals.filter(g => g.created_by === user.email);
+      for (const goal of userGoals) {
+        const newGoalAmount = parseFloat(((goal.current_amount || 0) + roundUp).toFixed(2));
+        // Deduct round-up from USD wallet
+        await base44.asServiceRole.entities.WalletBalance.update(freshWallet.id, {
+          balance: parseFloat((postBalance - roundUp).toFixed(2)),
+        });
+        await base44.asServiceRole.entities.SavingsGoal.update(goal.id, {
+          current_amount: newGoalAmount,
+          contributions: [
+            ...(goal.contributions || []),
+            { amount: roundUp, note: 'Round-up from transfer', date: new Date().toISOString() },
+          ],
+        });
+      }
     }
   }
 

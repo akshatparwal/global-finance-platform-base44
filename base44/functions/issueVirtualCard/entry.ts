@@ -37,8 +37,8 @@ Deno.serve(async (req) => {
   const user = await base44.auth.me();
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Prevent duplicate cards — check if user already has one
-  const existing = await base44.entities.VirtualCard.list('-created_date', 1);
+  // Prevent duplicate cards — server-side check using service role to be authoritative
+  const existing = await base44.asServiceRole.entities.VirtualCard.filter({ created_by: user.email });
   if (existing.length > 0) {
     return Response.json({ error: 'Card already issued.', card: existing[0] }, { status: 409 });
   }

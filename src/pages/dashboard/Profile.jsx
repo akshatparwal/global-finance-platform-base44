@@ -54,13 +54,7 @@ export default function Profile() {
           .then(r => { setReferrals(r); setReferralsLoading(false); })
           .catch(() => setReferralsLoading(false));
       }
-      // Auto-approve KYC: if doc is uploaded but still "pending", approve after 30s
-      if (u?.kyc_doc_url && u?.kyc_status === "pending") {
-        setTimeout(async () => {
-          await base44.auth.updateMe({ kyc_status: "approved" }).catch(() => {});
-          setUser(prev => prev ? { ...prev, kyc_status: "approved" } : prev);
-        }, 30000);
-      }
+      // KYC review is handled server-side — no client-side auto-approval
     }).catch(() => setLoadingUser(false));
     base44.entities.Transfer.list("-created_date", 100).then(setTransfers).catch(() => {});
   }, []);

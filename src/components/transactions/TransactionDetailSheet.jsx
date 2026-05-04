@@ -182,8 +182,13 @@ export default function TransactionDetailSheet({ tx: initialTx, onClose, darkMod
                     `Status: ${tx.status}`,
                   ].filter(Boolean).join("\n");
                   const blob = new Blob([lines], { type: "text/plain" });
-                  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-                  a.download = `KinnectFi-${refId}.txt`; a.click();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `KinnectFi-${refId}.txt`;
+                  a.click();
+                  // Revoke immediately after click to free memory
+                  setTimeout(() => URL.revokeObjectURL(url), 100);
                 }}
                 className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary text-secondary font-bold text-sm hover:opacity-90 transition-opacity"
               >
