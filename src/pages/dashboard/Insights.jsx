@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
+
 import { useOutletContext, useNavigate } from "react-router-dom";
 import AddFundsModal from "@/components/savings/AddFundsModal";
 import CreateGoalModal from "@/components/savings/CreateGoalModal";
