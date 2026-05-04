@@ -55,7 +55,8 @@ function BottomSheet({ open, onClose, title, children, darkMode }) {
 export default function Cards() {
   const { darkMode, taglish } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("My Card");
-  const [cardData, setCardData] = useState(null);      // persisted VirtualCard entity
+  const [cardData, setCardData] = useState(null);      // persisted VirtualCard entity (CVV is hashed)
+  const [plainCvv, setPlainCvv] = useState(null);      // plaintext CVV — held in memory only, never re-fetched
   const [issuing, setIssuing] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [copied, setCopied] = useState(null);
@@ -90,7 +91,8 @@ export default function Cards() {
       base44.entities.Transfer.list("-created_date", 100).catch(() => []),
     ]).then(([u, cards, txs]) => {
       setUser(u);
-      if (cards.length > 0) setCardData(cards[0]);
+      // Never expose the stored CVV hash to the UI — strip it on load
+      if (cards.length > 0) setCardData({ ...cards[0], cvv: null });
       setTransfers(txs);
     });
   }, []);
@@ -110,12 +112,15 @@ export default function Cards() {
     setIssuing(true);
     const res = await issueVirtualCard({});
     if (res?.data?.success) {
-      setCardData(res.data.card);
+      // Capture plaintext CVV returned once at issuance — never stored in DB
+      setPlainCvv(res.data.card.cvv);
+      // Strip CVV from entity state so we never accidentally display the hash
+      setCardData({ ...res.data.card, cvv: null });
       setShowDetails(true);
       showSuccess("Virtual card issued in seconds! ✓");
     } else if (res?.data?.card) {
-      // Already existed (409) — just load it
-      setCardData(res.data.card);
+      // Already existed (409) — CVV hash only, no plaintext available
+      setCardData({ ...res.data.card, cvv: null });
     }
     setIssuing(false);
   };
@@ -255,13 +260,13 @@ export default function Cards() {
                 <div>
                   <p className="text-white/30 uppercase tracking-wider mb-0.5">CVV</p>
                   <div className="flex items-center gap-1">
-                    <p className="text-white/70 font-bold font-mono">{issued && showDetails ? cardData.cvv : "•••"}</p>
-                    {issued && showDetails && (
-                      <button onClick={() => handleCopy(cardData.cvv, "cvv")} className="opacity-50 hover:opacity-100">
-                        {copied === "cvv" ? <Check className="w-2.5 h-2.5 text-emerald-400" /> : <Copy className="w-2.5 h-2.5 text-white" />}
-                      </button>
-                    )}
-                  </div>
+                   <p className="text-white/70 font-bold font-mono">{issued && showDetails && plainCvv ? plainCvv : "•••"}</p>
+                   {issued && showDetails && plainCvv && (
+                     <button onClick={() => handleCopy(plainCvv, "cvv")} className="opacity-50 hover:opacity-100">
+                       {copied === "cvv" ? <Check className="w-2.5 h-2.5 text-emerald-400" /> : <Copy className="w-2.5 h-2.5 text-white" />}
+                     </button>
+                   )}
+                 </div>
                 </div>
               </div>
               <div className="flex -space-x-2">
@@ -357,15 +362,17 @@ export default function Cards() {
               {[
                 { label: "Card Number", value: cardData.card_number, key: "card" },
                 { label: "Expiry", value: cardData.expiry, key: "exp" },
-                { label: "CVV", value: cardData.cvv, key: "cvv" },
+                { label: "CVV", value: plainCvv || "••• (shown once at issuance)", key: "cvv", copyValue: plainCvv },
               ].map(row => (
                 <div key={row.key} className={`flex items-center justify-between py-2.5 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
                   <span className={`text-xs ${muted}`}>{row.label}</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sm">{row.value}</span>
-                    <button onClick={() => handleCopy(row.value, row.key)} className={`p-1 rounded-lg transition-colors ${darkMode ? "hover:bg-white/10" : "hover:bg-black/10"}`}>
-                      {copied === row.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className={`w-3.5 h-3.5 ${muted}`} />}
-                    </button>
+                   <span className={`font-mono font-bold text-sm ${!row.copyValue && row.key === "cvv" ? "opacity-40 italic text-xs" : ""}`}>{row.value}</span>
+                   {(row.copyValue ?? row.value) && row.key !== "cvv" || plainCvv ? (
+                     <button onClick={() => handleCopy(row.copyValue ?? row.value, row.key)} className={`p-1 rounded-lg transition-colors ${darkMode ? "hover:bg-white/10" : "hover:bg-black/10"} ${row.key === "cvv" && !plainCvv ? "hidden" : ""}`}>
+                       {copied === row.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className={`w-3.5 h-3.5 ${muted}`} />}
+                     </button>
+                   ) : null}
                   </div>
                 </div>
               ))}
