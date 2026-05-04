@@ -28,8 +28,13 @@ export default function DashboardLayout() {
   const mainRef = useRef(null);
   const { activeTab, currentPath, stackDepth, isRoot, switchTab, resetTab, push, pop, loadScroll, saveScroll } = useTabStack();
   
+  // Read from localStorage synchronously in the initializer to prevent flash-of-light-mode
   const [darkMode, setDarkMode] = useState(() => {
-    try { return localStorage.getItem("kf_dark_mode") !== "false"; } catch { return true; }
+    try {
+      const stored = localStorage.getItem("kf_dark_mode");
+      // Default to dark if no preference stored
+      return stored === null ? true : stored !== "false";
+    } catch { return true; }
   });
   const [taglish, setTaglish] = useState(() => {
     try { return localStorage.getItem("kf_taglish") === "true"; } catch { return false; }

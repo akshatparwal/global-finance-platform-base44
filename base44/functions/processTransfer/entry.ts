@@ -14,8 +14,16 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// Fetch live USD/PHP rate via LLM+internet (same as frontend useLiveRates)
+// Simple in-process rate cache — survives for up to 5 minutes per isolate instance.
+// Deno isolates are ephemeral so this won't grow unbounded.
+const _rateCache = { rate: null, fetchedAt: 0 };
+const RATE_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 async function fetchLiveRate(base44) {
+  const now = Date.now();
+  if (_rateCache.rate && (now - _rateCache.fetchedAt) < RATE_CACHE_TTL_MS) {
+    return _rateCache.rate;
+  }
   try {
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: 'Get the current live mid-market USD to PHP (Philippine Peso) exchange rate right now.',
@@ -27,9 +35,13 @@ async function fetchLiveRate(base44) {
         },
       },
     });
+    if (result?.USDPHP) {
+      _rateCache.rate = result.USDPHP;
+      _rateCache.fetchedAt = now;
+    }
     return result?.USDPHP || null;
   } catch {
-    return null;
+    return _rateCache.rate || null; // return stale cache on error rather than null
   }
 }
 

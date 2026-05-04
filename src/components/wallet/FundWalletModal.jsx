@@ -195,6 +195,15 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
 
             {method === "crypto" && (
               <motion.div key="crypto" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                {!user?.onboarding_completed ? (
+                  <div className="flex items-start gap-3 bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 mb-4">
+                    <span className="text-orange-400 text-xl flex-shrink-0">🪪</span>
+                    <div>
+                      <p className="text-orange-400 text-sm font-bold mb-0.5">KYC Required</p>
+                      <p className="text-orange-400/70 text-xs">Complete identity verification before accessing your on-chain wallet address.</p>
+                    </div>
+                  </div>
+                ) : (
                 <div className={`rounded-2xl border p-5 mb-4 ${card}`}>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
@@ -214,18 +223,21 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                     </div>
                   )}
                 </div>
+                )}
                 <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 mb-4">
                   <span className="text-blue-400 text-lg flex-shrink-0">🔗</span>
                   <p className="text-blue-400 text-xs leading-relaxed">
                     Send <strong>USDC on Base</strong> to this address from any exchange (Coinbase, Binance, etc.) or another wallet. Funds arrive in ~30 seconds.
                   </p>
                 </div>
-                <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
-                  <span className="text-yellow-400 text-base flex-shrink-0">⚠️</span>
-                  <p className="text-yellow-400 text-xs leading-relaxed">
-                    Only send <strong>USDC on the Base network</strong>. Sending other tokens or on other networks may result in permanent loss.
-                  </p>
-                </div>
+                {user?.onboarding_completed && (
+                  <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3">
+                    <span className="text-yellow-400 text-base flex-shrink-0">⚠️</span>
+                    <p className="text-yellow-400 text-xs leading-relaxed">
+                      Only send <strong>USDC on the Base network</strong>. Sending other tokens or on other networks may result in permanent loss.
+                    </p>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

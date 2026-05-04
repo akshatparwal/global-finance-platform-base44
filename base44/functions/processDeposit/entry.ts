@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   // ── Daily deposit cap ──
-  // Use UTC midnight to avoid timezone skew on the server
+  // Always use UTC midnight so the limit resets consistently regardless of server locale
   const now = new Date();
   const todayStartUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   // Filter server-side by both user and category to avoid fetching all deposits globally

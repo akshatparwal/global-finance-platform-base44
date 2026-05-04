@@ -110,7 +110,7 @@ export default function Dashboard() {
   const usdWallet = wallets.find(w => w.currency_code === "USD");
   const totalUSD = usdWallet?.balance || 0;
   const totalPHP = wallets.find(w => w.currency_code === "PHP")?.balance || 0;
-  const { yieldEarned, dailyYield, apyPct } = useYieldAccrual({
+  const { yieldEarned, dailyYield, apyPct, projectedBalance } = useYieldAccrual({
     balance: totalUSD,
     walletCreatedDate: usdWallet?.created_date,
     yieldPctStr: usdWallet?.yield_pct,
@@ -234,10 +234,19 @@ export default function Dashboard() {
                 </p>
               )}
             </div>
-            <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">
-              <TrendingUp className="w-3 h-3 text-emerald-400" />
-              <span className="text-emerald-400 text-xs font-bold">+2.34%</span>
-            </div>
+            {(() => {
+              // Compute real 30-day change from wallet balance growth vs deposits
+              // As a simple proxy: if yield > 0, show the APY-implied monthly gain
+              const monthlyGainPct = totalUSD > 0 && yieldEarned > 0
+                ? ((Math.pow(1 + apyPct / 100, 30 / 365) - 1) * 100).toFixed(2)
+                : null;
+              return monthlyGainPct ? (
+                <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">
+                  <TrendingUp className="w-3 h-3 text-emerald-400" />
+                  <span className="text-emerald-400 text-xs font-bold">+{monthlyGainPct}%</span>
+                </div>
+              ) : null;
+            })()}
           </div>
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
             <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || (user === null ? "..." : "OFW")}</span> 👋</p>

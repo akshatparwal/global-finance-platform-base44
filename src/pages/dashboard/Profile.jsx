@@ -497,8 +497,24 @@ export default function Profile() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={() => {
-                    alert("Account deletion request submitted. Our team will process it within 48 hours and send a confirmation to your email.");
+                  onClick={async () => {
+                    // Record the deletion request as an entity for admin review
+                    await base44.entities.Transfer.create({
+                      amount_usd: 0,
+                      recipient_name: "ACCOUNT_DELETION_REQUEST",
+                      category: "other",
+                      status: "pending",
+                      note: `Deletion requested by ${user?.email || "unknown"} at ${new Date().toISOString()}`,
+                      reference_id: `DEL-${Date.now().toString(36).toUpperCase()}`,
+                    }).catch(() => {});
+                    // Send confirmation email
+                    if (user?.email) {
+                      await base44.integrations.Core.SendEmail({
+                        to: user.email,
+                        subject: "KinnectFi: Account Deletion Request Received",
+                        body: `Hi ${user.full_name || "there"},\n\nWe received your account deletion request. Our team will process it within 48 hours and send a confirmation once complete.\n\nIf you did not request this, please contact support immediately at support@kinnect.fi.\n\n— The KinnectFi Team`,
+                      }).catch(() => {});
+                    }
                     base44.auth.logout("/");
                   }}
                 >
