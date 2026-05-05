@@ -8,31 +8,32 @@ import { Fingerprint, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STORAGE_KEY = "kf_biometric_nudge_dismissed";
+// Session-level guard so it only fires once per page load, not per navigation
+let _shownThisSession = false;
 
 export default function BiometricNudge({ darkMode, whatsNewDismissed }) {
   const [show, setShow] = useState(false);
   const [supported, setSupported] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
   const [done, setDone] = useState(false);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (dismissed) return;
-    if (window.PublicKeyCredential) {
-      setSupported(true);
-      setReady(true);
-    }
+    // Already shown this session or permanently dismissed
+    if (_shownThisSession) return;
+    if (localStorage.getItem(STORAGE_KEY)) return;
+    if (!window.PublicKeyCredential) return;
+    setSupported(true);
   }, []);
 
-  // Only show after WhatsNew is dismissed (or wasn't shown)
+  // Only show after WhatsNew is dismissed (or wasn't shown) — but only once per session
   useEffect(() => {
-    if (!ready) return;
-    if (whatsNewDismissed) {
-      const t = setTimeout(() => setShow(true), 600);
-      return () => clearTimeout(t);
-    }
-  }, [ready, whatsNewDismissed]);
+    if (!supported) return;
+    if (!whatsNewDismissed) return;
+    if (_shownThisSession) return;
+    _shownThisSession = true;
+    const t = setTimeout(() => setShow(true), 600);
+    return () => clearTimeout(t);
+  }, [supported, whatsNewDismissed]);
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, "true");

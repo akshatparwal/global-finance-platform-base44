@@ -97,7 +97,7 @@ export default function Cards() {
     });
   }, []);
 
-  const cardholderName = user?.full_name?.toUpperCase() || "KINNECTFI USER";
+  const cardholderName = (user?.legal_name || user?.full_name || "KINNECTFI USER").toUpperCase();
   const isFrozen = cardData?.is_frozen || false;
   const issued = !!cardData;
 
@@ -255,7 +255,7 @@ export default function Cards() {
               <div className="flex gap-4 text-[9px]">
                 <div>
                   <p className="text-white/30 uppercase tracking-wider mb-0.5">EXP</p>
-                  <p className="text-white/70 font-bold font-mono">{issued && showDetails ? cardData.expiry : "—/——"}</p>
+                  <p className="text-white/70 font-bold font-mono">{issued ? (showDetails ? cardData.expiry : "••/••") : "—/——"}</p>
                 </div>
                 <div>
                   <p className="text-white/30 uppercase tracking-wider mb-0.5">CVV</p>

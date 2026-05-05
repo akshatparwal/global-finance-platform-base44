@@ -30,6 +30,7 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
   const [saving, setSaving] = useState(false);
 
   // Step data
+  const [legalName, setLegalName] = useState(user?.legal_name || user?.full_name || "");
   const [country, setCountry] = useState(user?.address_country || "");
   const [docType, setDocType] = useState(user?.kyc_doc_type || "");
   const [docUploading, setDocUploading] = useState(false);
@@ -179,8 +180,19 @@ export default function OnboardingModal({ user, onComplete, darkMode }) {
                 </div>
               ))}
             </div>
-            <button onClick={() => goNext({ address_country: country })}
-              className="w-full bg-primary text-secondary font-black py-4 rounded-xl text-base hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <div className="mb-5 text-left">
+              <label className="text-white/60 text-xs uppercase tracking-wider mb-2 block">Your Legal Full Name</label>
+              <input
+                value={legalName}
+                onChange={e => setLegalName(e.target.value)}
+                placeholder="e.g. Juan dela Cruz"
+                className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
+              />
+              <p className="text-white/30 text-xs mt-1.5">This will appear on your virtual and physical card.</p>
+            </div>
+            <button onClick={() => goNext({ address_country: country, legal_name: legalName })}
+              disabled={!legalName.trim()}
+              className="w-full bg-primary text-secondary font-black py-4 rounded-xl text-base hover:opacity-90 disabled:opacity-40 transition-opacity flex items-center justify-center gap-2">
               Get Started <ArrowRight className="w-5 h-5" />
             </button>
             <p className="text-white/30 text-xs mt-3">Takes ~2 minutes · 256-bit encrypted</p>
