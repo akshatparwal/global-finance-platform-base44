@@ -266,29 +266,8 @@ export default function Home() {
 
         {/* Features — horizontal scroll on mobile, grid on desktop */}
         <div className="mb-16">
-          {/* Mobile carousel */}
-          <div className="flex gap-3 overflow-x-auto pb-3 sm:hidden" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-            {[
-              { emoji: "⚡", title: "30-Second Delivery", desc: "GCash & Maya transfers arrive instantly.", badge: "INSTANT" },
-              { emoji: "🔒", title: "Zero Hidden Fees", desc: "No spread markup, no service charge.", badge: "FREE" },
-              { emoji: "📈", title: "Live Exchange Rate", desc: `Today: ₱${liveRate}/USD`, badge: "LIVE" },
-              { emoji: "🔔", title: "Rate Alerts", desc: "Get notified when your target rate hits.", badge: "SMART" },
-              { emoji: "👨‍👩‍👧", title: "Family Wallets", desc: "Linked wallets for your loved ones.", badge: "FAMILY" },
-              { emoji: "🎁", title: "Kinnect Points", desc: "Earn points on every padala.", badge: "REWARDS" },
-            ].map((f, i) => (
-              <div key={i} className="rounded-2xl p-5 border flex-shrink-0 w-[240px]"
-                style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: "rgba(201,123,34,0.1)" }}>{f.emoji}</div>
-                  <span className="text-[9px] font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(201,123,34,0.12)", color: "#C97B22" }}>{f.badge}</span>
-                </div>
-                <h3 className="font-extrabold text-base mb-1" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(13,31,60,0.5)" }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-          {/* Desktop grid */}
-          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Single responsive grid — single column on mobile, 2 col on sm, 3 col on lg */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { emoji: "⚡", title: "30-Second Delivery", desc: "GCash & Maya transfers arrive before your next heartbeat. No waiting, no anxiety.", badge: "INSTANT" },
               { emoji: "🔒", title: "Zero Hidden Fees", desc: "What you see is what they get. No spread markup, no service charge, no surprises.", badge: "FREE" },
@@ -300,10 +279,10 @@ export default function Home() {
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}
                 className="rounded-2xl p-5 border" style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: "rgba(201,123,34,0.1)" }}>{f.emoji}</div>
-                  <span className="text-[9px] font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(201,123,34,0.12)", color: "#C97B22" }}>{f.badge}</span>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "rgba(201,123,34,0.1)" }}>{f.emoji}</div>
+                  <span className="text-[9px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: "rgba(201,123,34,0.12)", color: "#C97B22" }}>{f.badge}</span>
                 </div>
-                <h3 className="font-extrabold text-base mb-1" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{f.title}</h3>
+                <h3 className="font-extrabold text-base mb-1 leading-tight" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{f.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(13,31,60,0.5)" }}>{f.desc}</p>
               </motion.div>
             ))}
@@ -338,7 +317,7 @@ export default function Home() {
                 style={{ background: "#C97B22", color: "#fff" }}>
                 {taglish ? "Magsimula Na →" : "Create Free Account →"}
               </Link>
-              <Link to="/HowItWorks" className="inline-flex items-center gap-2 ml-4 text-sm font-semibold hover:opacity-80 transition-opacity" style={{ color: "rgba(255,255,255,0.5)" }}>
+              <Link to="/auth" className="inline-flex items-center gap-2 ml-4 text-sm font-semibold hover:opacity-80 transition-opacity" style={{ color: "rgba(255,255,255,0.5)" }}>
                 Learn more <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>

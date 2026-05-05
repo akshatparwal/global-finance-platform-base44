@@ -105,7 +105,7 @@ export default function TestimonialsSection({ taglish }) {
             <div className="flex gap-0.5 mb-3">
               {[...Array(5)].map((_, j) => <span key={j} className="text-[#C97B22] text-xs">★</span>)}
             </div>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(13,31,60,0.65)" }}>"{t.message?.slice(0, 100)}{t.message?.length > 100 ? "..." : ""}"</p>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(13,31,60,0.65)" }}>"{t.message}"</p>
             <div className="flex items-center gap-2">
               {t.image_url && <img src={t.image_url} className="w-8 h-8 rounded-full object-cover" />}
               <div>

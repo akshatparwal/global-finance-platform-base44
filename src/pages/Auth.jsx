@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, HelpCircle, Eye, EyeOff, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useLiveRates } from "@/hooks/useLiveRates";
 
 const LANGUAGES = [
   { code: "en", label: "English", sub: "English", flag: "🇺🇸" },
@@ -12,6 +13,8 @@ const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_nam
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { rates } = useLiveRates();
+  const liveRate = rates?.USDPHP ? rates.USDPHP.toFixed(2) : "56.24";
   const [tab, setTab] = useState("signup");
   const [step, setStep] = useState(STEPS.LANGUAGE);
   const [lang, setLang] = useState("en");
@@ -30,8 +33,8 @@ export default function Auth() {
   const getPasswordStrength = (pw) => {
     if (!pw) return 0;
     let s = 0;
-    if (pw.length >= 6) s++;
-    if (pw.length >= 10) s++;
+    if (pw.length >= 8) s++;
+    if (pw.length >= 12) s++;
     if (/[A-Z]/.test(pw)) s++;
     if (/[0-9]/.test(pw)) s++;
     if (/[^A-Za-z0-9]/.test(pw)) s++;
@@ -86,7 +89,11 @@ export default function Auth() {
   };
 
   const handleSignUp = async () => {
-    if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
+    if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSymbol = /[^A-Za-z0-9]/.test(password);
+    if (!hasUpper && !hasNumber && !hasSymbol) { setError("Password is too simple. Please add uppercase letters, numbers, or symbols."); return; }
     setLoading(true); setError("");
     try {
       await base44.auth.register({ email, password });
@@ -132,8 +139,8 @@ export default function Auth() {
       case STEPS.LANGUAGE:
         return (
           <>
-            <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Your language</h1>
-            <p className="text-white/50 text-sm mb-6">Join the KinnectFi family.</p>
+            <h1 className="text-2xl font-extrabold text-white mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Create your account</h1>
+            <p className="text-white/50 text-sm mb-6">Choose your preferred language to get started.</p>
             <div className="grid grid-cols-2 gap-3 mb-6">
               {LANGUAGES.map(l => (
                 <button key={l.code} onClick={() => setLang(l.code)}
@@ -213,8 +220,8 @@ export default function Auth() {
             <label className="text-white/70 text-sm mb-2 block">Create a secure password</label>
             <div className="relative mb-3">
               <input value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="Min. 6 characters" type={showPassword ? "text" : "password"}
-                onKeyDown={e => e.key === "Enter" && password.length >= 6 && handleSignUp()}
+                placeholder="Min. 8 characters" type={showPassword ? "text" : "password"}
+                onKeyDown={e => e.key === "Enter" && password.length >= 8 && handleSignUp()}
                 className="w-full bg-white/10 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-primary" />
               <button onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3.5 text-white/40 hover:text-white">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -236,7 +243,7 @@ export default function Auth() {
             )}
             {!password.length && <div className="mb-4" />}
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-            <button onClick={handleSignUp} disabled={password.length < 6 || loading}
+            <button onClick={handleSignUp} disabled={password.length < 8 || loading}
               className="w-full bg-primary text-secondary font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {loading ? "Creating account..." : "Create Account"}
@@ -398,7 +405,7 @@ export default function Auth() {
             <span className="text-white/50 text-[10px] uppercase tracking-widest">Secured by 256-bit Encryption</span>
           </div>
           <div className="flex items-center justify-center gap-4">
-            <span className="text-white/40 text-xs">🇵🇭 PHP/USD <span className="text-primary font-bold">₱56.24</span></span>
+            <span className="text-white/40 text-xs">🇵🇭 PHP/USD <span className="text-primary font-bold">₱{liveRate}</span></span>
             <span className="text-white/40 text-xs">Padala Fee <span className="text-primary font-bold">$0 Today</span></span>
           </div>
         </div>

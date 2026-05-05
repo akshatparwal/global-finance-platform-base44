@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Zap, Globe, ArrowLeft } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,6 +27,17 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const mainRef = useRef(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  useEffect(() => {
+    base44.auth.isAuthenticated().then(authed => {
+      setIsAuthed(authed);
+      setAuthChecked(true);
+      if (!authed) base44.auth.redirectToLogin(window.location.href);
+    });
+  }, []);
+
   const { activeTab, currentPath, stackDepth, isRoot, switchTab, resetTab, push, pop, loadScroll, saveScroll } = useTabStack();
   
   // Read from localStorage synchronously in the initializer to prevent flash-of-light-mode
@@ -111,6 +123,15 @@ export default function DashboardLayout() {
   const textMuted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
   const activeClass = darkMode ? "bg-primary/20 text-primary" : "bg-primary/20 text-primary";
   const inactiveClass = darkMode ? "text-white/60 hover:text-white hover:bg-white/5" : "text-white/70 hover:text-white hover:bg-white/10";
+
+  if (!authChecked) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[#0a0f1a]">
+        <div className="w-8 h-8 border-4 border-white/10 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+  if (!isAuthed) return null;
 
   return (
     <div className={`min-h-screen flex ${bgMain}`}>
