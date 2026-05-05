@@ -13,8 +13,8 @@ const STEPS = { LANGUAGE: "language", SIGNIN: "signin", SIGNUP_NAME: "signup_nam
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { rates } = useLiveRates();
-  const liveRate = rates?.USDPHP ? rates.USDPHP.toFixed(2) : "56.24";
+  const { rates, loading: ratesLoading } = useLiveRates();
+  const liveRate = rates?.USDPHP ? rates.USDPHP.toFixed(2) : null;
   const [tab, setTab] = useState("signup");
   const [step, setStep] = useState(STEPS.LANGUAGE);
   const [lang, setLang] = useState("en");
@@ -405,7 +405,7 @@ export default function Auth() {
             <span className="text-white/50 text-[10px] uppercase tracking-widest">Secured by 256-bit Encryption</span>
           </div>
           <div className="flex items-center justify-center gap-4">
-            <span className="text-white/40 text-xs">🇵🇭 PHP/USD <span className="text-primary font-bold">₱{liveRate}</span></span>
+            <span className="text-white/40 text-xs">🇵🇭 PHP/USD <span className="text-primary font-bold">{liveRate ? `₱${liveRate}` : ratesLoading ? "₱—.——" : "₱56.24"}</span></span>
             <span className="text-white/40 text-xs">Padala Fee <span className="text-primary font-bold">$0 Today</span></span>
           </div>
         </div>

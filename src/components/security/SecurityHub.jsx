@@ -12,11 +12,22 @@ import {
 import PinSetupModal from "./PinSetupModal";
 import TwoFASetupModal from "./TwoFASetupModal";
 
-const SESSIONS = [
-  { device: "iPhone 15 Pro", location: "Dubai, UAE", time: "Now · Active", current: true },
-  { device: "MacBook Pro", location: "Dubai, UAE", time: "2 hours ago", current: false },
-  { device: "Chrome · Windows", location: "Manila, PH", time: "3 days ago", current: false },
-];
+// Detect current device browser/OS from user agent
+function getCurrentDeviceLabel() {
+  const ua = navigator.userAgent;
+  let browser = "Browser";
+  let os = "Unknown OS";
+  if (/Chrome\//.test(ua) && !/Chromium|Edg|OPR/.test(ua)) browser = "Chrome";
+  else if (/Firefox\//.test(ua)) browser = "Firefox";
+  else if (/Safari\//.test(ua) && !/Chrome/.test(ua)) browser = "Safari";
+  else if (/Edg\//.test(ua)) browser = "Edge";
+  if (/iPhone|iPad/.test(ua)) os = "iOS";
+  else if (/Android/.test(ua)) os = "Android";
+  else if (/Mac OS X/.test(ua)) os = "macOS";
+  else if (/Windows/.test(ua)) os = "Windows";
+  else if (/Linux/.test(ua)) os = "Linux";
+  return `${browser} · ${os}`;
+}
 
 export default function SecurityHub({ darkMode }) {
   const [biometric, setBiometric] = useState(() => localStorage.getItem("kfi_biometric") === "true");
@@ -28,6 +39,11 @@ export default function SecurityHub({ darkMode }) {
   const [showPinModal, setShowPinModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [revokedSessions, setRevokedSessions] = useState([]);
+
+  // Build sessions list with real current-device info only
+  const SESSIONS = [
+    { device: getCurrentDeviceLabel(), location: "Current session", time: "Now · Active", current: true },
+  ];
 
   const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";

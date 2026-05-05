@@ -203,13 +203,15 @@ export default function Profile() {
           {/* Account Details */}
           {user && <AccountDetails user={user} darkMode={darkMode} />}
 
-          <div className={`flex items-center justify-between p-4 rounded-xl border ${card}`}>
-            <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-primary" />
-              <div><p className={`font-semibold text-sm ${textMain}`}>IDENTITY VERIFIED</p><p className={`text-xs ${muted}`}>Full institutional access active</p></div>
+          {user?.kyc_status === "approved" && (
+            <div className={`flex items-center justify-between p-4 rounded-xl border ${card}`}>
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-primary" />
+                <div><p className={`font-semibold text-sm ${textMain}`}>IDENTITY VERIFIED</p><p className={`text-xs ${muted}`}>Full institutional access active</p></div>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center text-primary text-xs">✓</div>
             </div>
-            <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center text-primary text-xs">✓</div>
-          </div>
+          )}
 
           <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0d1526, #1a2a4a)" }}>
             <div className="absolute top-3 right-4 opacity-10 text-6xl">🙏</div>
@@ -269,9 +271,11 @@ export default function Profile() {
                 </button>
               ))}
             </div>
-            <button onClick={handleUploadDocument} className="w-full bg-primary text-secondary font-bold px-5 py-3 rounded-xl text-sm hover:bg-primary/90 transition-colors">
-              {user?.kyc_doc_url ? "Continue KYC Setup →" : "⬆ Start Identity Verification"}
-            </button>
+            {user?.kyc_status !== "approved" && (
+              <button onClick={handleUploadDocument} className="w-full bg-primary text-secondary font-bold px-5 py-3 rounded-xl text-sm hover:bg-primary/90 transition-colors">
+                {user?.kyc_doc_url ? "Continue KYC Setup →" : "⬆ Start Identity Verification"}
+              </button>
+            )}
           </div>
 
           {/* Editable profile fields */}

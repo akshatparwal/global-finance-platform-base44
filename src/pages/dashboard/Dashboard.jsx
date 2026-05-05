@@ -125,6 +125,17 @@ export default function Dashboard() {
     return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   })();
 
+  // Derive a friendly first name: prefer legal_name, then full_name, skip if it looks like an email username
+  const friendlyName = (() => {
+    const src = user?.legal_name || user?.full_name || "";
+    if (!src) return "OFW";
+    // If it contains no spaces and looks like an email username (no uppercase, has digits), skip it
+    const hasSpace = src.includes(" ");
+    const looksLikeUsername = !hasSpace && /[0-9]/.test(src) && src === src.toLowerCase();
+    if (looksLikeUsername) return "OFW";
+    return src.split(" ")[0];
+  })();
+
   const [recipients, setRecipients] = useState([]);
   useEffect(() => {
     base44.entities.Recipient.list("-transfer_count", 5).then(setRecipients).catch(() => {});
@@ -249,7 +260,7 @@ export default function Dashboard() {
             })()}
           </div>
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-            <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user?.full_name?.split(" ")[0] || (user === null ? "..." : "OFW")}</span> 👋</p>
+            <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user === null ? "..." : friendlyName}</span> 👋</p>
             <button onClick={() => navigate("/dashboard/pay")}
               className="bg-primary text-secondary text-[10px] font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform">
               {taglish ? "MAGPADALA" : "SEND"} →

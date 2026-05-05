@@ -576,7 +576,7 @@ export default function Pay() {
                     <span className="text-2xl flex-shrink-0">{s.emoji}</span>
                     <div className="flex-1">
                       <p className="font-semibold text-sm">{s.label}</p>
-                      <p className={`text-xs ${muted}`}>Monthly · {s.day_of_month ? `${s.day_of_month}th · Next: ${nextLabel}` : "Active"}</p>
+                      <p className={`text-xs ${muted}`}>Monthly · {s.day_of_month ? `${(() => { const n = s.day_of_month; const s2 = n % 100; return n + (s2 >= 11 && s2 <= 13 ? "th" : ["th","st","nd","rd","th"][Math.min(n % 10, 4)]); })()} · Next: ${nextLabel}` : "Active"}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-sm">{s.currency === "PHP" ? "₱" : "$"}{s.amount?.toLocaleString()}</p>
