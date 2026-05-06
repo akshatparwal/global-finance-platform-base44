@@ -153,7 +153,7 @@ export default function SecurityHub({ darkMode }) {
           iconColor="text-blue-400"
           iconBg="bg-blue-400/10"
           label="Face ID / Touch ID"
-          sub={biometric ? "Biometric login is active" : "Use biometrics to sign in instantly"}
+          sub={biometric ? "Active — faster, phishing-proof login" : "Prevents account takeover if password is stolen"}
           right={<Toggle value={biometric} onChange={handleBiometricToggle} color="bg-blue-500" />}
         />
 
@@ -180,7 +180,7 @@ export default function SecurityHub({ darkMode }) {
           iconColor="text-primary"
           iconBg="bg-primary/10"
           label="Transaction PIN"
-          sub={pinSet ? "6-digit PIN is set · Required for all transfers" : "Set a PIN to authorise transfers"}
+          sub={pinSet ? "Set — required before every outgoing transfer" : "Stops anyone with your phone from sending money"}
           right={
             <button
               onClick={() => setShowPinModal(true)}
@@ -206,7 +206,7 @@ export default function SecurityHub({ darkMode }) {
           iconColor="text-emerald-500"
           iconBg="bg-emerald-500/10"
           label="Authenticator App"
-          sub={twoFAEnabled ? "TOTP 2FA is active — Google Auth / Authy" : "Protect logins with an authenticator app"}
+          sub={twoFAEnabled ? "Active — login requires your authenticator code" : "Critical for large remittances — blocks phishing logins"}
           right={
             twoFAEnabled ? (
               <div className="flex items-center gap-2">
@@ -229,7 +229,7 @@ export default function SecurityHub({ darkMode }) {
           iconColor={muted.includes("white") ? "text-white/50" : "text-[#1a2a4a]/50"}
           iconBg={darkMode ? "bg-white/5" : "bg-black/5"}
           label="Login notifications"
-          sub="Email alert on every new sign-in"
+          sub="Alerts you instantly if someone else signs into your account"
           right={<Toggle value={loginNotifs} onChange={() => setLoginNotifs(!loginNotifs)} />}
         />
 
@@ -238,7 +238,7 @@ export default function SecurityHub({ darkMode }) {
           iconColor={muted.includes("white") ? "text-white/50" : "text-[#1a2a4a]/50"}
           iconBg={darkMode ? "bg-white/5" : "bg-black/5"}
           label="Transfer alerts"
-          sub="Notify me on every outgoing transfer"
+          sub="Catch unauthorised transfers the moment they happen"
           right={<Toggle value={transactionNotifs} onChange={() => setTransactionNotifs(!transactionNotifs)} />}
         />
       </div>

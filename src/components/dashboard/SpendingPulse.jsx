@@ -78,7 +78,7 @@ export default function SpendingPulse({ transfers = [], darkMode }) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className={`text-[10px] uppercase tracking-widest font-bold ${muted} mb-0.5`}>
-            Spending Pulse · Last 30 Days
+            Spending Pulse · Last 30 Days · All categories
           </p>
           <AnimatePresence mode="wait">
             {hovered ? (

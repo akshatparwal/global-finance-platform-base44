@@ -23,7 +23,7 @@ const SUBSCRIPTIONS = [
   { emoji: "🎵", label: "Spotify", sub: "Music & Podcasts · Renews Apr 20", amount: "$9.99" },
 ];
 
-const CARD_TABS = ["My Card", "Transactions", "Controls"];
+const CARD_TABS = ["My Card", "Transactions", "Controls", "Loyalty"];
 
 
 function BottomSheet({ open, onClose, title, children, darkMode }) {
@@ -394,7 +394,7 @@ export default function Cards() {
         <CardTransactionFeed cardLast4={cardData?.last4} darkMode={darkMode} />
       )}
 
-      {activeTab === "_Loyalty_removed" && (
+      {activeTab === "Loyalty" && (
         <div className="rounded-2xl p-6 bg-[#0d1526] border border-white/10">
           <div className="flex justify-between items-start mb-4 gap-3">
             <div>
@@ -461,7 +461,7 @@ export default function Cards() {
               {[
                 { icon: Snowflake, label: "Freeze Card", sub: "Temporarily disable all transactions", color: "text-blue-400", value: isFrozen, set: handleFreeze },
                 { icon: Wifi, label: "Contactless Pay", sub: "Tap-to-pay functionality", color: "text-blue-500", value: cardData?.contactless_enabled, set: handleContactless },
-                { icon: Zap, label: "Instant Settlement", sub: "Settle transfers in seconds, not days", color: "text-yellow-500", value: cardData?.instant_settlement, set: handleInstant, badge: "BETA" },
+                { icon: Zap, label: "Instant Settlement", sub: "Transfers clear in seconds instead of 1–2 hours. BETA: may not apply to all banks. No extra fee.", color: "text-yellow-500", value: cardData?.instant_settlement, set: handleInstant, badge: "BETA" },
               ].map((c, i) => (
                 <div key={i} className={`flex items-center justify-between py-4 border-t ${darkMode ? "border-white/5" : "border-black/5"}`}>
                   <div className="flex items-start gap-3 flex-1 min-w-0">
