@@ -24,7 +24,7 @@ export default function PostOnboardingCard({ darkMode, onFund, user }) {
   const completed = [hasFunded, hasAddedRecipient, hasSentTransfer];
   const completedCount = completed.filter(Boolean).length;
 
-  // Hide if user explicitly dismissed OR all 3 steps completed
+  // Hide if user explicitly dismissed, all 3 steps completed, or user has sent a transfer (Day 1 done)
   if (dismissed || completedCount === 3) return null;
 
   const dismiss = () => {

@@ -9,7 +9,6 @@ import { TrendingUp, Calendar, Info } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
 import RateAlertsPanel from "@/components/dashboard/RateAlertsPanel";
-import AIInsights from "@/components/dashboard/AIInsights";
 import SpendAnalytics from "@/components/dashboard/SpendAnalytics";
 import { GoalSkeleton } from "@/components/ui/SkeletonLoader";
 import KatuwangWallet from "@/components/dashboard/KatuwangWallet";
@@ -228,7 +227,44 @@ export default function Insights() {
             })}
           </div>
 
-          <AIInsights darkMode={darkMode} wallets={wallets} transfers={transfers} goals={goals} />
+          {/* Smart observation — replaces placeholder AI section */}
+          {(() => {
+            const now = new Date();
+            const thisMonthTransfers = transfers.filter(t => {
+              const d = new Date(t.created_date);
+              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && OUTBOUND_CATEGORIES.includes(t.category);
+            });
+            const lastMonthTransfers = transfers.filter(t => {
+              const d = new Date(t.created_date);
+              const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+              const lastMonthYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+              return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear && OUTBOUND_CATEGORIES.includes(t.category);
+            });
+            const thisTotal = thisMonthTransfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
+            const lastTotal = lastMonthTransfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
+            if (thisTotal === 0 && lastTotal === 0) return null;
+            const diff = lastTotal > 0 ? Math.round(((thisTotal - lastTotal) / lastTotal) * 100) : null;
+            const monthName = now.toLocaleDateString("en-US", { month: "long" });
+            const lastMonthName = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString("en-US", { month: "long" });
+            return (
+              <div className={`border rounded-xl p-4 flex items-start gap-3 ${card}`}>
+                <span className="text-lg flex-shrink-0 mt-0.5">{diff === null ? "📊" : diff <= -10 ? "📉" : diff >= 10 ? "📈" : "✦"}</span>
+                <div>
+                  <p className="font-bold text-sm mb-0.5">Spending Snapshot</p>
+                  <p className={`text-xs ${muted} leading-relaxed`}>
+                    {diff === null
+                      ? `You've sent $${thisTotal.toFixed(2)} in ${monthName} so far.`
+                      : diff < 0
+                        ? `You sent ${Math.abs(diff)}% less this month vs ${lastMonthName} ($${thisTotal.toFixed(2)} vs $${lastTotal.toFixed(2)}).`
+                        : diff > 0
+                          ? `You sent ${diff}% more this month vs ${lastMonthName} ($${thisTotal.toFixed(2)} vs $${lastTotal.toFixed(2)}).`
+                          : `Spending is consistent with ${lastMonthName} at $${thisTotal.toFixed(2)}.`
+                    }
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
           <RateAlertsPanel darkMode={darkMode} currentRate={liveRate} />
         </div>
         );

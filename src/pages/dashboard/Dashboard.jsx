@@ -9,12 +9,10 @@ import { useLiveRates } from "@/hooks/useLiveRates";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
-import CommunityStories from "@/components/dashboard/CommunityStories";
 import CelebrationsWidget from "@/components/dashboard/CelebrationsWidget";
 import { useCountUp } from "@/hooks/useCountUp";
 import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton, Skeleton } from "@/components/ui/SkeletonLoader";
 import EmptyState from "@/components/ui/EmptyState";
-import SpendingPulse from "@/components/dashboard/SpendingPulse";
 import { fetchWithCache } from "@/utils/offlineCache";
 import FundWalletModal from "@/components/wallet/FundWalletModal.jsx";
 import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
@@ -23,12 +21,6 @@ import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import WalletCard from "@/components/dashboard/WalletCard";
 import { useYieldAccrual } from "@/hooks/useYieldAccrual";
 
-const COMMUNITY = [
-  { emoji: "🎓", label: "Sent $500 for younger sibling's tuition", sub: "EXAMPLE PADALA", highlight: true },
-  { emoji: "🏠", label: "Reached the 'House in the Phils' savings goal!", sub: "EXAMPLE SAVINGS MILESTONE" },
-  { emoji: "💸", label: "$1,200 zero-spread transfer to Cebu", sub: "EXAMPLE TRANSFER" },
-  { emoji: "✈️", label: "Claimed Bayani Tier perks at NAIA lounge", sub: "EXAMPLE PERK", highlight: true },
-];
 
 export default function Dashboard() {
   const { darkMode, taglish } = useOutletContext() || {};
@@ -342,11 +334,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Spending Pulse */}
-      {!loading && transfers.length > 0 && (
-        <SpendingPulse transfers={transfers} darkMode={darkMode} />
-      )}
-
       {/* Activity Feed */}
       <div>
         <div className="flex justify-between items-center mb-3">
@@ -458,22 +445,23 @@ export default function Dashboard() {
           </div>
         )}
 
-        <CommunityStories darkMode={darkMode} taglish={taglish} />
-
-        {/* Family invite */}
-        <div className="kf-hero-card rounded-2xl p-5 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
-          <span className="text-4xl flex-shrink-0">❤️</span>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-white font-extrabold text-base mb-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {taglish ? "Isama ang pamilya!" : "Invite your family!"}
-            </h3>
-            <p className="text-white/70 text-xs">You both earn <span className="font-black text-white">500 pts</span></p>
-          </div>
-          <button onClick={() => navigate("/dashboard/profile")}
-            className="bg-white text-[#c97a20] font-black px-4 py-2 rounded-full text-xs flex-shrink-0 active:scale-95 transition-transform">
-            {taglish ? "Imbitahan" : "Invite →"}
-          </button>
-        </div>
+        {/* Year of Connection — shown when user has transfers */}
+        {!loading && transfers.length > 0 && (() => {
+          const totalSent = transfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
+          return (
+            <div className="kf-hero-card rounded-2xl p-5 flex items-center gap-4 cursor-pointer active:scale-[0.99] transition-transform" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}
+              onClick={() => navigate("/dashboard/story")}>
+              <span className="text-3xl flex-shrink-0">🎉</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-white/70 text-[10px] uppercase tracking-widest font-bold mb-0.5">Your Story</p>
+                <h3 className="text-white font-extrabold text-base leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  ${totalSent.toLocaleString("en-US", { maximumFractionDigits: 0 })} sent to your family
+                </h3>
+                <p className="text-white/60 text-xs mt-0.5">See your full year in review →</p>
+              </div>
+            </div>
+          );
+        })()}
       </div>
       </div>{/* end containerRef */}
 

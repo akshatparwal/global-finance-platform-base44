@@ -54,7 +54,7 @@ const AVATAR_COLORS = ["bg-purple-500","bg-blue-500","bg-red-500","bg-yellow-500
 const MIN_AMOUNT = 1;
 const MAX_AMOUNT = 10000;
 
-const PAY_TABS = ["Transfer History", "Rate Alerts"];
+const PAY_TABS = ["Transfer History", "Bills & Auto-Padala", "Rate Alerts"];
 
 export default function Pay() {
   const { darkMode, taglish } = useOutletContext() || {};
@@ -514,8 +514,9 @@ export default function Pay() {
       {/* Tabs */}
       <div className="flex gap-1.5 mb-4">
         {[
-          { key: "Transfer History", icon: "🕐" },
-          { key: "Rate Alerts",      icon: "🔔" },
+          { key: "Transfer History",   icon: "🕐" },
+          { key: "Bills & Auto-Padala", icon: "🔄" },
+          { key: "Rate Alerts",         icon: "🔔" },
         ].map(({ key, icon }) => (
           <button key={key} onClick={() => setActiveTab(key)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border ${activeTab === key ? "bg-primary text-secondary border-primary" : `${darkMode ? "border-white/10 text-white/50 bg-white/5" : "border-black/10 text-[#1a2a4a]/50 bg-black/5"}`}`}>
@@ -528,11 +529,11 @@ export default function Pay() {
         <div>
           <h3 className="font-bold mb-3">{taglish ? "Mga Nakaraang Padala" : "Recent Transfers"}</h3>
           {transfers.length === 0 ? (
-            <div className={`border rounded-xl p-6 text-center mb-6 ${card}`}>
+            <div className={`border rounded-xl p-6 text-center ${card}`}>
               <p className={`text-sm ${muted}`}>{taglish ? "Wala pang padala. Magpadala na!" : "No transfers yet. Send your first padala!"}</p>
             </div>
           ) : (
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2">
               {transfers.map((t, i) => (
                 <button key={i} onClick={() => setTrackedTransfer(t)}
                   className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>
@@ -552,7 +553,11 @@ export default function Pay() {
               ))}
             </div>
           )}
+        </div>
+      )}
 
+      {activeTab === "Bills & Auto-Padala" && (
+        <div>
           <h3 className="font-bold mb-3">{taglish ? "Naka-iskedyul na Bayad" : "Scheduled & Bills"}</h3>
           {scheduled.length === 0 ? (
             <div className={`border rounded-xl p-6 text-center ${card}`}>
@@ -585,6 +590,10 @@ export default function Pay() {
                   </div>
                 );
               })}
+              <button onClick={() => setShowScheduledForm(true)}
+                className="w-full flex items-center justify-center gap-2 border border-dashed border-primary/30 text-primary font-bold py-3 rounded-xl text-sm hover:bg-primary/5 transition-colors mt-2">
+                + Add Another
+              </button>
             </div>
           )}
         </div>
