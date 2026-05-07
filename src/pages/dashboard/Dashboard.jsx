@@ -53,7 +53,7 @@ export default function Dashboard() {
       setUser(u);
       if (!u.onboarding_completed) setShowOnboarding(true);
     }
-    let walletData = walletsResult.data || [];
+    let walletData = (walletsResult.data || []).filter(w => w.currency_code === "USD" || w.currency_code === "PHP");
     // Auto-seed starter wallets if none exist yet
     if (walletData.length === 0 && !walletsResult.fromCache) {
       try {
