@@ -112,8 +112,8 @@ export default function DashboardLayout() {
   });
 
   const bgMain = "kf-cosmic-bg";
-  const bgSidebar = "bg-[#080B15]";
-  const bgContent = "bg-[#080B15]";
+  const bgSidebar = "bg-[#0B0E1A]";
+  const bgContent = "bg-[#0B0E1A]";
   const textMain = "text-white";
   const textMuted = "text-white/40";
   const activeClass = "bg-white/8 text-white";
@@ -245,10 +245,10 @@ export default function DashboardLayout() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentPath}
-              initial={{ x: 40, opacity: 0 }}
+              initial={{ x: 32, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -40, opacity: 0 }}
-              transition={{ duration: 0.22, ease: "easeInOut" }}
+              exit={{ x: -24, opacity: 0 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               onAnimationComplete={() => {
                 if (mainRef.current) {
                   mainRef.current.scrollTop = loadScroll();

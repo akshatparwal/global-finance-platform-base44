@@ -20,7 +20,7 @@ export default function BottomNav({ onNavigate }) {
 
   return (
     <nav
-      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0d1526] border-t border-white/10"
+      className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#141829] border-t border-white/8"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="flex items-stretch h-[64px]">

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { Search, RefreshCw, Shield, Plus, Bell, Trash2, CheckCircle, TrendingUp, TrendingDown, Zap, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import AnimatedRate from "@/components/ui/AnimatedRate";
 import BestTimeToSend from "@/components/dashboard/BestTimeToSend";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
@@ -428,7 +430,12 @@ export default function Pay() {
           <div className={`h-px my-3 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
           <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>They Receive (PHP)</label>
           <div className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            ₱{sendAmount ? parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "0.00"}
+            <AnimatedRate
+              value={sendAmount ? parseFloat(receive) : 0}
+              prefix="₱"
+              decimals={2}
+              className="text-3xl font-black text-primary"
+            />
           </div>
           {amountError && (
             <div className="flex items-center justify-center gap-1.5 mt-2">
@@ -445,7 +452,9 @@ export default function Pay() {
             <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>Live Exchange Rate</span>
           </div>
           <div className="text-right">
-          <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>1 USD = {ratesLoading ? "..." : `${rate.toFixed(2)}`} PHP</span>
+          <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
+            1 USD = {ratesLoading ? "..." : <AnimatedRate value={rate} prefix="₱" suffix=" PHP" decimals={2} />}
+          </span>
           {lastUpdatedLabel && <p className={`text-[9px] ${darkMode ? "text-white/30" : "text-black/30"} mt-0.5`}>Updated {lastUpdatedLabel}</p>}
         </div>
         </div>
@@ -465,11 +474,20 @@ export default function Pay() {
           />
         </div>
 
-        <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline || kycRequired}
+        <motion.button
+          onClick={handleSend}
+          disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline || kycRequired}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
-          className={`w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
+          animate={{
+            opacity: sendAmount && parseFloat(sendAmount) > 0 && isOnline && !kycRequired ? 1 : 0.3,
+            scale: sendAmount && parseFloat(sendAmount) > 0 && isOnline && !kycRequired ? 1 : 0.98,
+          }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.18 }}
+          className="w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary bg-primary cursor-pointer disabled:cursor-not-allowed"
+        >
           {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : "Review & Send →"}
-        </button>
+        </motion.button>
       </div>
 
       {/* Tabs */}

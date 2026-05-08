@@ -17,21 +17,21 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) 
       ? `≈ $${(w.balance / liveRate).toFixed(2)}`
       : null;
 
-  const glowColor = isUSD ? "rgba(255,200,80,0.22)" : "rgba(80,140,255,0.18)";
+  const glowColor = "rgba(244,201,78,0.20)";
 
   return (
     <div
       className="kf-hero-card rounded-2xl p-6 relative overflow-hidden w-full"
       style={{
-        background: "rgba(255,255,255,0.04)",
-        boxShadow: `0 0 60px ${glowColor}, 0 0 0 1px rgba(255,255,255,0.07) inset`,
+        background: "rgba(20,24,41,0.9)",
+        boxShadow: `0 0 60px ${glowColor}, 0 0 0 1px rgba(244,201,78,0.10) inset`,
       }}
     >
       {/* Radial glow behind balance */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 70% 60% at 50% 70%, ${glowColor} 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse 70% 60% at 50% 70%, rgba(244,201,78,0.14) 0%, transparent 70%)`,
         }}
       />
 
@@ -53,7 +53,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) 
           {w.currency_code === "USD" && usdcBalance !== null && (
             <span
               className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
-              style={{ background: "rgba(80,140,255,0.1)", color: "rgba(120,170,255,0.8)", border: "1px solid rgba(80,140,255,0.15)" }}
+              style={{ background: "rgba(244,201,78,0.1)", color: "rgba(244,201,78,0.7)", border: "1px solid rgba(244,201,78,0.15)" }}
             >
               ON-CHAIN
             </span>
@@ -78,7 +78,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) 
         <div className="space-y-0.5">
           {phpEquiv && <p className="text-white/30 text-xs">{phpEquiv}</p>}
           {isUSD && displayBalance > 0 && yieldEarned > 0 && (
-            <p className="text-xs" style={{ color: "rgba(100,220,150,0.7)" }}>+${yieldEarned.toFixed(4)} yield</p>
+            <p className="text-xs" style={{ color: "#2ECC71" }}>+${yieldEarned.toFixed(4)} yield</p>
           )}
           {isUSD && walletAddress && (
             <p className="text-white/20 text-[9px] font-mono">{walletAddress.slice(0, 8)}…{walletAddress.slice(-6)}</p>

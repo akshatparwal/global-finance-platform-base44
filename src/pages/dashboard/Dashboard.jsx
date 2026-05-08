@@ -386,7 +386,7 @@ export default function Dashboard() {
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ background: "rgba(100,220,150,0.1)", border: "1px solid rgba(100,220,150,0.15)" }}>
-                <TrendingUp className="w-4 h-4" style={{ color: "rgba(100,220,150,0.9)" }} />
+                <TrendingUp className="w-4 h-4" style={{ color: "#2ECC71" }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white/70 text-sm font-medium">Yield Credit</p>
@@ -394,7 +394,7 @@ export default function Dashboard() {
               </div>
               <div className="text-right flex-shrink-0 flex items-center gap-2">
                 <div>
-                  <p className="text-sm font-light" style={{ color: "rgba(100,220,150,0.9)" }}>+${monthYield.toFixed(4)}</p>
+                  <p className="text-sm font-light" style={{ color: "#2ECC71" }}>+${monthYield.toFixed(4)}</p>
                   <p className="text-white/25 text-[10px]">+${dailyYieldAmt.toFixed(4)}/day</p>
                 </div>
                 <span className={`text-white/20 text-[10px] transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""}`}>▼</span>
@@ -407,12 +407,12 @@ export default function Dashboard() {
                     <p className="text-white/60 text-xs">{lastMonthLabel}</p>
                     <p className="text-white/25 text-[10px]">{daysInLastMonth} days</p>
                   </div>
-                  <p className="text-xs" style={{ color: "rgba(100,220,150,0.8)" }}>+${lastMonthYield.toFixed(4)}</p>
+                  <p className="text-xs" style={{ color: "#2ECC71" }}>+${lastMonthYield.toFixed(4)}</p>
                 </div>
                 {dailyRows.map((row, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                     <p className="text-white/30 text-xs">{row.date}</p>
-                    <p className="text-xs" style={{ color: "rgba(100,220,150,0.7)" }}>+${row.amount.toFixed(4)}</p>
+                    <p className="text-xs" style={{ color: "#2ECC71" }}>+${row.amount.toFixed(4)}</p>
                   </div>
                 ))}
               </div>
