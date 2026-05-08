@@ -106,12 +106,12 @@ export default function DashboardLayout() {
     },
   });
 
-  const bgMain = darkMode ? "kf-cosmic-bg" : "bg-[#f8f5f0]";
+  const bgMain = darkMode ? "kf-cosmic-bg" : "bg-[#F5EFE3]";
   const bgSidebar = "bg-[#0B0E1A]";
-  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
-  const textMuted = darkMode ? "text-white/40" : "text-[#1a2a4a]/50";
-  const activeClass = "bg-white/8 text-white";
-  const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5";
+  const textMain = darkMode ? "text-white" : "text-[#0D1F3C]";
+  const textMuted = darkMode ? "text-white/40" : "text-[#0D1F3C]/55";
+  const activeClass = darkMode ? "bg-white/8 text-white" : "bg-[#F4C94E]/15 text-[#0D1F3C]";
+  const inactiveClass = darkMode ? "text-white/40 hover:text-white hover:bg-white/5" : "text-[#0D1F3C]/40 hover:text-[#0D1F3C] hover:bg-[#F4C94E]/8";
 
   if (!authChecked) {
     return (
