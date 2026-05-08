@@ -30,7 +30,6 @@ const HERO_SLIDES = [
 ];
 
 export default function Home() {
-  const [darkHero, setDarkHero] = useState(true);
   const [taglish, setTaglish] = useState(false);
   const [slideIdx, setSlideIdx] = useState(0);
   const { rates } = useLiveRates();
@@ -44,11 +43,11 @@ export default function Home() {
   const slide = HERO_SLIDES[slideIdx];
   const txt = taglish ? slide.tl : slide.en;
 
-  const panelBg    = darkHero ? "#0D1F3C" : "#F0E9DC";
-  const panelText  = darkHero ? "#FFFFFF" : "#0D1F3C";
-  const panelMuted = darkHero ? "rgba(255,255,255,0.5)" : "rgba(13,31,60,0.5)";
-  const panelBorder= darkHero ? "rgba(255,255,255,0.08)" : "rgba(13,31,60,0.1)";
-  const dotInactive= darkHero ? "rgba(255,255,255,0.2)" : "rgba(13,31,60,0.18)";
+  const panelBg    = "#0D1F3C";
+  const panelText  = "#FFFFFF";
+  const panelMuted = "rgba(255,255,255,0.5)";
+  const panelBorder= "rgba(255,255,255,0.08)";
+  const dotInactive= "rgba(255,255,255,0.2)";
 
   return (
     <div style={{ backgroundColor: "#F5EFE3", fontFamily: "'Inter', sans-serif" }}>
@@ -143,19 +142,11 @@ export default function Home() {
           style={{ background: panelBg, transition: "background 0.4s", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)", overflowY: "auto" }}
         >
           {/* Top toolbar */}
-          <div className="flex items-center justify-between px-4 sm:px-7 pt-4 sm:pt-7 pb-2">
-            <button
-              onClick={() => setDarkHero(!darkHero)}
-              className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full transition-all"
-              style={{ background: darkHero ? "rgba(255,255,255,0.1)" : "rgba(13,31,60,0.08)", color: panelMuted }}
-            >
-              {darkHero ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
-              {darkHero ? "Light" : "Dark"}
-            </button>
+           <div className="flex items-center justify-between px-4 sm:px-7 pt-4 sm:pt-7 pb-2">
 
             <div
               className="flex rounded-full p-0.5 text-[11px] font-bold"
-              style={{ background: darkHero ? "rgba(255,255,255,0.08)" : "rgba(13,31,60,0.07)" }}
+              style={{ background: "rgba(255,255,255,0.08)" }}
             >
               {["EN", "Taglish"].map(lang => (
                 <button
@@ -237,7 +228,7 @@ export default function Home() {
           {/* Bottom status bar */}
           <div
             className="flex items-center justify-between px-4 sm:px-6 py-3 border-t text-[10px] font-semibold uppercase tracking-wider"
-            style={{ borderColor: panelBorder, background: darkHero ? "rgba(0,0,0,0.25)" : "rgba(13,31,60,0.04)" }}
+            style={{ borderColor: panelBorder, background: "rgba(0,0,0,0.25)" }}
           >
             <div className="flex items-center gap-1.5" style={{ color: panelMuted }}>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />

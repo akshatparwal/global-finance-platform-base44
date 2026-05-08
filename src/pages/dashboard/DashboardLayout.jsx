@@ -38,14 +38,8 @@ export default function DashboardLayout() {
 
   const { activeTab, currentPath, stackDepth, isRoot, switchTab, resetTab, push, pop, loadScroll, saveScroll } = useTabStack();
   
-  // Read from localStorage synchronously in the initializer to prevent flash-of-light-mode
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      const stored = localStorage.getItem("kf_dark_mode");
-      // Default to dark if no preference stored
-      return stored === null ? true : stored !== "false";
-    } catch { return true; }
-  });
+  // Always dark mode
+  const [darkMode] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -61,8 +55,7 @@ export default function DashboardLayout() {
     switchTab(tab);
   }, [location.pathname, push, switchTab]);
 
-  // Persist preferences
-  useEffect(() => { try { localStorage.setItem("kf_dark_mode", darkMode); } catch {} }, [darkMode]);
+
 
 
   // Close dropdown when clicking outside
@@ -219,9 +212,7 @@ export default function DashboardLayout() {
                 )}
               </AnimatePresence>
             </div>
-            <button onClick={() => setDarkMode(!darkMode)} className={`w-11 h-11 flex items-center justify-center rounded-lg ${darkMode ? "bg-white/10 text-white" : "bg-black/10 text-[#1a2a4a]"}`}>
-              {darkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            </button>
+
             <div className={`hidden sm:flex items-center gap-1.5 text-xs ${textMuted}`}>
               <Shield className="w-3 h-3 text-emerald-400" />
               <span>Secured</span>
