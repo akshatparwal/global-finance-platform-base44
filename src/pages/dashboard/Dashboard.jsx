@@ -445,28 +445,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Year of Connection — shown when user has transfers */}
-        {!loading && transfers.length > 0 && (() => {
-          const totalSent = transfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
-          return (
-            <div
-              className="kf-glass rounded-2xl p-5 flex items-center gap-4 cursor-pointer active:scale-[0.99] transition-transform"
-              style={{ boxShadow: "0 0 40px rgba(255,200,80,0.14)", borderColor: "rgba(255,200,80,0.15)" }}
-              onClick={() => navigate("/dashboard/story")}
-            >
-              <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(255,200,80,0.12)" }}>
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="kf-label text-white/30 mb-0.5">Your Story</p>
-                <p className="text-white/80 text-base font-light">
-                  ${totalSent.toLocaleString("en-US", { maximumFractionDigits: 0 })} sent to your family
-                </p>
-                <p className="text-white/30 text-xs mt-0.5">See your year in review</p>
-              </div>
-            </div>
-          );
-        })()}
+
       </div>
       </div>{/* end containerRef */}
 
