@@ -261,38 +261,7 @@ export default function Profile() {
             />
           )}
 
-          {/* Year story */}
-          {transfers.length > 0 && (() => {
-            const OUTBOUND = ["remittance", "bills", "subscriptions", "savings", "other"];
-            const sentTransfers = transfers.filter(t => OUTBOUND.includes(t.category));
-            const totalSent = sentTransfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
-            const totalPHP = sentTransfers.reduce((s, t) => s + (t.amount_php || 0), 0);
-            const uniqueRecipients = [...new Set(sentTransfers.map(t => t.recipient_name).filter(Boolean))].length;
-            return (
-              <div className="rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
-                <p className="text-white/70 text-xs uppercase tracking-wider mb-1">✦ YOUR 2026 KAYAH STORY</p>
-                <h3 className="text-white font-extrabold text-xl mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>A Year of Connection</h3>
-                <div className="grid grid-cols-3 gap-3 mb-2">
-                  {[
-                    { label: "Total Sent", val: `$${totalSent.toLocaleString("en-US", { maximumFractionDigits: 0 })}` },
-                    { label: "Received (PHP)", val: `₱${(totalPHP / 1000).toFixed(0)}K` },
-                    { label: "Family Members", val: String(uniqueRecipients) },
-                  ].map((s, i) => (
-                    <div key={i} className="bg-white/20 rounded-xl p-2.5 text-center">
-                      <p className="text-white font-black text-lg leading-none">{s.val}</p>
-                      <p className="text-white/70 text-[9px] uppercase tracking-wider mt-0.5">{s.label}</p>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-white/60 text-xs mt-2">Every transfer is a reminder of your love for your family. 🇵🇭</p>
-                <button onClick={() => navigate("/dashboard/story")}
-                  className="mt-3 w-full flex items-center justify-center gap-2 bg-white/20 border border-white/30 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-white/30 transition-colors active:scale-[0.98]">
-                  <PlayCircle className="w-4 h-4" />
-                  View Full Story →
-                </button>
-              </div>
-            );
-          })()}
+
         </div>
       )}
 
