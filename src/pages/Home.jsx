@@ -64,9 +64,9 @@ export default function Home() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 38%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.08) 100%)" }} />
 
           {/* Logo */}
-          <div className="absolute top-4 left-4 sm:top-7 sm:left-7 flex items-center gap-2 z-10 bg-black/40 backdrop-blur-sm rounded-xl sm:rounded-2xl px-2.5 py-1.5 sm:px-3 sm:py-2">
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl overflow-hidden bg-white/15 flex items-center justify-center">
-              <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" />
+          <div className="absolute top-4 left-4 sm:top-7 sm:left-7 flex items-center gap-2.5 z-10 bg-black/50 backdrop-blur-md rounded-2xl px-3 py-2">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-md">
+              <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" />
             </div>
             <div>
               <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -275,7 +275,7 @@ export default function Home() {
               { emoji: "📈", title: "Live Exchange Rate", desc: `Today's rate: ₱${liveRate}/USD — the real mid-market rate, always.`, badge: "LIVE" },
               { emoji: "🔔", title: "Rate Alerts", desc: "Set your target rate and get notified the moment it hits. Never miss a peak.", badge: "SMART" },
               { emoji: "👨‍👩‍👧", title: "Family Wallets", desc: "Give your loved ones in the Philippines a linked wallet. Support them directly.", badge: "FAMILY" },
-              { emoji: "🎁", title: "Kinnect Points", desc: "Earn points on every padala. Redeem for fee credits, cash back, or donations.", badge: "REWARDS" },
+              { emoji: "🎁", title: "Kayah Points", desc: "Earn points on every padala. Redeem for fee credits, cash back, or donations.", badge: "REWARDS" },
             ].map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}
                 className="rounded-2xl p-5 border" style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}>

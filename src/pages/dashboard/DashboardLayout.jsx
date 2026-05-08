@@ -134,7 +134,7 @@ export default function DashboardLayout() {
         {/* Logo */}
         <div className="p-5 pb-6 border-b border-white/8">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-primary/30"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
+            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
             <div>
               <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
               <div className="flex items-center gap-1 mt-0.5">
@@ -190,7 +190,7 @@ export default function DashboardLayout() {
           )}
           {/* Logo shown in mobile header */}
           <div className="sm:hidden flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
+            <div className="w-7 h-7 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
             <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></span>
           </div>
 

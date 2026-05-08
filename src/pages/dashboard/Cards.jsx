@@ -432,14 +432,14 @@ export default function Cards() {
                   {!unlocked && (
                     <div className="absolute top-2 right-2 text-white/30 text-base">🔒</div>
                   )}
-                  <p className={`text-[10px] font-black uppercase mb-2 ${unlocked ? "text-primary" : "text-white/30"}`}>{t.name}</p>
+                  <p className={`text-[10px] font-black uppercase mb-2 ${unlocked ? "text-primary" : darkMode ? "text-white/30" : "text-[#1a2a4a]/35"}`}>{t.name}</p>
                   {t.perks.map((p, j) => (
-                    <p key={j} className={`text-xs flex gap-1 mb-1 ${unlocked ? "text-white/70" : "text-white/25"}`}>
-                      <span className={`flex-shrink-0 ${unlocked ? "text-primary" : "text-white/25"}`}>{unlocked ? "✓" : "·"}</span>{p}
+                    <p key={j} className={`text-xs flex gap-1 mb-1 ${unlocked ? darkMode ? "text-white/70" : "text-[#1a2a4a]/70" : darkMode ? "text-white/25" : "text-[#1a2a4a]/30"}`}>
+                      <span className={`flex-shrink-0 ${unlocked ? "text-primary" : darkMode ? "text-white/25" : "text-[#1a2a4a]/30"}`}>{unlocked ? "✓" : "·"}</span>{p}
                     </p>
                   ))}
                   {!unlocked && (
-                    <p className="text-[9px] text-white/30 mt-2 font-bold uppercase tracking-wider">
+                    <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${darkMode ? "text-white/30" : "text-[#1a2a4a]/35"}`}>
                       Reach {t.tierName} to unlock
                     </p>
                   )}

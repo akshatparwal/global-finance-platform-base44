@@ -90,9 +90,9 @@ export default function Profile() {
       });
       await base44.integrations.Core.SendEmail({
         to: inviteEmail,
-        subject: `${user.full_name || "Your friend"} invited you to KinnectFi 🇵🇭`,
-        from_name: "KinnectFi",
-        body: `Hi there!\n\n${user.full_name || "A friend"} invited you to KinnectFi — zero-fee cross-border neobank for Filipino families.\n\nJoin and you'll both earn $50 cash:\nhttps://${referralLink}\n\n— The KinnectFi Team`,
+        subject: `${user.full_name || "Your friend"} invited you to Kayah 🇵🇭`,
+        from_name: "Kayah",
+        body: `Hi there!\n\n${user.full_name || "A friend"} invited you to Kayah — zero-fee cross-border neobank for Filipino families.\n\nJoin and you'll both earn $50 cash:\nhttps://${referralLink}\n\n— The Kayah Team`,
       });
       setReferrals(prev => [...prev, ref]);
       setInviteEmail("");
@@ -133,7 +133,7 @@ export default function Profile() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
               <h2 className={`font-extrabold text-base truncate ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                {user?.full_name || "KinnectFi User"}
+                {user?.full_name || "Kayah User"}
               </h2>
               <span className="text-primary text-sm flex-shrink-0">✓</span>
             </div>
@@ -176,14 +176,14 @@ export default function Profile() {
           )}
 
           {/* Streak */}
-          <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0d1526, #1a2a4a)" }}>
+          <div className={`rounded-2xl p-5 relative overflow-hidden border ${card}`}>
             <div className="absolute top-3 right-4 opacity-10 text-6xl">🙏</div>
             <div className="flex items-center gap-3 relative z-10">
               <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-xl">🔥</div>
               <div>
                 <span className="text-primary text-xs font-bold uppercase">Bayani Streak</span>
-                <h3 className="text-white font-extrabold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{streak} Month Padala Streak</h3>
-                <p className="text-white/50 text-xs">{streak >= 12 ? "You've supported your family every month for a year!" : streak > 0 ? `${streak} consecutive months of supporting your family.` : "Send your first padala to start your streak!"}</p>
+                <h3 className={`font-extrabold ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{streak} Month Padala Streak</h3>
+                <p className={`text-xs ${muted}`}>{streak >= 12 ? "You've supported your family every month for a year!" : streak > 0 ? `${streak} consecutive months of supporting your family.` : "Send your first padala to start your streak!"}</p>
               </div>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function Profile() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-2 mb-4">
               {[{ label: "Invited", val: referrals.length, icon: "📨" }, { label: "Joined", val: joined, icon: "✅" }, { label: "Earned", val: `$${cashEarned}`, icon: "💵" }].map((s, i) => (
-                <div key={i} className={`rounded-xl p-3 text-center ${darkMode ? "bg-white/5" : "bg-black/4"}`}>
+                <div key={i} className={`rounded-xl p-3 text-center ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
                   <p className="text-base mb-0.5">{s.icon}</p>
                   <p className={`font-black text-lg ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.val}</p>
                   <p className={`text-[10px] uppercase tracking-wider ${muted}`}>{s.label}</p>
@@ -300,7 +300,7 @@ export default function Profile() {
             const uniqueRecipients = [...new Set(sentTransfers.map(t => t.recipient_name).filter(Boolean))].length;
             return (
               <div className="rounded-2xl p-6" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}>
-                <p className="text-white/70 text-xs uppercase tracking-wider mb-1">✦ YOUR 2026 KINNECTFI STORY</p>
+                <p className="text-white/70 text-xs uppercase tracking-wider mb-1">✦ YOUR 2026 KAYAH STORY</p>
                 <h3 className="text-white font-extrabold text-xl mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>A Year of Connection</h3>
                 <div className="grid grid-cols-3 gap-3 mb-2">
                   {[
@@ -367,8 +367,8 @@ export default function Profile() {
                     }).catch(() => {});
                     if (user?.email) {
                       await base44.integrations.Core.SendEmail({
-                        to: user.email, subject: "KinnectFi: Account Deletion Request Received",
-                        body: `Hi ${user.full_name || "there"},\n\nWe received your account deletion request. Our team will process it within 48 hours.\n\n— The KinnectFi Team`,
+                        to: user.email, subject: "Kayah: Account Deletion Request Received",
+                        body: `Hi ${user.full_name || "there"},\n\nWe received your account deletion request. Our team will process it within 48 hours.\n\n— The Kayah Team`,
                       }).catch(() => {});
                     }
                     base44.auth.logout("/");

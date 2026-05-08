@@ -7,15 +7,15 @@ import ChatMessage from "@/components/support/ChatMessage";
 import SuggestedPrompts from "@/components/support/SuggestedPrompts";
 import { useLiveRates } from "@/hooks/useLiveRates";
 
-const buildSystemPrompt = (liveRate) => `You are Kaya, KinnectFi's friendly and knowledgeable AI support assistant. KinnectFi is a cross-border neobank built for Filipino OFWs (Overseas Filipino Workers) to send money home instantly with zero fees.
+const buildSystemPrompt = (liveRate) => `You are Kaya, Kayah's friendly and knowledgeable AI support assistant. Kayah is a cross-border neobank built for Filipino OFWs (Overseas Filipino Workers) to send money home instantly with zero fees.
 
 Key facts you know:
 - Current USD/PHP rate is ${liveRate ? `₱${liveRate.toFixed(2)} (live, just fetched)` : "approximately ₱56.24 (live rate, varies)"}
 - Transfers to GCash, Maya, BDO, BPI, Metrobank, UnionBank, PNB, RCBC, Landbank are supported
 - Transfers arrive in 30 seconds to 2 minutes for GCash/Maya, 1-2 hours for bank transfers
-- KinnectFi charges ZERO transfer fees
+- Kayah charges ZERO transfer fees
 - KYC requires: PhilSys, UMID, Passport, Driver's License, Voter's ID, or SSS ID + selfie + phone verification
-- KinnectFi cards (virtual + physical) are available to verified users
+- Kayah cards (virtual + physical) are available to verified users
 - Savings goals, rate alerts, and referral rewards (500 pts per referral) are available
 - Bayani tier requires 10+ referrals; users earn Kinnect Points redeemable for transfer credits
 - The app supports English and Taglish
@@ -26,7 +26,7 @@ const SYSTEM_PROMPT = buildSystemPrompt(null); // fallback, overridden at send t
 
 const WELCOME_MESSAGE = {
   role: "assistant",
-  content: "Kumusta! 👋 I'm Kaya, your KinnectFi assistant.\n\nI can help you with transfers, rates, KYC, cards, and more. What can I help you with today?",
+  content: "Kumusta! 👋 I'm Kaya, your Kayah assistant.\n\nI can help you with transfers, rates, KYC, cards, and more. What can I help you with today?",
   timestamp: Date.now(),
 };
 
@@ -132,7 +132,7 @@ export default function Support() {
     if (rating === "down") {
       await base44.integrations.Core.SendEmail({
         to: "support@kinnectfi.com",
-        from_name: "KinnectFi Kaya Feedback",
+        from_name: "Kayah Kaya Feedback",
         subject: `👎 Unhelpful Kaya Response — ${user?.email || "unknown user"}`,
         body: `A user rated a Kaya response as unhelpful.\n\nUser: ${user?.full_name || "Unknown"} (${user?.email || "no email"})\nTime: ${new Date().toISOString()}\n\nKaya's response:\n"${msgContent}"\n\nFull conversation:\n${messages.map(m => `${m.role === "user" ? "User" : "Kaya"}: ${m.content}`).join("\n\n")}`,
       }).catch(() => {});
@@ -175,7 +175,7 @@ export default function Support() {
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-2 mb-4 flex-shrink-0">
         <a
-          href="mailto:support@kinnectfi.com?subject=Help%20Center%20FAQ&body=Hi%2C%20I%20have%20a%20question%20about%20KinnectFi."
+          href="mailto:support@kinnectfi.com?subject=Help%20Center%20FAQ&body=Hi%2C%20I%20have%20a%20question%20about%20Kayah."
           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-colors ${card} hover:border-primary/30`}
         >
           <BookOpen className="w-4 h-4 text-primary flex-shrink-0" />
@@ -187,7 +187,7 @@ export default function Support() {
         </a>
         <div className={`flex flex-col rounded-xl border overflow-hidden ${card}`}>
           <a
-            href="https://wa.me/14155238886?text=Hi%2C%20I%20need%20help%20with%20my%20KinnectFi%20account"
+            href="https://wa.me/14155238886?text=Hi%2C%20I%20need%20help%20with%20my%20Kayah%20account"
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center gap-2 px-3 py-2 border-b text-left transition-colors hover:border-primary/30 ${darkMode ? "border-white/5" : "border-black/5"}`}
@@ -200,7 +200,7 @@ export default function Support() {
             <ChevronRight className={`w-3 h-3 ${muted} flex-shrink-0 ml-auto`} />
           </a>
           <a
-            href={`mailto:support@kinnectfi.com?subject=Support%20Request&body=Hi%2C%20I%20need%20help%20with%20my%20KinnectFi%20account.%20My%20email%3A%20${encodeURIComponent(user?.email || "")}`}
+            href={`mailto:support@kinnectfi.com?subject=Support%20Request&body=Hi%2C%20I%20need%20help%20with%20my%20Kayah%20account.%20My%20email%3A%20${encodeURIComponent(user?.email || "")}`}
             className="flex items-center gap-2 px-3 py-2 text-left transition-colors hover:opacity-80"
           >
             <Phone className="w-4 h-4 text-primary flex-shrink-0" />
@@ -266,7 +266,7 @@ export default function Support() {
                 const transcript = messages.map(m => `${m.role === "user" ? "User" : "Kaya"}: ${m.content}`).join("\n\n");
                 await base44.integrations.Core.SendEmail({
                   to: "support@kinnectfi.com",
-                  from_name: "KinnectFi Kaya Escalation",
+                  from_name: "Kayah Kaya Escalation",
                   subject: `🚩 Unresolved Support Issue — ${user?.email || "unknown user"}`,
                   body: `A user flagged an unresolved issue in the Kaya chat.\n\nUser: ${user?.full_name || "Unknown"} (${user?.email || "no email"})\nTime: ${new Date().toISOString()}\n\n--- Transcript ---\n\n${transcript}`,
                 }).catch(() => {});
