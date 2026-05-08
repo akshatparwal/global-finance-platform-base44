@@ -64,15 +64,15 @@ export default function Home() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 38%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.08) 100%)" }} />
 
           {/* Logo */}
-          <div className="absolute top-4 left-4 sm:top-7 sm:left-7 flex items-center gap-2.5 z-10 bg-black/50 backdrop-blur-md rounded-2xl px-3 py-2">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center flex-shrink-0">
-              <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain brightness-0 invert" />
+          <div className="absolute top-4 left-4 sm:top-7 sm:left-7 flex items-center gap-2 z-10 bg-white rounded-lg px-3 py-2 shadow-sm">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
+              <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/02c4d00b2_Screenshot2026-05-08at53712PM.png" className="w-full h-full object-contain" />
             </div>
             <div>
-            <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Ka<span className="text-[#F4C94E]">yah</span>
+            <div className="font-extrabold text-[#0B0E1A] text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Kayah
             </div>
-            <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest">Cross-Border Bank</div>
+            <div className="text-[#0B0E1A]/40 text-[7px] sm:text-[8px] uppercase tracking-widest">⊙ Cross-Border Bank</div>
             </div>
           </div>
 
