@@ -127,11 +127,18 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       <aside className={`${bgSidebar} w-56 flex-shrink-0 flex flex-col fixed left-0 top-0 bottom-0 z-40 transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}>
         {/* Logo */}
-         <div className="p-4 pb-5 border-b border-white/8">
-           <Link to="/" className="inline-block">
-             <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/02c4d00b2_Screenshot2026-05-08at53712PM.png" className="h-10 object-contain" />
-           </Link>
-         </div>
+        <div className="p-5 pb-6 border-b border-white/8">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
+            <div>
+              <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <Globe className="w-2.5 h-2.5 text-primary/60" />
+                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Bank</span>
+              </div>
+            </div>
+          </Link>
+        </div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 space-y-0.5">

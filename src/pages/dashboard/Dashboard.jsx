@@ -297,7 +297,7 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <p className="font-bold text-sm uppercase tracking-widest text-white/40 mb-3">Quick Send</p>
+        <p className="kf-label text-white/40 mb-3">Quick Send</p>
         <div className="relative">
           <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
             {QUICK_SEND.map((p, i) => (
@@ -321,9 +321,9 @@ export default function Dashboard() {
 
       {/* Offline banner */}
       {offline && (
-        <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border ${darkMode ? "kf-glass" : "bg-amber-50 border-amber-200"}`} role="alert" aria-live="polite">
+        <div className="kf-glass flex items-center gap-2 px-4 py-2.5 rounded-xl" role="alert" aria-live="polite">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          <p className={`text-xs ${darkMode ? "text-white/50" : "text-amber-800"}`}>Showing cached data — offline</p>
+          <p className="text-white/50 text-xs">Showing cached data — offline</p>
         </div>
       )}
 
