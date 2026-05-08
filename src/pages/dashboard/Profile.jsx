@@ -27,12 +27,11 @@ import {
 const PROFILE_TABS = ["General","Family","Referrals","Security","Support"];
 
 export default function Profile() {
-  const { darkMode, taglish, setTaglish: onSetTaglish } = useOutletContext() || {};
+  const { darkMode } = useOutletContext() || {};
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("General");
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [activeLang, setActiveLang] = useState(() => (taglish ? "TG" : "EN"));
   const [transfers, setTransfers] = useState([]);
   // Referrals state
   const [referrals, setReferrals] = useState([]);
@@ -286,25 +285,6 @@ export default function Profile() {
               onUpdated={(updated) => setUser(u => ({ ...u, ...updated }))}
             />
           )}
-
-          {/* Language & Theme — EN/TG only, persisted to localStorage via DashboardLayout */}
-          <div className={`border rounded-xl p-4 ${card}`}>
-            <div className="flex items-center justify-between py-2">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">🌐</span>
-                <div>
-                  <p className="font-semibold text-sm">Wika / Language</p>
-                  <p className={`text-xs ${muted}`}>{activeLang === "EN" ? "English (US)" : "Taglish"}</p>
-                </div>
-              </div>
-              <div className="flex gap-1">
-                {[{ code: "EN", taglish: false }, { code: "TG", taglish: true }].map(({ code, taglish: tg }) => (
-                  <button key={code} onClick={() => { setActiveLang(code); onSetTaglish(tg); }}
-                    className={`text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors ${code === activeLang ? "bg-primary text-secondary" : `${darkMode ? "bg-white/10 text-white/50 hover:bg-white/20" : "bg-black/10 text-black/50 hover:bg-black/20"}`}`}>{code}</button>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* Year story — real stats (remittance only, excludes deposits and yield) */}
           {transfers.length > 0 && (() => {
