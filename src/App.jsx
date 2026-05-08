@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -21,9 +22,11 @@ import Support from './pages/dashboard/Support';
 import KinnectFiStory from './pages/dashboard/KinnectFiStory';
 import Recipients from './pages/dashboard/Recipients';
 import ErrorBoundaryPage from './components/ErrorBoundaryPage';
+import { useLiveRates } from '@/hooks/useLiveRates';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { /* rates */ } = useLiveRates(); // Warm cache on auth load
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
-import { useOutletContext, useNavigate } from "react-router-dom";
-import { Shield, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Users, Mail, Share2, PlayCircle } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import { Shield, HelpCircle, LogOut, ChevronRight, Trash2, Copy, Check, Share2 } from "lucide-react";
 import SecurityHub from "@/components/security/SecurityHub";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import AccountDetails from "@/components/profile/AccountDetails";
@@ -13,15 +13,13 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-const PROFILE_TABS = ["General", "Security", "Support"];
+const PROFILE_TABS = ["General", "Settings"];
 
 export default function Profile() {
   const { darkMode } = useOutletContext() || {};
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("General");
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [transfers, setTransfers] = useState([]);
   const [referrals, setReferrals] = useState([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [sending, setSending] = useState(false);
@@ -44,7 +42,6 @@ export default function Profile() {
           .catch(() => setReferralsLoading(false));
       }
     }).catch(() => setLoadingUser(false));
-    base44.entities.Transfer.list("-created_date", 100).then(setTransfers).catch(() => {});
   }, []);
 
   const handleSignOut = () => base44.auth.logout("/");
@@ -261,63 +258,65 @@ export default function Profile() {
             />
           )}
 
-
         </div>
       )}
 
-      {activeTab === "Security" && <SecurityHub darkMode={darkMode} />}
+      {activeTab === "Settings" && (
+        <div className="space-y-4">
+          <SecurityHub darkMode={darkMode} />
 
-      {activeTab === "Support" && (
-        <div className="space-y-3">
-          <button onClick={() => window.open("/HowItWorks", "_blank")} className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${card} ${darkMode ? "hover:bg-white/5" : "hover:bg-black/5"}`}>
-            <HelpCircle className={`w-5 h-5 ${muted}`} />
-            <span className="font-semibold text-sm">Help Center & FAQs</span>
-          </button>
-          <button onClick={handleSignOut} className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-500/20 hover:bg-red-500/5">
-            <LogOut className="w-5 h-5 text-red-500" />
-            <span className="font-semibold text-sm text-red-500">Sign Out</span>
-          </button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-700/30 hover:bg-red-700/5">
-                <Trash2 className="w-5 h-5 text-red-700" />
-                <div>
-                  <span className="font-semibold text-sm text-red-700 block">Delete Account</span>
-                  <span className={`text-xs ${darkMode ? "text-white/30" : "text-black/30"}`}>Permanently remove your account and data</span>
-                </div>
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action is <strong>permanent and irreversible</strong>. All your wallets, transfer history, savings goals, and personal data will be erased.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={async () => {
-                    await base44.entities.Transfer.create({
-                      amount_usd: 0, recipient_name: "ACCOUNT_DELETION_REQUEST", category: "other", status: "pending",
-                      note: `Deletion requested by ${user?.email || "unknown"} at ${new Date().toISOString()}`,
-                      reference_id: `DEL-${Date.now().toString(36).toUpperCase()}`,
-                    }).catch(() => {});
-                    if (user?.email) {
-                      await base44.integrations.Core.SendEmail({
-                        to: user.email, subject: "Kayah: Account Deletion Request Received",
-                        body: `Hi ${user.full_name || "there"},\n\nWe received your account deletion request. Our team will process it within 48 hours.\n\n— The Kayah Team`,
+          <div className="space-y-3">
+            <p className={`text-[10px] font-black uppercase tracking-wider ${muted} px-1`}>Support & Account</p>
+            <button onClick={() => window.open("/HowItWorks", "_blank")} className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors ${card} ${darkMode ? "hover:bg-white/5" : "hover:bg-black/5"}`}>
+              <HelpCircle className={`w-5 h-5 ${muted}`} />
+              <span className="font-semibold text-sm">Help Center & FAQs</span>
+            </button>
+            <button onClick={handleSignOut} className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-500/20 hover:bg-red-500/5">
+              <LogOut className="w-5 h-5 text-red-500" />
+              <span className="font-semibold text-sm text-red-500">Sign Out</span>
+            </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors border-red-700/30 hover:bg-red-700/5">
+                  <Trash2 className="w-5 h-5 text-red-700" />
+                  <div>
+                    <span className="font-semibold text-sm text-red-700 block">Delete Account</span>
+                    <span className={`text-xs ${darkMode ? "text-white/30" : "text-black/30"}`}>Permanently remove your account and data</span>
+                  </div>
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action is <strong>permanent and irreversible</strong>. All your wallets, transfer history, savings goals, and personal data will be erased.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                    onClick={async () => {
+                      await base44.entities.Transfer.create({
+                        amount_usd: 0, recipient_name: "ACCOUNT_DELETION_REQUEST", category: "other", status: "pending",
+                        note: `Deletion requested by ${user?.email || "unknown"} at ${new Date().toISOString()}`,
+                        reference_id: `DEL-${Date.now().toString(36).toUpperCase()}`,
                       }).catch(() => {});
-                    }
-                    base44.auth.logout("/");
-                  }}
-                >
-                  Yes, delete my account
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                      if (user?.email) {
+                        await base44.integrations.Core.SendEmail({
+                          to: user.email, subject: "Kayah: Account Deletion Request Received",
+                          body: `Hi ${user.full_name || "there"},\n\nWe received your account deletion request. Our team will process it within 48 hours.\n\n— The Kayah Team`,
+                        }).catch(() => {});
+                      }
+                      base44.auth.logout("/");
+                    }}
+                  >
+                    Yes, delete my account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       )}
     </div>
