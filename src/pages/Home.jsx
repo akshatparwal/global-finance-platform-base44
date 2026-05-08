@@ -69,10 +69,10 @@ export default function Home() {
               <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain brightness-0 invert" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Ka<span className="text-[#F4C94E]">yah</span>
-              </div>
-              <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest hidden xs:block">Cross-Border Neobank</div>
+            <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Ka<span className="text-[#F4C94E]">yah</span>
+            </div>
+            <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest">Cross-Border Bank</div>
             </div>
           </div>
 
