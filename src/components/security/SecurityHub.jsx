@@ -5,8 +5,8 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Shield, ShieldCheck, Fingerprint, Smartphone, Key,
-  Eye, EyeOff, Lock, Unlock, ChevronRight, AlertTriangle,
+  ShieldCheck, Fingerprint, Smartphone, Key,
+  Lock, ChevronRight, AlertTriangle,
   Monitor, Globe, Check, X
 } from "lucide-react";
 import PinSetupModal from "./PinSetupModal";
@@ -49,13 +49,6 @@ export default function SecurityHub({ darkMode }) {
   const text = darkMode ? "text-white" : "text-[#1a2a4a]";
   const muted = darkMode ? "text-white/40" : "text-[#1a2a4a]/40";
   const divider = darkMode ? "border-white/5" : "border-black/5";
-
-  // Security score calculation
-  const checks = [biometric, pinSet, twoFAEnabled, loginNotifs, transactionNotifs];
-  const score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
-  const scoreColor = score >= 80 ? "text-emerald-500" : score >= 50 ? "text-yellow-500" : "text-red-400";
-  const scoreBarColor = score >= 80 ? "bg-emerald-500" : score >= 50 ? "bg-yellow-500" : "bg-red-400";
-  const scoreLabel = score >= 80 ? "Strong" : score >= 50 ? "Fair" : "Weak";
 
   const handleBiometricToggle = () => {
     const next = !biometric;
@@ -106,42 +99,6 @@ export default function SecurityHub({ darkMode }) {
 
   return (
     <div className="space-y-4">
-
-      {/* Security Score */}
-      <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0d1526 0%, #1a2a4a 100%)" }}>
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-white/40 text-[10px] uppercase tracking-widest mb-0.5">Security Score</p>
-            <p className={`font-black text-4xl ${scoreColor}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {score}<span className="text-xl">/100</span>
-            </p>
-            <p className={`text-xs font-bold mt-0.5 ${scoreColor}`}>{scoreLabel} Protection</p>
-          </div>
-          <div className={`w-16 h-16 rounded-2xl ${score >= 80 ? "bg-emerald-500/20" : score >= 50 ? "bg-yellow-500/20" : "bg-red-400/20"} flex items-center justify-center`}>
-            {score >= 80
-              ? <ShieldCheck className={`w-8 h-8 ${scoreColor}`} />
-              : <Shield className={`w-8 h-8 ${scoreColor}`} />
-            }
-          </div>
-        </div>
-        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-          <motion.div
-            className={`h-full ${scoreBarColor} rounded-full`}
-            animate={{ width: `${score}%` }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          />
-        </div>
-        <div className="flex gap-2 mt-3 flex-wrap">
-          {checks.map((c, i) => (
-            <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center ${c ? "bg-emerald-500/20" : "bg-white/10"}`}>
-              {c ? <Check className="w-3 h-3 text-emerald-500" /> : <X className="w-3 h-3 text-white/30" />}
-            </div>
-          ))}
-          <p className="text-white/30 text-xs self-center ml-1">
-            {checks.filter(Boolean).length}/{checks.length} checks passed
-          </p>
-        </div>
-      </div>
 
       {/* Biometric & PIN */}
       <div className={`border rounded-2xl p-5 ${card}`}>

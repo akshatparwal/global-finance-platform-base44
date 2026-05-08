@@ -14,7 +14,6 @@ import { WalletSkeleton, TransactionSkeleton } from "@/components/ui/SkeletonLoa
 import { fetchWithCache } from "@/utils/offlineCache";
 import FundWalletModal from "@/components/wallet/FundWalletModal.jsx";
 import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
-import PostOnboardingCard from "@/components/dashboard/PostOnboardingCard";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import WalletCard from "@/components/dashboard/WalletCard";
 import { useYieldAccrual } from "@/hooks/useYieldAccrual";
@@ -198,11 +197,6 @@ export default function Dashboard() {
         </div>
         );
       })()}
-
-      {/* Post-onboarding "3 next steps" card — shown once after KYC complete */}
-      {user?.onboarding_completed && (
-        <PostOnboardingCard darkMode={darkMode} onFund={() => setShowFundWallet(true)} user={user} />
-      )}
 
       {/* KYC Completion Banner — only if onboarding incomplete */}
       {user && !user.onboarding_completed && (

@@ -55,23 +55,6 @@ export default function Profile() {
   const pending = referrals.filter(r => r.status === "pending").length;
   const cashEarned = joined * 50;
 
-  // Streak — consecutive months with at least one transfer
-  const streak = (() => {
-    if (!transfers.length) return 0;
-    const monthSet = new Set(transfers.map(t => {
-      const d = new Date(t.created_date);
-      return `${d.getFullYear()}-${d.getMonth()}`;
-    }));
-    let count = 0;
-    const now = new Date();
-    for (let i = 0; i < 24; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      if (monthSet.has(`${d.getFullYear()}-${d.getMonth()}`)) count++;
-      else break;
-    }
-    return count;
-  })();
-
   const handleCopy = () => {
     navigator.clipboard.writeText(`https://${referralLink}`).then(() => {
       setCopied(true);
@@ -174,19 +157,6 @@ export default function Profile() {
               <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center text-primary text-xs">✓</div>
             </div>
           )}
-
-          {/* Streak */}
-          <div className={`rounded-2xl p-5 relative overflow-hidden border ${card}`}>
-            <div className="absolute top-3 right-4 opacity-10 text-6xl">🙏</div>
-            <div className="flex items-center gap-3 relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-xl">🔥</div>
-              <div>
-                <span className="text-primary text-xs font-bold uppercase">Bayani Streak</span>
-                <h3 className={`font-extrabold ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{streak} Month Padala Streak</h3>
-                <p className={`text-xs ${muted}`}>{streak >= 12 ? "You've supported your family every month for a year!" : streak > 0 ? `${streak} consecutive months of supporting your family.` : "Send your first padala to start your streak!"}</p>
-              </div>
-            </div>
-          </div>
 
           {/* Referrals — concise inline section */}
           <div className={`border rounded-2xl p-5 ${card}`}>

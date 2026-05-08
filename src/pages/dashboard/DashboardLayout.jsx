@@ -7,10 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
 import NotificationPanel from "@/components/notifications/NotificationPanel";
 import NotificationToast from "@/components/notifications/NotificationToast";
-import WhatsNew from "@/components/WhatsNew";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import SessionTimeoutWarning from "@/components/SessionTimeoutWarning";
-import BiometricNudge from "@/components/BiometricNudge";
 import { useTabStack } from "@/hooks/useTabStack";
 import PWAInstallNudge from "@/components/PWAInstallNudge";
 import { useSwipeTabs } from "@/hooks/useSwipeTabs";
@@ -50,9 +48,6 @@ export default function DashboardLayout() {
   });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [whatsNewDone, setWhatsNewDone] = useState(() => {
-    try { return localStorage.getItem("kinnectfi_whats_new_seen") === "3.0.0"; } catch { return false; }
-  });
   const notifRef = useRef(null);
   const { notifications, toast, unreadCount, dismiss, markAllRead, clearAll, dismissToast } = useNotifications();
   const { showWarning, secondsLeft, extendSession, doLogout } = useSessionTimeout();
@@ -260,12 +255,6 @@ export default function DashboardLayout() {
         </main>
 
         <BottomNav onNavigate={handleTabClick} />
-
-        {/* What's New changelog — BiometricNudge shown only after this is dismissed */}
-        <WhatsNew darkMode={darkMode} onDismissed={() => setWhatsNewDone(true)} />
-
-        {/* Biometric nudge — staggered after WhatsNew */}
-        <BiometricNudge darkMode={darkMode} whatsNewDismissed={whatsNewDone} />
 
         {/* PWA install nudge */}
         <PWAInstallNudge darkMode={darkMode} />
