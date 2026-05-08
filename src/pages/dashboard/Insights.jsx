@@ -103,7 +103,7 @@ export default function Insights() {
       <div className={`flex gap-1 p-1 rounded-xl mb-4 ${darkMode ? "bg-white/5" : "bg-black/5"}`}>
         {TABS.map(t => (
           <button key={t} onClick={() => setActiveTab(t)}
-            className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${activeTab === t ? "bg-primary text-secondary" : `${muted} hover:text-current`}`}>
+            className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap ${activeTab === t ? "bg-primary text-secondary" : `${darkMode ? "text-white/50 hover:text-white" : "text-[#1a2a4a]/60 hover:text-[#1a2a4a]"}`}`}>
             {t === "Activity" && "⚡"}{t === "Goals" && "◎"}{t === "Analytics" && "↗"}{t === "Markets" && "📊"}{" "}{t}
           </button>
         ))}
@@ -343,21 +343,21 @@ export default function Insights() {
             }, goals[0]);
             const pct = topGoal.target_amount > 0 ? Math.min(Math.round(((topGoal.current_amount || 0) / topGoal.target_amount) * 100), 100) : 0;
             return (
-              <div className="border rounded-2xl p-6 bg-[#0d1526] border-white/10">
-                <p className="text-primary/60 text-xs uppercase tracking-wider mb-1">🌟 Featured Goal</p>
+              <div className={`border rounded-2xl p-6 ${darkMode ? "bg-[#0d1526] border-white/10" : "bg-white border-black/10"}`}>
+                <p className="text-primary/80 text-xs uppercase tracking-wider mb-1">🌟 Featured Goal</p>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">{topGoal.emoji}</span>
                   <div>
-                    <h3 className="text-white font-extrabold text-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{topGoal.label}</h3>
-                    {topGoal.description && <p className="text-white/50 text-sm">{topGoal.description}</p>}
+                    <h3 className={`font-extrabold text-lg ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{topGoal.label}</h3>
+                    {topGoal.description && <p className={`text-sm ${muted}`}>{topGoal.description}</p>}
                   </div>
                 </div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-1">Progress</p>
-                <div className="w-full h-2 bg-white/10 rounded-full mb-3"><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
-                <div className="flex justify-between text-white/50 text-xs mb-4"><span>${(topGoal.current_amount || 0).toLocaleString()} / ${topGoal.target_amount.toLocaleString()}</span><span>{pct}%</span></div>
+                <p className={`text-xs uppercase tracking-wider mb-1 ${muted}`}>Progress</p>
+                <div className={`w-full h-2 rounded-full mb-3 ${darkMode ? "bg-white/10" : "bg-black/10"}`}><div className="h-full bg-primary rounded-full" style={{ width: `${pct}%` }} /></div>
+                <div className={`flex justify-between text-xs mb-4 ${muted}`}><span>${(topGoal.current_amount || 0).toLocaleString()} / ${topGoal.target_amount.toLocaleString()}</span><span>{pct}%</span></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/5 rounded-xl p-3"><p className="text-white/40 text-xs mb-1">Remaining</p><p className="text-white font-bold">${Math.max(topGoal.target_amount - (topGoal.current_amount || 0), 0).toLocaleString()}</p></div>
-                  <div className="bg-white/5 rounded-xl p-3"><p className="text-white/40 text-xs mb-1">Auto-Save</p><p className="text-primary font-bold">{topGoal.auto_save_enabled ? `$${topGoal.auto_save_amount}/${topGoal.auto_save_frequency}` : "Off"}</p></div>
+                  <div className={`rounded-xl p-3 ${darkMode ? "bg-white/5" : "bg-black/5"}`}><p className={`text-xs mb-1 ${muted}`}>Remaining</p><p className={`font-bold ${text}`}>${Math.max(topGoal.target_amount - (topGoal.current_amount || 0), 0).toLocaleString()}</p></div>
+                  <div className={`rounded-xl p-3 ${darkMode ? "bg-white/5" : "bg-black/5"}`}><p className={`text-xs mb-1 ${muted}`}>Auto-Save</p><p className="text-primary font-bold">{topGoal.auto_save_enabled ? `$${topGoal.auto_save_amount}/${topGoal.auto_save_frequency}` : "Off"}</p></div>
                 </div>
               </div>
             );

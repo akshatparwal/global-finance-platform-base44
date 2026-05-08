@@ -69,10 +69,10 @@ export default function Home() {
               <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-sm sm:text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Kinnect<span className="text-[#C97B22]">Fi</span>
+              <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Ka<span className="text-[#F4C94E]">yah</span>
               </div>
-              <div className="text-white/40 text-[7px] sm:text-[8px] uppercase tracking-widest hidden xs:block">Cross-Border Neobank</div>
+              <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest hidden xs:block">Cross-Border Neobank</div>
             </div>
           </div>
 
@@ -89,21 +89,21 @@ export default function Home() {
                 {taglish ? (
                   <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Ang pera mo,<br />
-                    <span className="text-[#C97B22]">konektado</span><br />
+                    <span className="text-[#F4C94E]">konektado</span><br />
                     sa puso mo.
                   </h1>
                 ) : (
                   <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     Your money,<br />
-                    <span className="text-[#C97B22]">connected</span><br />
+                    <span className="text-[#F4C94E]">connected</span><br />
                     to your heart.
                   </h1>
                 )}
                 {/* Live rate badge in hero */}
-                <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full" style={{ background: "rgba(201,123,34,0.18)", border: "1px solid rgba(201,123,34,0.35)" }}>
+                <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full" style={{ background: "rgba(244,201,78,0.18)", border: "1px solid rgba(244,201,78,0.35)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-white/60 text-[10px] sm:text-[11px] font-semibold">Live rate:</span>
-                  <span className="text-[#C97B22] text-[12px] sm:text-[13px] font-black">₱{liveRate}/USD</span>
+                  <span className="text-[#F4C94E] text-[12px] sm:text-[13px] font-black">₱{liveRate}/USD</span>
                   <span className="text-white/40 text-[9px] sm:text-[10px]">· $0 fee</span>
                 </div>
                 <p className="text-white/75 text-sm sm:text-base mb-5 sm:mb-7 max-w-sm leading-relaxed hidden sm:block">
@@ -127,7 +127,7 @@ export default function Home() {
               </div>
               <div>
                 <div className="flex gap-0.5 mb-0.5">
-                  {[...Array(5)].map((_, i) => <span key={i} className="text-[#C97B22] text-xs">★</span>)}
+                  {[...Array(5)].map((_, i) => <span key={i} className="text-[#F4C94E] text-xs">★</span>)}
                 </div>
                 <p className="text-white/65 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
                   {taglish ? "10,000+ Pilipino sa buong mundo" : "Trusted by 10,000+ Filipinos worldwide"}
@@ -163,7 +163,7 @@ export default function Home() {
                   onClick={() => setTaglish(lang === "Taglish")}
                   className="px-3 py-1.5 rounded-full transition-all"
                   style={{
-                    background: (lang === "Taglish") === taglish ? "#C97B22" : "transparent",
+                    background: (lang === "Taglish") === taglish ? "#F4C94E" : "transparent",
                     color: (lang === "Taglish") === taglish ? "#fff" : panelMuted,
                   }}
                 >
@@ -210,14 +210,14 @@ export default function Home() {
 
             <Link
               to="/auth"
-              aria-label={taglish ? "Magsimula na sa KinnectFi" : "Get started with KinnectFi — create your free account"}
+              aria-label={taglish ? "Magsimula na sa Kayah" : "Get started with Kayah — create your free account"}
               className="flex items-center justify-center gap-2 font-bold rounded-xl py-3.5 sm:py-4 px-6 text-sm sm:text-base mb-2.5 sm:mb-3 hover:opacity-90 transition-opacity"
-              style={{ background: "#C97B22", color: "#fff" }}
+              style={{ background: "#F4C94E", color: "#0B0E1A" }}
             >
               {taglish ? "Magsimula Na →" : "Get Started →"}
             </Link>
             <p className="text-center text-[11px] mb-4 sm:mb-7" style={{ color: panelMuted }}>
-              <Link to="/auth" aria-label="Sign in to your existing KinnectFi account" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
+              <Link to="/auth" aria-label="Sign in to your existing Kayah account" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
                 {taglish ? "May account ka na? Maligayang pagbabalik!" : "Already have an account? Welcome back!"}
               </Link>
             </p>
@@ -228,7 +228,7 @@ export default function Home() {
                   key={i}
                   onClick={() => setSlideIdx(i)}
                   className="h-1.5 rounded-full transition-all duration-300 !min-h-0"
-                  style={{ width: i === slideIdx ? 28 : 7, background: i === slideIdx ? "#C97B22" : dotInactive }}
+                  style={{ width: i === slideIdx ? 28 : 7, background: i === slideIdx ? "#F4C94E" : dotInactive }}
                 />
               ))}
             </div>
@@ -245,8 +245,8 @@ export default function Home() {
               <span className="sm:hidden">256-bit Secure</span>
             </div>
             <div className="flex items-center gap-3" style={{ color: panelMuted }}>
-              <span>₱<span className="font-black" style={{ color: "#C97B22" }}>{liveRate}</span>/USD</span>
-              <span>{taglish ? "Bayad" : "Fee"} <span className="font-black" style={{ color: "#C97B22" }}>$0</span></span>
+              <span>₱<span className="font-black" style={{ color: "#F4C94E" }}>{liveRate}</span>/USD</span>
+              <span>{taglish ? "Bayad" : "Fee"} <span className="font-black" style={{ color: "#F4C94E" }}>$0</span></span>
             </div>
           </div>
         </div>
@@ -255,10 +255,11 @@ export default function Home() {
       {/* ── Features Strip ── */}
       <section style={{ backgroundColor: "#F5EFE3" }} className="px-6 py-16 max-w-5xl mx-auto">
         <div className="text-center mb-8 sm:mb-12">
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C97B22" }}>Why KinnectFi</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#F4C94E" }}>Why Kayah</p>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-3" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Built for the OFW. <span style={{ color: "#C97B22" }}>Zero compromises.</span>
+            Built for the OFW. <span style={{ color: "#F4C94E" }}>Zero compromises.</span>
           </h2>
+
           <p className="text-sm sm:text-base max-w-md mx-auto" style={{ color: "rgba(13,31,60,0.55)" }}>
             Every feature is designed around the real needs of Filipino families sending love across oceans.
           </p>
@@ -280,7 +281,7 @@ export default function Home() {
                 className="rounded-2xl p-5 border" style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "rgba(201,123,34,0.1)" }}>{f.emoji}</div>
-                  <span className="text-[9px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: "rgba(201,123,34,0.12)", color: "#C97B22" }}>{f.badge}</span>
+                  <span className="text-[9px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: "rgba(201,123,34,0.12)", color: "#F4C94E" }}>{f.badge}</span>
                 </div>
                 <h3 className="font-extrabold text-base mb-1 leading-tight" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{f.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "rgba(13,31,60,0.5)" }}>{f.desc}</p>
@@ -294,7 +295,7 @@ export default function Home() {
           <div className="px-5 py-8 sm:px-12 sm:py-10">
             <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(201,123,34,0.7)" }}>How it works</p>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white mb-6 sm:mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Send padala in <span style={{ color: "#C97B22" }}>3 simple steps</span>
+              Send padala in <span style={{ color: "#F4C94E" }}>3 simple steps</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {[
@@ -303,7 +304,7 @@ export default function Home() {
                 { step: "03", title: "Send & they receive", desc: "Hit send. Your family gets notified in seconds. Zero fees deducted." },
               ].map((s, i) => (
                 <div key={i} className="flex gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm" style={{ background: "rgba(201,123,34,0.2)", color: "#C97B22" }}>{s.step}</div>
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm" style={{ background: "rgba(201,123,34,0.2)", color: "#F4C94E" }}>{s.step}</div>
                   <div>
                     <h4 className="text-white font-bold mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.title}</h4>
                     <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{s.desc}</p>
@@ -314,7 +315,7 @@ export default function Home() {
             <div className="mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               <Link to="/auth"
                 className="inline-flex items-center gap-2 font-bold rounded-xl py-3.5 px-7 text-sm hover:opacity-90 transition-opacity"
-                style={{ background: "#C97B22", color: "#fff" }}>
+                style={{ background: "#F4C94E", color: "#0B0E1A" }}>
                 {taglish ? "Magsimula Na →" : "Create Free Account →"}
               </Link>
               <Link to="/auth" className="inline-flex items-center gap-2 ml-4 text-sm font-semibold hover:opacity-80 transition-opacity" style={{ color: "rgba(255,255,255,0.5)" }}>

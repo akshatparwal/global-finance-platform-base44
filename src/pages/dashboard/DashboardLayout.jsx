@@ -111,11 +111,10 @@ export default function DashboardLayout() {
     },
   });
 
-  const bgMain = "kf-cosmic-bg";
+  const bgMain = darkMode ? "kf-cosmic-bg" : "bg-[#f8f5f0]";
   const bgSidebar = "bg-[#0B0E1A]";
-  const bgContent = "bg-[#0B0E1A]";
-  const textMain = "text-white";
-  const textMuted = "text-white/40";
+  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
+  const textMuted = darkMode ? "text-white/40" : "text-[#1a2a4a]/50";
   const activeClass = "bg-white/8 text-white";
   const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5";
 
@@ -137,10 +136,10 @@ export default function DashboardLayout() {
           <Link to="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-primary/30"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
             <div>
-              <div className="font-extrabold text-white text-base leading-none" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></div>
+              <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
               <div className="flex items-center gap-1 mt-0.5">
                 <Globe className="w-2.5 h-2.5 text-primary/60" />
-                <span className="text-white/30 text-[8px] uppercase tracking-widest">Cross-Border Neobank</span>
+                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Neobank</span>
               </div>
             </div>
           </Link>
@@ -178,7 +177,7 @@ export default function DashboardLayout() {
       {/* Main */}
       <div className="flex-1 sm:ml-56 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className={`${bgContent} border-b ${darkMode ? "border-white/5" : "border-black/5"} px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
+        <header className={`${darkMode ? "bg-[#0B0E1A]" : "bg-white"} border-b ${darkMode ? "border-white/5" : "border-black/10"} px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
           {/* Mobile: Back button if not root, menu button if root */}
           {!isRoot ? (
             <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => { pop(); navigate(activeTab); }} title="Go back">
@@ -192,7 +191,7 @@ export default function DashboardLayout() {
           {/* Logo shown in mobile header */}
           <div className="sm:hidden flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg overflow-hidden"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full scale-150 object-cover" /></div>
-            <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kinnect<span className="text-primary">Fi</span></span>
+            <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></span>
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
@@ -240,7 +239,7 @@ export default function DashboardLayout() {
           onScroll={() => { saveScroll(mainRef.current?.scrollTop ?? 0); }}
           onTouchStart={swipeHandlers.onTouchStart}
           onTouchEnd={swipeHandlers.onTouchEnd}
-          className="flex-1 p-4 sm:p-6 pb-28 sm:pb-8 text-white overflow-y-auto"
+          className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 overflow-y-auto ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -290,7 +289,7 @@ export default function DashboardLayout() {
           )}
         </AnimatePresence>
 
-        <footer className={`hidden sm:flex px-6 py-3 text-center text-[10px] ${textMuted} border-t ${darkMode ? "border-white/5" : "border-black/5"} justify-between`}>
+        <footer className={`hidden sm:flex px-6 py-3 text-center text-[10px] ${darkMode ? "text-white/40" : "text-[#1a2a4a]/50"} border-t ${darkMode ? "border-white/5" : "border-black/10"} justify-between ${darkMode ? "bg-[#0B0E1A]" : "bg-white"}`}>
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>
           <span>© 2026 KinnectFi. All rights reserved.</span>
         </footer>

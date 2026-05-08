@@ -97,7 +97,7 @@ export default function Cards() {
     });
   }, []);
 
-  const cardholderName = (user?.legal_name || user?.full_name || "KINNECTFI USER").toUpperCase();
+  const cardholderName = (user?.legal_name || user?.full_name || "KAYAH USER").toUpperCase();
   const isFrozen = cardData?.is_frozen || false;
   const issued = !!cardData;
 
@@ -229,7 +229,7 @@ export default function Cards() {
               </div>
               <div className="flex items-center gap-2">
                 <Wifi className={`w-3.5 h-3.5 ${cardData?.contactless_enabled ? "text-white/60" : "text-white/20"}`} />
-                <span className="text-white/40 text-[9px] font-bold tracking-widest">KINNECTFI</span>
+                <span className="text-white/40 text-[9px] font-bold tracking-widest">KAYAH</span>
               </div>
             </div>
 
@@ -395,15 +395,15 @@ export default function Cards() {
       )}
 
       {activeTab === "Loyalty" && (
-        <div className="rounded-2xl p-6 bg-[#0d1526] border border-white/10">
+        <div className={`rounded-2xl p-6 border ${darkMode ? "bg-[#0d1526] border-white/10" : "bg-white border-black/10"}`}>
           <div className="flex justify-between items-start mb-4 gap-3">
             <div>
-              <h3 className="text-white font-extrabold text-xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>KinnectFi Tiers</h3>
-              <p className="text-white/50 text-sm">Elevate your status as a global provider.</p>
+              <h3 className={`font-extrabold text-xl ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kayah Tiers</h3>
+              <p className={`text-sm ${muted}`}>Elevate your status as a global provider.</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <p className="text-white/40 text-xs mb-0.5">Lifetime Padala</p>
-              <p className="text-white font-black text-lg">${lifetimePadala.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
+              <p className={`text-xs mb-0.5 ${muted}`}>Lifetime Padala</p>
+              <p className={`font-black text-lg ${textMain}`}>${lifetimePadala.toLocaleString("en-US", { maximumFractionDigits: 0 })}</p>
               <p className="text-primary text-xs font-bold">{currentTier.name} TIER</p>
             </div>
           </div>
@@ -413,8 +413,8 @@ export default function Cards() {
                 <div className={`w-10 h-10 rounded-full mx-auto mb-1 flex items-center justify-center font-bold text-sm ${t.reached ? "bg-primary text-secondary" : "bg-white/10 text-white/40"}`}>
                   {t.reached ? "✓" : i + 1}
                 </div>
-                <p className={`text-[10px] font-bold ${t.reached ? "text-primary" : "text-white/30"}`}>{t.name}</p>
-                <p className="text-white/20 text-[9px]">{t.threshold}</p>
+                <p className={`text-[10px] font-bold ${t.reached ? "text-primary" : darkMode ? "text-white/30" : "text-[#1a2a4a]/30"}`}>{t.name}</p>
+                <p className={`text-[9px] ${darkMode ? "text-white/20" : "text-[#1a2a4a]/25"}`}>{t.threshold}</p>
               </div>
             ))}
           </div>

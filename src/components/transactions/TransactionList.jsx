@@ -206,8 +206,8 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
         </div>
       )}
 
-      {/* Summary bar */}
-      {filtered.length > 0 && (
+      {/* Summary bar — only when there's real data to show */}
+      {filtered.length > 0 && (totalSpent > 0 || totalInbound > 0) && (
         <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl border mb-3 ${card}`}>
           <span className={`text-xs font-semibold ${muted}`}>{filtered.length} transaction{filtered.length !== 1 ? "s" : ""}</span>
           <div className="flex items-center gap-3">
@@ -235,27 +235,48 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
 
       {/* Empty state */}
       {!loading && filtered.length === 0 && (
-        <div className={`border rounded-2xl ${card}`}>
+        <>
           {search || categoryFilter !== "all" || dateFilter !== "all" ? (
-            <EmptyState
-              darkMode={darkMode}
-              illustration="🔍"
-              title="No results found"
-              description="Try adjusting your search or filters to find what you're looking for."
-              ctaLabel="Clear filters"
-              onCta={() => { setSearch(""); setCategoryFilter("all"); setDateFilter("all"); }}
-              size="md"
-            />
+            <div className={`border rounded-2xl px-6 py-10 text-center ${card}`}>
+              <p className="text-3xl mb-3">🔍</p>
+              <p className={`font-semibold text-sm mb-1 ${text}`}>No results found</p>
+              <p className={`text-xs ${muted} mb-4`}>Try adjusting your search or filters.</p>
+              <button
+                onClick={() => { setSearch(""); setCategoryFilter("all"); setDateFilter("all"); }}
+                className="text-primary text-xs font-bold hover:opacity-70 transition-opacity"
+              >
+                Clear filters
+              </button>
+            </div>
           ) : (
-            <EmptyState
-              darkMode={darkMode}
-              illustration="💸"
-              title="No transactions yet"
-              description="Your first padala will appear here. Send money home to get started!"
-              size="md"
-            />
+            /* Ghost row — ARQ empty state */
+            <div className={`border rounded-2xl overflow-hidden ${card}`}>
+              {/* Faint ghost row */}
+              <div className="flex items-center gap-3 px-4 py-3.5 opacity-25 pointer-events-none select-none">
+                <div
+                  className="w-10 h-10 rounded-xl flex-shrink-0"
+                  style={{ background: "rgba(244,201,78,0.10)", border: "1px solid rgba(244,201,78,0.12)" }}
+                />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 w-36 rounded-full" style={{ background: "rgba(255,255,255,0.10)" }} />
+                  <div className="h-2 w-20 rounded-full" style={{ background: "rgba(255,255,255,0.06)" }} />
+                </div>
+                <div className="text-right space-y-1.5 flex-shrink-0">
+                  <div className="h-3 w-12 rounded-full ml-auto" style={{ background: "rgba(255,255,255,0.10)" }} />
+                  <div className="h-2 w-8 rounded-full ml-auto" style={{ background: "rgba(255,255,255,0.06)" }} />
+                </div>
+              </div>
+              {/* Label */}
+              <div
+                className="flex items-center justify-center gap-2 py-4 border-t"
+                style={{ borderColor: "rgba(255,255,255,0.05)" }}
+              >
+                <span className="text-sm">✈️</span>
+                <p className={`text-xs ${muted}`}>Your first transfer will appear here</p>
+              </div>
+            </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Grouped transactions */}
@@ -264,9 +285,12 @@ export default function TransactionList({ transfers = [], loading, darkMode, tag
           {/* Date header */}
           <div className="flex items-center justify-between mb-2 px-1">
             <p className={`text-[10px] font-black uppercase tracking-widest ${muted}`}>{dateLabel}</p>
-            <p className={`text-[10px] font-bold ${muted}`}>
-              -${txs.reduce((s, t) => s + (t.amount_usd || 0), 0).toFixed(2)}
-            </p>
+            {(() => {
+              const dayTotal = txs.filter(t => !["deposit","yield"].includes(t.category)).reduce((s, t) => s + (t.amount_usd || 0), 0);
+              return dayTotal > 0 ? (
+                <p className={`text-[10px] font-bold ${muted}`}>-${dayTotal.toFixed(2)}</p>
+              ) : null;
+            })()}
           </div>
 
           {/* Transaction rows */}
