@@ -139,7 +139,7 @@ export default function DashboardLayout() {
               <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
               <div className="flex items-center gap-1 mt-0.5">
                 <Globe className="w-2.5 h-2.5 text-primary/60" />
-                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Neobank</span>
+                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Bank</span>
               </div>
             </div>
           </Link>
