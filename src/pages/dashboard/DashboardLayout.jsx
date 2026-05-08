@@ -15,7 +15,7 @@ import { useSwipeTabs } from "@/hooks/useSwipeTabs";
 
 const NAV = [
   { label: "Dashboard",        icon: LayoutDashboard, path: "/dashboard",          color: "text-blue-400",    bg: "bg-blue-500/15" },
-  { label: "Insights & Wealth",icon: TrendingUp,      path: "/dashboard/insights", color: "text-emerald-400", bg: "bg-emerald-500/15" },
+  { label: "Insights",         icon: TrendingUp,      path: "/dashboard/insights", color: "text-emerald-400", bg: "bg-emerald-500/15" },
   { label: "Pay",              icon: Send,            path: "/dashboard/pay",      color: "text-primary",     bg: "bg-primary/15" },
   { label: "Cards",            icon: CreditCard,      path: "/dashboard/cards",    color: "text-purple-400",  bg: "bg-purple-500/15" },
   { label: "Profile",          icon: User,            path: "/dashboard/profile",  color: "text-orange-400",  bg: "bg-orange-500/15" },
