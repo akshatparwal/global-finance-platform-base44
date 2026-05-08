@@ -129,12 +129,11 @@ export default function DashboardLayout() {
         {/* Logo */}
         <div className="p-5 pb-6 border-b border-white/8">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
+            <div className="w-9 h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/02c4d00b2_Screenshot2026-05-08at53712PM.png" className="w-full h-full object-contain" /></div>
             <div>
-              <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
+              <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Kayah</div>
               <div className="flex items-center gap-1 mt-0.5">
-                <Globe className="w-2.5 h-2.5 text-primary/60" />
-                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Bank</span>
+                <span className="text-[8px] uppercase tracking-widest text-white/40">⊙ Cross-Border Bank</span>
               </div>
             </div>
           </Link>
