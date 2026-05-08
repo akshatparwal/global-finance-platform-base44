@@ -200,15 +200,6 @@ export default function Pay() {
     if (amountError) setAmountError(validateAmount(cleaned));
   };
 
-  // Format the raw amount string for display (Wise/Revolut style)
-  const formatAmountDisplay = (raw) => {
-    if (!raw) return "";
-    const parts = raw.split(".");
-    const intPart = parseInt(parts[0] || "0", 10).toLocaleString("en-US");
-    if (parts.length === 2) return `${intPart}.${parts[1]}`;
-    return intPart;
-  };
-
   // Step 1: validate then show auth gate
   const handleSend = () => {
     const error = validateAmount(sendAmount);
@@ -415,27 +406,25 @@ export default function Pay() {
           </div>
         )}
 
-        {/* Revolut-style big amount display */}
+        {/* Amount input */}
         <div className={`rounded-2xl p-3 sm:p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
           <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>You Send (USD)</label>
-          <div
-            className={`text-4xl sm:text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
-            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 48 }}
-          >
-            {sendAmount ? `$${formatAmountDisplay(sendAmount)}` : <span className="opacity-20">$0</span>}
+          <div className="relative flex items-center justify-center mb-1">
+            <span className={`text-4xl sm:text-5xl font-black tracking-tight pointer-events-none select-none ${darkMode ? "text-white/30" : "text-[#1a2a4a]/30"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$</span>
+            <input
+              value={sendAmount}
+              onChange={e => handleAmountChange(e.target.value)}
+              inputMode="decimal"
+              type="number"
+              min={MIN_AMOUNT}
+              max={MAX_AMOUNT}
+              placeholder="0"
+              autoComplete="off"
+              className={`text-4xl sm:text-5xl font-black tracking-tight bg-transparent outline-none border-none w-full text-center ${amountError ? "text-red-400" : darkMode ? "text-white" : "text-[#1a2a4a]"}`}
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 48, WebkitAppearance: "none", MozAppearance: "textfield" }}
+              aria-label="Amount to send in USD"
+            />
           </div>
-          {/* Hidden native numeric input */}
-          <input
-            value={sendAmount}
-            onChange={e => handleAmountChange(e.target.value)}
-            inputMode="numeric"
-            type="number"
-            min={MIN_AMOUNT}
-            max={MAX_AMOUNT}
-            placeholder="0"
-            className="sr-only"
-            aria-label="Amount to send in USD"
-          />
           <div className={`h-px my-3 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
           <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>They Receive (PHP)</label>
           <div className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -448,34 +437,6 @@ export default function Pay() {
             </div>
           )}
           <p className={`text-[10px] ${muted} mt-2`}>Min ${MIN_AMOUNT} · Max ${MAX_AMOUNT.toLocaleString()}</p>
-        </div>
-
-        {/* Numpad */}
-        <div className="grid grid-cols-3 gap-1.5 mb-3">
-          {[1,2,3,4,5,6,7,8,9,".",0,"⌫"].map((d, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                if (d === "⌫") {
-                  const next = sendAmount.slice(0, -1);
-                  setSendAmount(next);
-                  if (amountError) setAmountError(validateAmount(next));
-                } else {
-                  const next = String(sendAmount) + String(d);
-                  if (d === "." && sendAmount.includes(".")) return;
-                  if (sendAmount.includes(".") && sendAmount.split(".")[1]?.length >= 2) return;
-                  handleAmountChange(next);
-                }
-              }}
-              className={`h-11 sm:h-14 rounded-xl sm:rounded-2xl text-lg sm:text-xl font-bold transition-all active:scale-95 select-none
-                ${d === "⌫"
-                  ? `${darkMode ? "text-white/50 bg-white/5" : "text-[#1a2a4a]/50 bg-black/5"}`
-                  : `${darkMode ? "bg-white/8 text-white hover:bg-white/12" : "bg-black/6 text-[#1a2a4a] hover:bg-black/10"} border ${darkMode ? "border-white/5" : "border-black/5"}`
-                }`}
-            >
-              {d}
-            </button>
-          ))}
         </div>
 
         <div className={`flex items-center justify-between py-2.5 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-3`}>
