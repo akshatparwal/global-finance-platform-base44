@@ -15,23 +15,22 @@ export function Skeleton({ className = "", darkMode }) {
 }
 
 export function TransactionSkeleton({ darkMode, count = 4 }) {
-  const border = darkMode ? "border-white/5" : "border-black/5";
-  const bg = darkMode ? "bg-[#1a2332]" : "bg-white";
   return (
-    <div className={`rounded-2xl border overflow-hidden ${bg} ${border}`}>
+    <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className={`flex items-center gap-3 px-4 py-3.5 border-b last:border-0 ${border}`}
+          className="flex items-center gap-3 px-4 py-3.5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
         >
-          <Skeleton darkMode className="w-10 h-10 rounded-xl flex-shrink-0" />
+          <div className="w-10 h-10 rounded-full animate-pulse flex-shrink-0" style={{ background: "rgba(255,255,255,0.06)" }} />
           <div className="flex-1 space-y-2">
-            <Skeleton darkMode className="h-3.5 w-36 rounded" />
-            <Skeleton darkMode className="h-2.5 w-20 rounded" />
+            <div className="h-3 w-32 rounded animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
+            <div className="h-2 w-20 rounded animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Skeleton darkMode className="h-3.5 w-14 rounded" />
-            <Skeleton darkMode className="h-2.5 w-10 rounded" />
+            <div className="h-3 w-14 rounded animate-pulse" style={{ background: "rgba(255,255,255,0.06)" }} />
+            <div className="h-2 w-10 rounded animate-pulse" style={{ background: "rgba(255,255,255,0.04)" }} />
           </div>
         </div>
       ))}
@@ -45,18 +44,15 @@ export function WalletSkeleton({ darkMode }) {
       {[0, 1].map(i => (
         <div
           key={i}
-          className="rounded-2xl p-4 h-32 animate-pulse"
-          style={{ background: "linear-gradient(135deg, #1a2a4a, #3d2e00)" }}
+          className="rounded-2xl p-5 h-40 animate-pulse"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
         >
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-full bg-white/10" />
-              <div className="w-10 h-3 rounded bg-white/10" />
-            </div>
-            <div className="w-8 h-4 rounded-full bg-white/10" />
+          <div className="flex justify-between items-start mb-5">
+            <div className="w-16 h-2.5 rounded bg-white/8" />
+            <div className="w-12 h-4 rounded-full bg-white/8" />
           </div>
-          <div className="w-12 h-2 rounded bg-white/10 mb-2" />
-          <div className="w-20 h-5 rounded bg-white/20" />
+          <div className="w-10 h-2 rounded bg-white/6 mb-3" />
+          <div className="w-28 h-8 rounded bg-white/10" />
         </div>
       ))}
     </div>

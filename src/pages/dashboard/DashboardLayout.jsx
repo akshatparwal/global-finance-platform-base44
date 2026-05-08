@@ -111,13 +111,13 @@ export default function DashboardLayout() {
     },
   });
 
-  const bgMain = darkMode ? "bg-[#0a0f1a]" : "bg-[#f5efe6]";
-  const bgSidebar = darkMode ? "bg-[#0d1526]" : "bg-[#1a2a4a]";
-  const bgContent = darkMode ? "bg-[#111827]" : "bg-white";
-  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
-  const textMuted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
-  const activeClass = darkMode ? "bg-primary/20 text-primary" : "bg-primary/20 text-primary";
-  const inactiveClass = darkMode ? "text-white/60 hover:text-white hover:bg-white/5" : "text-white/70 hover:text-white hover:bg-white/10";
+  const bgMain = "kf-cosmic-bg";
+  const bgSidebar = "bg-[#080B15]";
+  const bgContent = "bg-[#080B15]";
+  const textMain = "text-white";
+  const textMuted = "text-white/40";
+  const activeClass = "bg-white/8 text-white";
+  const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5";
 
   if (!authChecked) {
     return (
@@ -240,7 +240,7 @@ export default function DashboardLayout() {
           onScroll={() => { saveScroll(mainRef.current?.scrollTop ?? 0); }}
           onTouchStart={swipeHandlers.onTouchStart}
           onTouchEnd={swipeHandlers.onTouchEnd}
-          className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 ${darkMode ? "text-white" : "text-[#1a2a4a]"} overflow-y-auto`}
+          className="flex-1 p-4 sm:p-6 pb-28 sm:pb-8 text-white overflow-y-auto"
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div

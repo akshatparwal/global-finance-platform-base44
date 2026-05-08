@@ -37,9 +37,9 @@ export default function Dashboard() {
   const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const { walletAddress, usdcBalance, refetchBalance } = usePrivyWallet();
   const liveRate = rates?.USDPHP || 56.24;
-  const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5";
-  const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
-  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
+  const card = "kf-glass rounded-2xl";
+  const muted = "text-white/40";
+  const textMain = "text-white";
 
   const [offline, setOffline] = useState(false);
 
@@ -186,17 +186,16 @@ export default function Dashboard() {
         const holiday = getUpcomingHoliday();
         if (!holiday) return null;
         return (
-          <div className={`flex items-center justify-between px-4 py-3 rounded-xl ${darkMode ? "bg-[#1a2332] border border-white/5" : "bg-[#f0e8d8] border border-[#e8dece]"}`}>
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="text-lg flex-shrink-0">{holiday.emoji}</span>
-              <div className="min-w-0">
-                <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
-                <span className={`text-sm font-semibold ${textMain}`}>{holiday.en}</span>
-                <span className={`text-sm ${muted} hidden sm:inline`}> · {holiday.diff === 0 ? "Today!" : holiday.diff === 1 ? "Tomorrow" : `In ${holiday.diff} days`}</span>
-              </div>
+        <div className="kf-glass flex items-center justify-between px-4 py-3 rounded-xl">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-base flex-shrink-0">{holiday.emoji}</span>
+            <div className="min-w-0">
+              <span className="text-white/70 text-sm">{holiday.en}</span>
+              <span className="text-white/30 text-xs ml-2 hidden sm:inline">{holiday.diff === 0 ? "Today" : holiday.diff === 1 ? "Tomorrow" : `In ${holiday.diff} days`}</span>
             </div>
-            <Calendar className={`w-4 h-4 ${muted} flex-shrink-0`} />
           </div>
+          <Calendar className="w-3.5 h-3.5 text-white/20 flex-shrink-0" />
+        </div>
         );
       })()}
 
@@ -216,18 +215,23 @@ export default function Dashboard() {
 
       {/* Greeting */}
       <div className="flex items-center justify-between mb-1">
-        <p className={`text-sm ${muted}`}>{greeting}, <span className={`font-bold ${textMain}`}>{user === null ? "..." : friendlyName}</span> 👋</p>
-        {!ratesLoading && <p className={`text-[10px] ${muted}`}>₱{liveRate.toFixed(2)}/USD · Live</p>}
+        <p className="text-white/40 text-sm">{greeting}, <span className="text-white/80">{user === null ? "..." : friendlyName}</span></p>
+        {!ratesLoading && (
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <p className="text-white/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
+          </div>
+        )}
       </div>
 
       {/* Wallet Slider */}
       {loading ? (
         <WalletSkeleton darkMode={darkMode} />
       ) : wallets.length === 0 ? (
-        <div className={`border rounded-2xl p-8 text-center ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
-          <p className={`text-sm font-semibold mb-1 ${textMain}`}>No wallets yet</p>
-          <p className={`text-xs ${muted} mb-3`}>Add funds to get started.</p>
-          <button onClick={() => setShowFundWallet(true)} className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs">Add Funds →</button>
+        <div className="kf-glass rounded-2xl p-8 text-center">
+          <p className="text-white/60 text-sm mb-1">No wallets yet</p>
+          <p className="text-white/30 text-xs mb-3">Add funds to get started.</p>
+          <button onClick={() => setShowFundWallet(true)} className="bg-primary text-primary-foreground font-medium px-4 py-2 rounded-xl text-xs">Add Funds</button>
         </div>
       ) : (
         <div>
@@ -259,7 +263,7 @@ export default function Dashboard() {
             <div className="sm:hidden flex justify-center gap-1.5 mt-2">
               {wallets.map((_, i) => (
                 <button key={i} onClick={() => setWalletSlide(i)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === walletSlide ? "bg-primary w-4" : darkMode ? "bg-white/20" : "bg-black/20"}`} />
+                  className={`h-1 rounded-full transition-all ${i === walletSlide ? "bg-primary w-6" : "bg-white/20 w-1.5"}`} />
               ))}
             </div>
           )}
@@ -276,14 +280,16 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => setShowFundWallet(true)}
-          className="flex items-center justify-center gap-2 bg-primary text-secondary font-bold py-4 rounded-2xl text-sm hover:opacity-90 active:scale-[0.97] transition-all shadow-lg"
+          className="flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-medium hover:opacity-90 active:scale-[0.97] transition-all"
+          style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
         >
           <ArrowDownToLine className="w-4 h-4" />
           Add Funds
         </button>
         <button
           onClick={() => navigate("/dashboard/pay")}
-          className={`flex items-center justify-center gap-2 font-bold py-4 rounded-2xl text-sm hover:opacity-90 active:scale-[0.97] transition-all border-2 border-primary ${darkMode ? "bg-primary/10 text-primary" : "bg-primary/5 text-primary"}`}
+          className="flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-medium hover:opacity-90 active:scale-[0.97] transition-all kf-glass"
+          style={{ color: "hsl(var(--primary))" }}
         >
           <Send className="w-4 h-4" />
           Send Money
@@ -297,41 +303,41 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <h2 className={`font-bold text-sm mb-3 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Quick Send</h2>
+        <p className="kf-label text-white/40 mb-3">Quick Send</p>
         <div className="relative">
           <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-            {QUICK_SEND.map((p, i) => {
-              const avatarColors = ["bg-blue-500","bg-violet-500","bg-emerald-500","bg-rose-500","bg-amber-500"];
-              const avatarColor = avatarColors[i % avatarColors.length];
-              return (
-                <button key={i} onClick={() => navigate("/dashboard/pay")}
-                  className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
-                  <div className={`w-13 h-13 w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-xl shadow-md ${p.isAdd ? `border-2 border-dashed ${darkMode ? "border-white/20" : "border-black/20"}` : `${avatarColor} text-white`}`}>
-                    {p.isAdd ? <Plus className="w-5 h-5 opacity-40" /> : p.emoji}
-                  </div>
-                  <span className={`text-[10px] font-semibold ${muted} max-w-[52px] truncate text-center`}>{p.label}</span>
-                  {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">SEND</span>}
-                </button>
-              );
-            })}
+            {QUICK_SEND.map((p, i) => (
+              <button key={i} onClick={() => navigate("/dashboard/pay")}
+                className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
+                <div
+                  className="w-[52px] h-[52px] rounded-full flex items-center justify-center text-lg"
+                  style={p.isAdd
+                    ? { background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.15)" }
+                    : { background: "rgba(255,200,80,0.1)", border: "1px solid rgba(255,200,80,0.15)" }}
+                >
+                  {p.isAdd ? <Plus className="w-4 h-4 text-white/25" /> : <span>{p.emoji}</span>}
+                </div>
+                <span className="text-white/30 text-[10px] max-w-[52px] truncate text-center">{p.label}</span>
+              </button>
+            ))}
           </div>
-          <div className={`absolute right-0 top-0 bottom-0 w-10 pointer-events-none ${darkMode ? "bg-gradient-to-l from-[#0a0f1a]" : "bg-gradient-to-l from-[#f5efe6]"}`} />
+          <div className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-[#0B0E1A]" />
         </div>
       </div>
 
       {/* Offline banner */}
       {offline && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/20" role="alert" aria-live="polite">
-          <span className="text-yellow-400 text-base">📶</span>
-          <p className="text-yellow-400 text-xs font-semibold">Showing cached data — you appear to be offline</p>
+        <div className="kf-glass flex items-center gap-2 px-4 py-2.5 rounded-xl" role="alert" aria-live="polite">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          <p className="text-white/50 text-xs">Showing cached data — offline</p>
         </div>
       )}
 
       {/* Activity Feed */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Activity</h2>
-          <button onClick={() => navigate("/dashboard/transactions")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
+          <p className="kf-label text-white/40">Activity</p>
+          <button onClick={() => navigate("/dashboard/transactions")} className="text-primary/60 text-[10px] tracking-wider hover:opacity-70">View all</button>
         </div>
 
         {/* Recent Transfers */}
@@ -341,15 +347,18 @@ export default function Dashboard() {
           </div>
         )}
         {!loading && transfers.length === 0 && (
-          <div className={`border rounded-2xl mb-4 px-5 py-6 flex items-center gap-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
-            <span className="text-3xl flex-shrink-0">📬</span>
+          <div className="kf-glass rounded-2xl mb-4 px-5 py-6 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,200,80,0.1)" }}>
+              <Send className="w-4 h-4 text-primary" />
+            </div>
             <div className="flex-1 min-w-0">
-              <p className={`font-bold text-sm mb-0.5 ${textMain}`}>No transfers yet</p>
-              <p className={`text-xs ${muted}`}>Send money home to your family — zero fees, live rates.</p>
+              <p className="text-white/80 text-sm font-medium mb-0.5">No transfers yet</p>
+              <p className="text-white/30 text-xs">Send money home — zero fees, live rates.</p>
             </div>
             <button onClick={() => navigate("/dashboard/pay")}
-              className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs flex-shrink-0 active:scale-95 transition-transform">
-              Send →
+              className="text-primary text-xs font-medium px-3 py-2 rounded-xl flex-shrink-0 active:scale-95 transition-transform"
+              style={{ background: "rgba(255,200,80,0.1)", border: "1px solid rgba(255,200,80,0.15)" }}>
+              Send
             </button>
           </div>
         )}
@@ -369,68 +378,72 @@ export default function Dashboard() {
             return { date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), amount: dailyYieldAmt };
           }).reverse();
           return (
-            <div className={`rounded-2xl border overflow-hidden mb-3 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
-              <button
-                onClick={() => setYieldExpanded(e => !e)}
-                className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-emerald-500/5 ${yieldExpanded ? (darkMode ? "border-b border-white/5" : "border-b border-black/5") : ""}`}
-              >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-lg flex-shrink-0">⚡</div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold ${textMain}`}>Yield Credit</p>
-                  <p className={`text-[10px] font-medium ${muted}`}>{monthLabel} · {apyPct}% APY · {daysPassed} days</p>
+          <div className="kf-glass rounded-2xl overflow-hidden mb-3">
+            <button
+              onClick={() => setYieldExpanded(e => !e)}
+              className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-white/3"
+              style={{ borderBottom: yieldExpanded ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(100,220,150,0.1)", border: "1px solid rgba(100,220,150,0.15)" }}>
+                <TrendingUp className="w-4 h-4" style={{ color: "rgba(100,220,150,0.9)" }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white/70 text-sm font-medium">Yield Credit</p>
+                <p className="text-white/30 text-[10px]">{monthLabel} · {apyPct}% APY</p>
+              </div>
+              <div className="text-right flex-shrink-0 flex items-center gap-2">
+                <div>
+                  <p className="text-sm font-light" style={{ color: "rgba(100,220,150,0.9)" }}>+${monthYield.toFixed(4)}</p>
+                  <p className="text-white/25 text-[10px]">+${dailyYieldAmt.toFixed(4)}/day</p>
                 </div>
-                <div className="text-right flex-shrink-0 flex items-center gap-2">
+                <span className={`text-white/20 text-[10px] transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""}`}>▼</span>
+              </div>
+            </button>
+            {yieldExpanded && (
+              <div className="max-h-56 overflow-y-auto">
+                <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
                   <div>
-                    <p className="font-bold text-sm text-emerald-400">+${monthYield.toFixed(4)}</p>
-                    <p className={`text-[10px] ${muted}`}>+${dailyYieldAmt.toFixed(4)}/day</p>
+                    <p className="text-white/60 text-xs">{lastMonthLabel}</p>
+                    <p className="text-white/25 text-[10px]">{daysInLastMonth} days</p>
                   </div>
-                  <span className={`text-[10px] font-bold transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""} ${muted}`}>▼</span>
+                  <p className="text-xs" style={{ color: "rgba(100,220,150,0.8)" }}>+${lastMonthYield.toFixed(4)}</p>
                 </div>
-              </button>
-              {yieldExpanded && (
-                <div className="max-h-56 overflow-y-auto">
-                  {/* Last month summary row */}
-                  <div className={`flex items-center justify-between px-4 py-3 border-b ${darkMode ? "border-white/5 bg-white/3" : "border-black/5 bg-black/3"}`}>
-                    <div>
-                      <p className={`text-xs font-semibold ${textMain}`}>{lastMonthLabel}</p>
-                      <p className={`text-[10px] ${muted}`}>Previous month · {daysInLastMonth} days</p>
-                    </div>
-                    <p className="text-xs font-bold text-emerald-400">+${lastMonthYield.toFixed(4)}</p>
+                {dailyRows.map((row, i) => (
+                  <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <p className="text-white/30 text-xs">{row.date}</p>
+                    <p className="text-xs" style={{ color: "rgba(100,220,150,0.7)" }}>+${row.amount.toFixed(4)}</p>
                   </div>
-                  {/* Current month daily rows */}
-                  {dailyRows.map((row, i) => (
-                    <div key={i} className={`flex items-center justify-between px-4 py-2.5 border-b last:border-0 ${darkMode ? "border-white/5" : "border-black/5"}`}>
-                      <p className={`text-xs ${muted}`}>{row.date}</p>
-                      <p className="text-xs font-semibold text-emerald-400">+${row.amount.toFixed(4)}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
+          </div>
           );
         })()}
 
         {!loading && transfers.length > 0 && (
-          <div className={`rounded-2xl border overflow-hidden mb-4 ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+          <div className="kf-glass rounded-2xl overflow-hidden mb-4">
             {transfers.map((t, i) => {
               const initials = (t.recipient_name || "?").slice(0, 2).toUpperCase();
-              const avatarColors = ["bg-blue-500","bg-violet-500","bg-emerald-500","bg-rose-500","bg-amber-500"];
-              const avatarColor = avatarColors[t.recipient_name?.charCodeAt(0) % avatarColors.length] || "bg-primary";
               return (
                 <button key={i} onClick={() => setSelectedTx(t)}
-                  className={`w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors border-b last:border-0 hover:bg-primary/5 ${darkMode ? "border-white/5" : "border-black/5"}`}>
-                  <div className={`w-10 h-10 rounded-xl ${avatarColor} flex items-center justify-center text-white font-black text-xs flex-shrink-0`}>
+                  className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors border-b last:border-0 hover:bg-white/4"
+                  style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 text-xs font-medium flex-shrink-0"
+                    style={{ background: "rgba(255,200,80,0.12)", border: "1px solid rgba(255,200,80,0.15)" }}
+                  >
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-semibold ${textMain}`}>{t.recipient_name}</p>
-                    <p className={`text-[10px] font-medium ${muted}`}>
-                      {new Date(t.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · via {t.recipient_bank || "Transfer"}
+                    <p className="text-white/80 text-sm font-medium">{t.recipient_name}</p>
+                    <p className="text-white/30 text-[10px]">
+                      {new Date(t.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {t.recipient_bank || "Transfer"}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-sm text-primary">−${t.amount_usd}</p>
-                    {t.amount_php && <p className={`text-[10px] ${muted}`}>₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
+                    <p className="text-sm font-light" style={{ color: "hsl(var(--primary))" }}>−${t.amount_usd}</p>
+                    {t.amount_php && <p className="text-white/25 text-[10px]">₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
                   </div>
                 </button>
               );
@@ -442,15 +455,20 @@ export default function Dashboard() {
         {!loading && transfers.length > 0 && (() => {
           const totalSent = transfers.reduce((s, t) => s + (t.amount_usd || 0), 0);
           return (
-            <div className="kf-hero-card rounded-2xl p-5 flex items-center gap-4 cursor-pointer active:scale-[0.99] transition-transform" style={{ background: "linear-gradient(135deg, #c97a20, #e8a030)" }}
-              onClick={() => navigate("/dashboard/story")}>
-              <span className="text-3xl flex-shrink-0">🎉</span>
+            <div
+              className="kf-glass rounded-2xl p-5 flex items-center gap-4 cursor-pointer active:scale-[0.99] transition-transform"
+              style={{ boxShadow: "0 0 40px rgba(255,200,80,0.14)", borderColor: "rgba(255,200,80,0.15)" }}
+              onClick={() => navigate("/dashboard/story")}
+            >
+              <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(255,200,80,0.12)" }}>
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white/70 text-[10px] uppercase tracking-widest font-bold mb-0.5">Your Story</p>
-                <h3 className="text-white font-extrabold text-base leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <p className="kf-label text-white/30 mb-0.5">Your Story</p>
+                <p className="text-white/80 text-base font-light">
                   ${totalSent.toLocaleString("en-US", { maximumFractionDigits: 0 })} sent to your family
-                </h3>
-                <p className="text-white/60 text-xs mt-0.5">See your full year in review →</p>
+                </p>
+                <p className="text-white/30 text-xs mt-0.5">See your year in review</p>
               </div>
             </div>
           );

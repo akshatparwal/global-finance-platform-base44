@@ -1,62 +1,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
+    /* KinnectFi dark cosmic tokens — always-dark design system */
+    --background:    228 40% 7%;       /* #0B0E1A deep navy */
+    --foreground:    210 40% 96%;
 
-    --accent: 64.7 70% 40%;
+    --card:          228 35% 10%;      /* #10142A glass base */
+    --card-foreground: 210 40% 96%;
 
-    --accent-foreground: 222.2 84% 4.9%;
+    --popover:       228 35% 10%;
+    --popover-foreground: 210 40% 96%;
 
-    --background: 40 46.2% 94.9%;
+    --primary:       38 90% 58%;       /* warm gold accent */
+    --primary-foreground: 228 40% 7%;
 
-    --border: 39 24.4% 83.9%;
+    --secondary:     228 30% 16%;
+    --secondary-foreground: 210 40% 90%;
 
-    --card: 40 46.2% 94.9%;
+    --muted:         228 28% 18%;
+    --muted-foreground: 215 20% 50%;
 
-    --card-foreground: 222.2 84% 4.9%;
+    --accent:        38 90% 58%;
+    --accent-foreground: 228 40% 7%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive:   0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
 
-    --destructive-foreground: 210 40% 98%;
+    --border:        228 28% 16%;
+    --input:         228 28% 13%;
+    --ring:          38 90% 58%;
+    --radius:        0.875rem;
 
-    --font-body: 'Inter', system-ui, sans-serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+    --font-heading: 'Inter', system-ui, sans-serif;
 
-    --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
-
-    --foreground: 222.2 84% 4.9%;
-
-    --input: 214.3 31.8% 91.4%;
-
-    --muted: 39 24.4% 83.9%;
-
-    --muted-foreground: 0 0% 32.2%;
-
-    --popover: 40 46.2% 94.9%;
-
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 36 88% 36%;
-
-    --primary-foreground: 0 0% 100%;
-
-    --radius: 0.75rem;
-
-    --ring: 34.7 90.5% 32.9%;
-
-    --secondary: 216.7 73% 14.5%;
-
-    --secondary-foreground: 210 40% 98%;
-
+    /* Glow palette */
+    --glow-gold:  rgba(255, 200, 80, 0.15);
+    --glow-coral: rgba(255, 130, 80, 0.12);
+    --glow-blue:  rgba(80, 140, 255, 0.12);
   }
 }
-
 
 @layer base {
   * {
@@ -66,83 +54,114 @@
 
   html {
     overscroll-behavior: none;
+    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
-    /* Disable text selection app-wide (re-enable in content areas) */
     -webkit-user-select: none;
     user-select: none;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    background-color: #0B0E1A;
   }
 
-  /* Re-enable text selection for readable content */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+  }
+
   p, span, h1, h2, h3, h4, h5, h6, li, td, input, textarea {
     -webkit-user-select: text;
     user-select: text;
   }
 
-  /* Minimum 44px touch targets for mobile */
   @media (max-width: 640px) {
     button, a[href], [role="button"] {
       min-height: 44px;
     }
   }
-
-  /* System dark mode preference */
-  @media (prefers-color-scheme: dark) {
-    :root:not(.light) {
-      --background: 222 47% 8%;
-      --foreground: 210 40% 96%;
-      --card: 222 47% 10%;
-      --card-foreground: 210 40% 96%;
-      --popover: 222 47% 10%;
-      --popover-foreground: 210 40% 96%;
-      --muted: 217 33% 17%;
-      --muted-foreground: 215 20% 65%;
-      --border: 217 33% 20%;
-      --input: 217 33% 17%;
-    }
-  }
 }
 
+/* ================================================================
+   KinnectFi ARQ — Glassmorphism Card System
+   ================================================================ */
 
-body { font-family: var(--font-body) !important; }
-h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
-
-
-
-/* KinnectFi custom animations and utilities */
-
-@keyframes floatA {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(3deg); }
+/* Glass card — primary surface */
+.kf-glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 40px var(--glow-gold);
 }
 
-@keyframes floatB {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(-2deg); }
+/* Hero wallet card — stronger glow */
+.kf-hero-card {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 0 60px rgba(255, 200, 80, 0.18),
+    0 0 0 1px rgba(255, 200, 80, 0.08) inset;
 }
 
-@keyframes floatC {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-25px) rotate(2deg); }
+/* Standard bordered cards — no box shadow, just subtle glow */
+.rounded-2xl.border,
+.rounded-xl.border {
+  box-shadow: 0 0 24px rgba(255, 200, 80, 0.06);
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Hero radial glow behind balance number */
+.kf-balance-glow {
+  position: relative;
 }
+.kf-balance-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(255, 200, 80, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.kf-balance-glow > * { position: relative; z-index: 1; }
+
+/* Label style */
+.kf-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+/* Cosmic background — used on main layout */
+.kf-cosmic-bg {
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(255, 200, 80, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 20% 80%, rgba(80, 120, 255, 0.05) 0%, transparent 60%),
+    #0B0E1A;
+}
+
+/* ================================================================
+   Animations
+   ================================================================ */
 
 @keyframes gradient-x {
   0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  50%       { background-position: 100% 50%; }
 }
 
 @keyframes fade-in {
-  0% { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  0%  { opacity: 0; transform: translateY(8px); }
+  to  { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes ping {
@@ -158,17 +177,17 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
 }
 
 @keyframes sonner-fade-in {
-  0% { opacity: 0; transform: scale(0.8); }
+  0%   { opacity: 0; transform: scale(0.8); }
   100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes sonner-fade-out {
-  0% { opacity: 1; transform: scale(1); }
+  0%   { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(0.8); }
 }
 
 @keyframes sonner-spin {
-  0% { opacity: 1; }
+  0%   { opacity: 1; }
   100% { opacity: 0.15; }
 }
 
@@ -195,45 +214,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading) !important; }
   background-size: 200% auto;
 }
 
-/* ============================================================
-   KinnectFi — Card Highlight & Shadow System
-   Top-edge highlight streak + depth shadow = premium neobank feel.
-   Works in both dark mode and light mode.
-   ============================================================ */
-
-/* Gradient hero cards: net worth, wallet cards, invite banner */
-.kf-hero-card {
-  box-shadow:
-    0 1px 0 0 rgba(255, 255, 255, 0.16) inset,   /* top highlight streak */
-    0 -1px 0 0 rgba(0, 0, 0, 0.45) inset,          /* bottom depth edge */
-    0 0 0 1px rgba(201, 160, 80, 0.14) inset;       /* golden rim */
-}
-
-/* All rounded bordered cards — minimal inset highlight only */
-.rounded-2xl.border,
-.rounded-xl.border {
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset;
-}
-
-/* Light-background content area */
-.bg-\[#f5efe6\] .rounded-2xl.border,
-.bg-\[#f5efe6\] .rounded-xl.border,
-.bg-white .rounded-2xl.border,
-.bg-white .rounded-xl.border {
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.98) inset;
-}
-
-/* Smooth scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.4);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.7);
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 200, 80, 0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 200, 80, 0.4); }
