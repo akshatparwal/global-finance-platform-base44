@@ -1,8 +1,8 @@
 import { useOutletContext, useNavigate } from "react-router-dom";
 import TransactionDetailSheet from "@/components/transactions/TransactionDetailSheet";
 import { getUpcomingHoliday } from "@/utils/holidays";
-import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown, ArrowDownToLine } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { TrendingUp, Calendar, Plus, RefreshCw, ArrowDown, ArrowDownToLine, Send } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useLiveRates } from "@/hooks/useLiveRates";
@@ -10,9 +10,7 @@ import { AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import OnboardingBanner from "@/components/onboarding/OnboardingBanner";
 import CelebrationsWidget from "@/components/dashboard/CelebrationsWidget";
-import { useCountUp } from "@/hooks/useCountUp";
-import { WalletSkeleton, TransactionSkeleton, NetWorthSkeleton, Skeleton } from "@/components/ui/SkeletonLoader";
-import EmptyState from "@/components/ui/EmptyState";
+import { WalletSkeleton, TransactionSkeleton } from "@/components/ui/SkeletonLoader";
 import { fetchWithCache } from "@/utils/offlineCache";
 import FundWalletModal from "@/components/wallet/FundWalletModal.jsx";
 import ZeroBalanceBanner from "@/components/dashboard/ZeroBalanceBanner";
@@ -33,6 +31,9 @@ export default function Dashboard() {
   const [showFundWallet, setShowFundWallet] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
   const [yieldExpanded, setYieldExpanded] = useState(false);
+  const [walletSlide, setWalletSlide] = useState(0);
+  const sliderRef = useRef(null);
+  const touchStartX = useRef(null);
   const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const { walletAddress, usdcBalance, refetchBalance } = usePrivyWallet();
   const liveRate = rates?.USDPHP || 56.24;
@@ -107,9 +108,7 @@ export default function Dashboard() {
     walletCreatedDate: usdWallet?.created_date,
     yieldPctStr: usdWallet?.yield_pct,
   });
-  const netWorth = totalUSD + yieldEarned + (totalPHP / liveRate);
-  const { value: animatedNetWorth, ref: netWorthRef } = useCountUp(netWorth, 1000, 200);
-  const secondaryAmount = `₱ ${totalPHP.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
+
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -215,90 +214,86 @@ export default function Dashboard() {
         />
       )}
 
-      {/* Net Worth Card */}
-      {loading ? <NetWorthSkeleton /> : null}
-      <div ref={netWorthRef} className={`kf-hero-card relative rounded-2xl overflow-hidden ${loading ? "hidden" : ""}`} style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
-        <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
-          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">Total Net Worth</p>
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-2xl sm:text-5xl font-black text-white mb-0.5 break-all leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                ${loading ? "0.00" : animatedNetWorth.toFixed(2)}
-              </p>
-              <p className="text-white/50 text-xs">{secondaryAmount}</p>
-              <p className="text-white/30 text-[10px] mt-0.5">
-                {ratesLoading ? "Fetching rate..." : `₱${liveRate.toFixed(2)}/USD · Live${lastUpdatedLabel ? ` · ${lastUpdatedLabel}` : ""}`}
-              </p>
-              {totalUSD > 0 && yieldEarned > 0 && (
-                <p className="text-emerald-400 text-[10px] mt-1 font-semibold">
-                  ⚡ +${yieldEarned.toFixed(4)} earned · +${dailyYield.toFixed(4)}/day · {apyPct}% APY
-                </p>
-              )}
-            </div>
-            {(() => {
-              // Compute real 30-day change from wallet balance growth vs deposits
-              // As a simple proxy: if yield > 0, show the APY-implied monthly gain
-              const monthlyGainPct = totalUSD > 0 && yieldEarned > 0
-                ? ((Math.pow(1 + apyPct / 100, 30 / 365) - 1) * 100).toFixed(2)
-                : null;
-              return monthlyGainPct ? (
-                <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-full px-2.5 py-1 flex items-center gap-1 flex-shrink-0 mt-1">
-                  <TrendingUp className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-400 text-xs font-bold">+{monthlyGainPct}%</span>
+      {/* Greeting */}
+      <div className="flex items-center justify-between mb-1">
+        <p className={`text-sm ${muted}`}>{greeting}, <span className={`font-bold ${textMain}`}>{user === null ? "..." : friendlyName}</span> 👋</p>
+        {!ratesLoading && <p className={`text-[10px] ${muted}`}>₱{liveRate.toFixed(2)}/USD · Live</p>}
+      </div>
+
+      {/* Wallet Slider */}
+      {loading ? (
+        <WalletSkeleton darkMode={darkMode} />
+      ) : wallets.length === 0 ? (
+        <div className={`border rounded-2xl p-8 text-center ${darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/5"}`}>
+          <p className={`text-sm font-semibold mb-1 ${textMain}`}>No wallets yet</p>
+          <p className={`text-xs ${muted} mb-3`}>Add funds to get started.</p>
+          <button onClick={() => setShowFundWallet(true)} className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs">Add Funds →</button>
+        </div>
+      ) : (
+        <div>
+          {/* Mobile: swipeable slider — Desktop: show both side by side */}
+          <div
+            ref={sliderRef}
+            className="sm:hidden overflow-hidden rounded-2xl"
+            onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
+            onTouchEnd={e => {
+              if (touchStartX.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchStartX.current;
+              if (Math.abs(dx) > 40) setWalletSlide(dx < 0 ? Math.min(walletSlide + 1, wallets.length - 1) : Math.max(walletSlide - 1, 0));
+              touchStartX.current = null;
+            }}
+          >
+            <div
+              className="flex transition-transform duration-300 ease-in-out"
+              style={{ transform: `translateX(-${walletSlide * 100}%)` }}
+            >
+              {wallets.map(w => (
+                <div key={w.currency_code} className="w-full flex-shrink-0">
+                  <WalletCard w={w} usdcBalance={usdcBalance} walletAddress={walletAddress} liveRate={liveRate} />
                 </div>
-              ) : null;
-            })()}
+              ))}
+            </div>
           </div>
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-            <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user === null ? "..." : friendlyName}</span> 👋</p>
-            <button onClick={() => navigate("/dashboard/pay")}
-              className="bg-primary text-secondary text-[10px] font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform">
-              SEND →
-            </button>
+          {/* Dot indicators — mobile only */}
+          {wallets.length > 1 && (
+            <div className="sm:hidden flex justify-center gap-1.5 mt-2">
+              {wallets.map((_, i) => (
+                <button key={i} onClick={() => setWalletSlide(i)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${i === walletSlide ? "bg-primary w-4" : darkMode ? "bg-white/20" : "bg-black/20"}`} />
+              ))}
+            </div>
+          )}
+          {/* Desktop: side by side */}
+          <div className="hidden sm:grid grid-cols-2 gap-3">
+            {wallets.map(w => (
+              <WalletCard key={w.currency_code} w={w} usdcBalance={usdcBalance} walletAddress={walletAddress} liveRate={liveRate} />
+            ))}
           </div>
         </div>
+      )}
+
+      {/* Primary Action Buttons */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => setShowFundWallet(true)}
+          className="flex items-center justify-center gap-2 bg-primary text-secondary font-bold py-4 rounded-2xl text-sm hover:opacity-90 active:scale-[0.97] transition-all shadow-lg"
+        >
+          <ArrowDownToLine className="w-4 h-4" />
+          Add Funds
+        </button>
+        <button
+          onClick={() => navigate("/dashboard/pay")}
+          className={`flex items-center justify-center gap-2 font-bold py-4 rounded-2xl text-sm hover:opacity-90 active:scale-[0.97] transition-all border-2 border-primary ${darkMode ? "bg-primary/10 text-primary" : "bg-primary/5 text-primary"}`}
+        >
+          <Send className="w-4 h-4" />
+          Send Money
+        </button>
       </div>
 
       {/* Zero balance nudge */}
       {!loading && totalUSD === 0 && (
         <ZeroBalanceBanner darkMode={darkMode} onFund={() => setShowFundWallet(true)} />
       )}
-
-      {/* Wallets */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Wallets</h2>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setShowFundWallet(true)} className="flex items-center gap-1 text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
-              <ArrowDownToLine className="w-3 h-3" />Add Funds
-            </button>
-            <span className={`text-[10px] ${darkMode ? "text-white/20" : "text-black/20"}`}>·</span>
-            <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
-              Send →
-            </button>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          {loading ? <WalletSkeleton darkMode={darkMode} /> : null}
-          {!loading && wallets.length === 0 && (
-            <div className="col-span-2 text-center py-6">
-              <p className={`text-sm font-semibold mb-1 ${textMain}`}>No wallets yet</p>
-              <p className={`text-xs ${muted} mb-3`}>Add funds to create your USD wallet and start sending.</p>
-              <button onClick={() => setShowFundWallet(true)} className="bg-primary text-secondary font-bold px-4 py-2 rounded-xl text-xs">Add Funds →</button>
-            </div>
-          )}
-          {!loading && wallets.length > 0 ? wallets.map(w => (
-            <WalletCard
-              key={w.currency_code}
-              w={w}
-              usdcBalance={usdcBalance}
-              walletAddress={walletAddress}
-              liveRate={liveRate}
-            />
-          )) : null}
-        </div>
-      </div>
 
       {/* Quick Send */}
       <div>
