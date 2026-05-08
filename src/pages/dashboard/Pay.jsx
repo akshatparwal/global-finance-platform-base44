@@ -57,7 +57,7 @@ const MAX_AMOUNT = 10000;
 const PAY_TABS = ["Transfer History", "Bills & Auto-Padala", "Rate Alerts"];
 
 export default function Pay() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode } = useOutletContext() || {};
   const isOnline = useOnlineStatus();
   const navigate = useNavigate();
   const [showScheduledForm, setShowScheduledForm] = useState(false);
@@ -305,9 +305,9 @@ export default function Pay() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <h1 className="text-base font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {taglish ? "Magpadala" : "Send Money"}
+            Send Money
           </h1>
-          <p className={`text-[11px] sm:text-xs ${muted}`}>{taglish ? "Mabilis at ligtas na padala" : "Fast, secure cross-border transfers"}</p>
+          <p className={`text-[11px] sm:text-xs ${muted}`}>Fast, secure cross-border transfers</p>
         </div>
         <div className="flex items-center gap-1 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1">
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
@@ -331,14 +331,14 @@ export default function Pay() {
       )}
 
       {/* Best Time to Send — intelligent rate-aware badge */}
-      <BestTimeToSend rate={rate} ratesLoading={ratesLoading} darkMode={darkMode} taglish={taglish} />
+      <BestTimeToSend rate={rate} ratesLoading={ratesLoading} darkMode={darkMode} />
 
       {/* Send form */}
       <div className={`border rounded-2xl p-3 sm:p-4 mb-4 ${card}`}>
         <div className={`flex items-center gap-3 border rounded-xl px-4 py-3 mb-5 ${inputBg}`}>
           <Search className="w-4 h-4 opacity-40" />
           <input
-            placeholder={taglish ? "Hanapin ang tatanggap..." : "Search by name or bank..."}
+            placeholder="Search by name or bank..."
             className="flex-1 bg-transparent outline-none text-sm"
             value={recipientSearch}
             onChange={e => setRecipientSearch(e.target.value)}
@@ -374,7 +374,7 @@ export default function Pay() {
         })()}
 
         <div className="flex items-center gap-3 mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-          <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>{taglish ? "Kamakailan:" : "Recent:"}</span>
+          <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>Recent:</span>
           <div className="flex gap-2 flex-shrink-0">
             {recipientsLoading && [1,2,3,4].map(i => (
               <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
@@ -401,7 +401,7 @@ export default function Pay() {
             })}
             <button onClick={() => navigate("/dashboard/recipients")} className="flex flex-col items-center gap-1 flex-shrink-0">
               <div className="w-10 h-10 rounded-full border-2 border-dashed border-current opacity-30 flex items-center justify-center"><Plus className="w-3 h-3" /></div>
-              <span className={`text-[9px] ${muted}`}>{taglish ? "Dagdag" : "Add"}</span>
+              <span className={`text-[9px] ${muted}`}>Add</span>
             </button>
           </div>
         </div>
@@ -417,7 +417,7 @@ export default function Pay() {
 
         {/* Revolut-style big amount display */}
         <div className={`rounded-2xl p-3 sm:p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
-          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>{taglish ? "Ipadala (USD)" : "You Send (USD)"}</label>
+          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>You Send (USD)</label>
           <div
             className={`text-4xl sm:text-5xl font-black mb-1 tracking-tight cursor-text ${darkMode ? "text-white" : "text-[#1a2a4a]"} ${amountError ? "text-red-400" : ""}`}
             style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 48 }}
@@ -437,7 +437,7 @@ export default function Pay() {
             aria-label="Amount to send in USD"
           />
           <div className={`h-px my-3 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
-          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>{taglish ? "Matatanggap (PHP)" : "They Receive (PHP)"}</label>
+          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>They Receive (PHP)</label>
           <div className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             ₱{sendAmount ? parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "0.00"}
           </div>
@@ -481,7 +481,7 @@ export default function Pay() {
         <div className={`flex items-center justify-between py-2.5 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-3`}>
           <div className="flex items-center gap-2">
             <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
-            <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>{taglish ? "Live na Palitan" : "Live Exchange Rate"}</span>
+            <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>Live Exchange Rate</span>
           </div>
           <div className="text-right">
           <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>1 USD = {ratesLoading ? "..." : `${rate.toFixed(2)}`} PHP</span>
@@ -490,16 +490,16 @@ export default function Pay() {
         </div>
 
         <div className="mb-3">
-          <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} taglish={taglish} />
+          <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} />
         </div>
 
         {/* Note/memo field */}
         <div className="mb-3">
-          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1 block`}>{taglish ? "Mensahe (opsyonal)" : "Note (optional)"}</label>
+          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1 block`}>Note (optional)</label>
           <input
             value={transferNote}
             onChange={e => setTransferNote(e.target.value)}
-            placeholder={taglish ? "para sa pagkain, bayad ng kuryente..." : "for groceries, school fees..."}
+            placeholder="for groceries, school fees..."
             className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors ${inputBg}`}
           />
         </div>
@@ -507,7 +507,7 @@ export default function Pay() {
         <button onClick={handleSend} disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline || kycRequired}
           aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
           className={`w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary transition-all hover:opacity-90 active:scale-[0.98] ${sendAmount && parseFloat(sendAmount) > 0 && isOnline ? "bg-primary" : "bg-primary/40 cursor-not-allowed"}`}>
-          {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : taglish ? "Suriin at Magpadala →" : "Review & Send →"}
+          {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : "Review & Send →"}
         </button>
       </div>
 
@@ -527,10 +527,10 @@ export default function Pay() {
 
       {activeTab === "Transfer History" && (
         <div>
-          <h3 className="font-bold mb-3">{taglish ? "Mga Nakaraang Padala" : "Recent Transfers"}</h3>
+          <h3 className="font-bold mb-3">Recent Transfers</h3>
           {transfers.length === 0 ? (
             <div className={`border rounded-xl p-6 text-center ${card}`}>
-              <p className={`text-sm ${muted}`}>{taglish ? "Wala pang padala. Magpadala na!" : "No transfers yet. Send your first padala!"}</p>
+              <p className={`text-sm ${muted}`}>No transfers yet. Send your first padala!</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -558,7 +558,7 @@ export default function Pay() {
 
       {activeTab === "Bills & Auto-Padala" && (
         <div>
-          <h3 className="font-bold mb-3">{taglish ? "Naka-iskedyul na Bayad" : "Scheduled & Bills"}</h3>
+          <h3 className="font-bold mb-3">Scheduled & Bills</h3>
           {scheduled.length === 0 ? (
             <div className={`border rounded-xl p-6 text-center ${card}`}>
               <p className="text-2xl mb-2">🔄</p>

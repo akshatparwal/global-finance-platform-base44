@@ -16,7 +16,7 @@ const MOCK_GOAL = {
   members: ["You", "Nanay", "Ate Maria"],
 };
 
-export default function KatuwangWallet({ darkMode, taglish, onContribute }) {
+export default function KatuwangWallet({ darkMode, onContribute }) {
   const [goal] = useState(MOCK_GOAL);
   const [contributed, setContributed] = useState(false);
 
@@ -40,7 +40,7 @@ export default function KatuwangWallet({ darkMode, taglish, onContribute }) {
       <div className="relative z-10 flex items-start justify-between mb-3">
         <div>
           <p className="text-teal-300/70 text-[10px] uppercase tracking-widest font-bold mb-0.5">
-            {taglish ? "Katuwang Wallet" : "Family Savings Pod"}
+            Family Savings Pod
           </p>
           <div className="flex items-center gap-2">
             <span className="text-xl">{goal.emoji}</span>
@@ -71,7 +71,7 @@ export default function KatuwangWallet({ darkMode, taglish, onContribute }) {
           />
         </div>
         <p className="text-white/40 text-[10px] mt-1">
-          {taglish ? `₱${(remaining * 56.24).toLocaleString("en-PH", { maximumFractionDigits: 0 })} pa ang kulang` : `$${remaining.toLocaleString()} remaining · ${pct}% funded`}
+          ${remaining.toLocaleString()} remaining · {pct}% funded
         </p>
       </div>
 
@@ -90,7 +90,7 @@ export default function KatuwangWallet({ darkMode, taglish, onContribute }) {
           <Plus className="w-3 h-3" />
         </button>
         <span className="text-white/40 text-[10px] ml-1">
-          {taglish ? "Imbitahan ang pamilya" : "Invite family"}
+          Invite family
         </span>
       </div>
 
@@ -103,12 +103,12 @@ export default function KatuwangWallet({ darkMode, taglish, onContribute }) {
           {contributed ? (
             <>
               <CheckCircle className="w-4 h-4" />
-              {taglish ? "Salamat!" : "Contributed!"}
+              Contributed!
             </>
           ) : (
             <>
               <Plus className="w-4 h-4" />
-              {taglish ? "Mag-ambag" : "Contribute to Goal"}
+              Contribute to Goal
             </>
           )}
         </button>

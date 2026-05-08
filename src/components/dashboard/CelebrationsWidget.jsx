@@ -88,7 +88,7 @@ function getActiveEvent() {
   });
 }
 
-export default function CelebrationsWidget({ darkMode, taglish }) {
+export default function CelebrationsWidget({ darkMode }) {
   const [event, setEvent] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -135,7 +135,7 @@ export default function CelebrationsWidget({ darkMode, taglish }) {
             {event.name}
           </p>
           <p className={`text-xs font-semibold ${text} leading-snug`}>
-            {taglish ? event.tl : event.msg}
+            {event.msg}
           </p>
         </div>
 

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useYieldAccrual } from "@/hooks/useYieldAccrual";
 import TnalakPattern from "@/components/dashboard/TnalakPattern";
 
-export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, taglish }) {
+export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) {
   const displayBalance = w.currency_code === "USD" && usdcBalance !== null ? usdcBalance : w.balance;
   const isOnChain = w.currency_code === "USD" && usdcBalance !== null;
   const { yieldEarned, apyPct } = useYieldAccrual(
@@ -40,7 +40,7 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate, ta
         </div>
       </div>
       <div>
-        <div className="text-white/40 text-[9px] uppercase tracking-wider mb-0.5">{taglish ? "Balanse" : "Balance"}</div>
+        <div className="text-white/40 text-[9px] uppercase tracking-wider mb-0.5">Balance</div>
         <div className="text-white font-black text-lg leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           {w.currency_code === "USD"
             ? `$${displayBalance.toFixed(2)}`

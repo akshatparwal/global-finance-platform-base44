@@ -23,7 +23,7 @@ import { useYieldAccrual } from "@/hooks/useYieldAccrual";
 
 
 export default function Dashboard() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode } = useOutletContext() || {};
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [wallets, setWallets] = useState([]);
@@ -113,7 +113,6 @@ export default function Dashboard() {
 
   const greeting = (() => {
     const h = new Date().getHours();
-    if (taglish) return h < 12 ? "Magandang umaga" : h < 18 ? "Magandang hapon" : "Magandang gabi";
     return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   })();
 
@@ -135,7 +134,7 @@ export default function Dashboard() {
 
   const QUICK_SEND = [
     ...recipients.map(r => ({ emoji: r.emoji || "👤", label: r.nickname || r.full_name, id: r.id })),
-    { emoji: "+", label: taglish ? "Bagong Padala" : "New Send", isAdd: true },
+    { emoji: "+", label: "New Send", isAdd: true },
   ];
 
   const handleOnboardingComplete = async () => {
@@ -181,7 +180,7 @@ export default function Dashboard() {
       </div>
       <div ref={containerRef} className="space-y-4 overflow-y-auto">
       {/* Celebrations Widget — Philippine cultural milestones */}
-      <CelebrationsWidget darkMode={darkMode} taglish={taglish} />
+      <CelebrationsWidget darkMode={darkMode} />
 
       {/* Dynamic holiday banner */}
       {(() => {
@@ -193,7 +192,7 @@ export default function Dashboard() {
               <span className="text-lg flex-shrink-0">{holiday.emoji}</span>
               <div className="min-w-0">
                 <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>UPCOMING: </span>
-                <span className={`text-sm font-semibold ${textMain}`}>{taglish ? holiday.tl : holiday.en}</span>
+                <span className={`text-sm font-semibold ${textMain}`}>{holiday.en}</span>
                 <span className={`text-sm ${muted} hidden sm:inline`}> · {holiday.diff === 0 ? "Today!" : holiday.diff === 1 ? "Tomorrow" : `In ${holiday.diff} days`}</span>
               </div>
             </div>
@@ -221,7 +220,7 @@ export default function Dashboard() {
       <div ref={netWorthRef} className={`kf-hero-card relative rounded-2xl overflow-hidden ${loading ? "hidden" : ""}`} style={{ background: "linear-gradient(135deg, #1a2a4a 0%, #3d2e00 50%, #8a6a00 100%)" }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(201,160,80,0.5) 0%, transparent 60%)" }} />
         <div className="relative z-10 px-4 pt-4 pb-5 sm:px-8 sm:pt-8 sm:pb-8">
-          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">{taglish ? "Kabuuang Halaga" : "Total Net Worth"}</p>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">Total Net Worth</p>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-2xl sm:text-5xl font-black text-white mb-0.5 break-all leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -255,7 +254,7 @@ export default function Dashboard() {
             <p className="text-white/60 text-xs">{greeting}, <span className="font-bold text-white">{user === null ? "..." : friendlyName}</span> 👋</p>
             <button onClick={() => navigate("/dashboard/pay")}
               className="bg-primary text-secondary text-[10px] font-black px-3 py-1.5 rounded-full active:scale-95 transition-transform">
-              {taglish ? "MAGPADALA" : "SEND"} →
+              SEND →
             </button>
           </div>
         </div>
@@ -269,14 +268,14 @@ export default function Dashboard() {
       {/* Wallets */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Pitaka" : "Wallets"}</h2>
+          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Wallets</h2>
           <div className="flex items-center gap-2">
             <button onClick={() => setShowFundWallet(true)} className="flex items-center gap-1 text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
-              <ArrowDownToLine className="w-3 h-3" />{taglish ? "Mag-deposit" : "Add Funds"}
+              <ArrowDownToLine className="w-3 h-3" />Add Funds
             </button>
             <span className={`text-[10px] ${darkMode ? "text-white/20" : "text-black/20"}`}>·</span>
             <button onClick={() => navigate("/dashboard/pay")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">
-              {taglish ? "Padala →" : "Send →"}
+              Send →
             </button>
           </div>
         </div>
@@ -296,7 +295,6 @@ export default function Dashboard() {
               usdcBalance={usdcBalance}
               walletAddress={walletAddress}
               liveRate={liveRate}
-              taglish={taglish}
             />
           )) : null}
         </div>
@@ -304,7 +302,7 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <h2 className={`font-bold text-sm mb-3 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mabilis na Padala" : "Quick Send"}</h2>
+        <h2 className={`font-bold text-sm mb-3 ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Quick Send</h2>
         <div className="relative">
           <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
             {QUICK_SEND.map((p, i) => {
@@ -317,7 +315,7 @@ export default function Dashboard() {
                     {p.isAdd ? <Plus className="w-5 h-5 opacity-40" /> : p.emoji}
                   </div>
                   <span className={`text-[10px] font-semibold ${muted} max-w-[52px] truncate text-center`}>{p.label}</span>
-                  {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">{taglish ? "PADALA" : "SEND"}</span>}
+                  {!p.isAdd && <span className="text-[9px] text-primary font-bold uppercase">SEND</span>}
                 </button>
               );
             })}
@@ -337,7 +335,7 @@ export default function Dashboard() {
       {/* Activity Feed */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{taglish ? "Mga Aktibidad" : "Activity"}</h2>
+          <h2 className={`font-bold text-sm ${textMain}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Activity</h2>
           <button onClick={() => navigate("/dashboard/transactions")} className="text-primary text-[10px] font-bold uppercase tracking-wider hover:opacity-70">VIEW ALL</button>
         </div>
 

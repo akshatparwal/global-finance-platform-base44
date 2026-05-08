@@ -44,7 +44,7 @@ function buildMonthlySpendData(transfers) {
 const TABS = ["Activity", "Goals", "Analytics"];
 
 export default function Insights() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("Activity");
   const [goals, setGoals] = useState([]);
   const [goalsLoading, setGoalsLoading] = useState(true);
@@ -364,7 +364,7 @@ export default function Insights() {
           })()}
 
           {/* Katuwang Wallet — Shared Family Savings Pod */}
-          <KatuwangWallet darkMode={darkMode} taglish={taglish} onContribute={() => setShowCreateGoal(true)} />
+          <KatuwangWallet darkMode={darkMode} onContribute={() => setShowCreateGoal(true)} />
 
           {/* Live yield card — driven by on-chain USDC balance */}
           <YieldCard

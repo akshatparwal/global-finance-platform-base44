@@ -53,7 +53,7 @@ function BottomSheet({ open, onClose, title, children, darkMode }) {
 }
 
 export default function Cards() {
-  const { darkMode, taglish } = useOutletContext() || {};
+  const { darkMode } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("My Card");
   const [cardData, setCardData] = useState(null);      // persisted VirtualCard entity (CVV is hashed)
   const [plainCvv, setPlainCvv] = useState(null);      // plaintext CVV — held in memory only, never re-fetched
@@ -191,9 +191,9 @@ export default function Cards() {
     <div className="max-w-2xl mx-auto">
       <div className="mb-4">
         <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          {taglish ? "Mga Kard" : "Cards"}
+          Cards
         </h1>
-        <p className={`text-xs ${muted}`}>{taglish ? "Pamahalaan ang iyong mga panandaliang susi" : "Manage your financial keys"}</p>
+        <p className={`text-xs ${muted}`}>Manage your financial keys</p>
       </div>
 
       {/* Success toast */}
@@ -340,7 +340,7 @@ export default function Cards() {
         <CardIcon className="w-4 h-4 text-primary" />
         {cardData?.physical_requested
           ? `Physical Card — ${cardData.physical_status === "processing" ? "Being Prepared 📦" : "Shipped! 🚀"}`
-          : taglish ? "Mag-order ng Pisikal na Kard" : "Order Physical Card"}
+          : "Order Physical Card"}
       </button>
 
       {/* Tabs */}
@@ -382,10 +382,10 @@ export default function Cards() {
           <div className={`border rounded-2xl p-5 ${card}`}>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-primary text-lg">👨‍👩‍👧</span>
-              <h3 className="font-bold">{taglish ? "Mga Kard ng Pamilya" : "Family Cards"}</h3>
+              <h3 className="font-bold">Family Cards</h3>
               <button onClick={() => { setFamilyNameInput(""); setSheet({ type: "addFamily" }); }} className="ml-auto text-primary text-xs font-bold hover:underline py-1 px-2">+ ADD NEW</button>
             </div>
-            <p className={`text-xs ${muted}`}>{taglish ? "Magdagdag ng miyembro ng pamilya para sa shared na kard." : "Add family members to share a spending card."}</p>
+            <p className={`text-xs ${muted}`}>Add family members to share a spending card.</p>
           </div>
         </div>
       )}
@@ -452,7 +452,7 @@ export default function Cards() {
 
       {activeTab === "Controls" && (
         <div className={`border rounded-2xl p-5 ${card}`}>
-          <h3 className={`font-bold mb-4 ${textMain}`}>{taglish ? "Kontrol ng Kard" : "Card Controls"}</h3>
+          <h3 className={`font-bold mb-4 ${textMain}`}>Card Controls</h3>
           {!issued && (
             <div className={`text-center py-6 ${muted} text-sm`}>Issue a virtual card first to manage controls.</div>
           )}

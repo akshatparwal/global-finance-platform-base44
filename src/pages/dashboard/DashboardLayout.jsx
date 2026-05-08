@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Zap, Globe, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, TrendingUp, Send, CreditCard, User, Bell, Sun, Moon, Shield, Menu, X, MessageCircle, Globe, ArrowLeft } from "lucide-react";
 import BottomNav from "@/components/dashboard/BottomNav";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -48,10 +48,6 @@ export default function DashboardLayout() {
       return stored === null ? true : stored !== "false";
     } catch { return true; }
   });
-  const [taglish, setTaglish] = useState(() => {
-    try { return localStorage.getItem("kf_taglish") === "true"; } catch { return false; }
-  });
-
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [whatsNewDone, setWhatsNewDone] = useState(() => {
@@ -72,7 +68,6 @@ export default function DashboardLayout() {
 
   // Persist preferences
   useEffect(() => { try { localStorage.setItem("kf_dark_mode", darkMode); } catch {} }, [darkMode]);
-  useEffect(() => { try { localStorage.setItem("kf_taglish", taglish); } catch {} }, [taglish]);
 
 
   // Close dropdown when clicking outside
@@ -168,18 +163,9 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        {/* Bottom toggles */}
-        <div className="p-4 space-y-2.5 border-t border-white/8">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5">
-              <Zap className="w-3 h-3 text-primary/60" />
-              <span className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Taglish</span>
-            </div>
-            <button onClick={() => setTaglish(!taglish)} className={`w-9 h-5 rounded-full transition-all duration-200 ${taglish ? "bg-primary" : "bg-white/15"} relative`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all duration-200 ${taglish ? "left-4" : "left-0.5"}`} />
-            </button>
-          </div>
-          <div className="flex items-center gap-1.5 px-1 pt-1">
+        {/* Bottom */}
+        <div className="p-4 border-t border-white/8">
+          <div className="flex items-center gap-1.5 px-1">
             <Shield className="w-3 h-3 text-emerald-400/70" />
             <span className="text-white/25 text-[9px] uppercase tracking-widest">Bank-Grade Secure</span>
           </div>
@@ -269,7 +255,7 @@ export default function DashboardLayout() {
                 }
               }}
             >
-              <Outlet context={{ darkMode: darkMode === true, taglish: taglish === true, setTaglish }} />
+              <Outlet context={{ darkMode: darkMode === true }} />
             </motion.div>
           </AnimatePresence>
         </main>

@@ -2,7 +2,7 @@
  * BestTimeToSend — Intelligent "Highly Optimal" badge on Pay page.
  * Compares current rate to a rolling average and shows a tip.
  */
-export default function BestTimeToSend({ rate, ratesLoading, darkMode, taglish }) {
+export default function BestTimeToSend({ rate, ratesLoading, darkMode }) {
   // Rolling average from recent rate history
   const RATE_AVG = 56.05;
   const diff = rate ? rate - RATE_AVG : 0;
@@ -23,21 +23,13 @@ export default function BestTimeToSend({ rate, ratesLoading, darkMode, taglish }
           {isOptimal ? "🔥" : isGood ? "🕐" : "💡"}
         </span>
         <div className="min-w-0">
-          <p className={`text-xs font-bold ${text}`}>
-            {taglish ? "Pinakamabuting Oras" : "Best Time to Send"}
-          </p>
+          <p className={`text-xs font-bold ${text}`}>Best Time to Send</p>
           <p className={`text-[10px] ${muted}`}>
             {isOptimal
-              ? taglish
-                ? `₱${diff.toFixed(2)} higit sa average — Magpadala na!`
-                : `₱${diff.toFixed(2)} above avg — Send now for max value!`
+              ? `₱${diff.toFixed(2)} above avg — Send now for max value!`
               : isGood
-                ? taglish
-                  ? "Magandang rate ngayon"
-                  : "Good rate right now"
-                : taglish
-                  ? "Hintayin ang mas mabuting rate"
-                  : `₱${Math.abs(diff).toFixed(2)} below avg — rate may improve`}
+                ? "Good rate right now"
+                : `₱${Math.abs(diff).toFixed(2)} below avg — rate may improve`}
           </p>
         </div>
       </div>
