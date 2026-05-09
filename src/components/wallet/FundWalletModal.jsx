@@ -1,13 +1,176 @@
 /**
  * FundWalletModal — Add Funds sheet.
- * Methods: ACH, Wire, Instant (simulated), Crypto onramp via Privy.
+ * Methods: PHP (GCash/Maya/PH bank), ACH, Wire, Instant (debit card), Crypto onramp via Privy.
  */
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Copy, Check, Building2, Zap, ArrowDownToLine, CheckCircle, Wallet } from "lucide-react";
+import { X, Copy, Check, Building2, Zap, ArrowDownToLine, CheckCircle, Wallet, ArrowRight, ChevronRight } from "lucide-react";
 import { processDeposit } from "@/functions/processDeposit";
 import { haptic } from "@/utils/haptic";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
+import { useLiveRates } from "@/hooks/useLiveRates";
+
+const PHP_SOURCES = [
+  { id: "gcash", label: "GCash", sub: "Mobile wallet · most popular · ~2 min", color: "bg-blue-500/20 text-blue-600" },
+  { id: "maya",  label: "Maya",  sub: "Mobile wallet · ~2 min",               color: "bg-emerald-500/20 text-emerald-600" },
+  { id: "phbank",label: "PH Bank", sub: "BPI, BDO, Metrobank, RCBC, UnionBank · ~5 min via InstaPay", color: "bg-[#0D1F3C]/10 text-[#0D1F3C]" },
+];
+
+function PhpFundingFlow({ darkMode, onClose }) {
+  const [phpStep, setPhpStep] = useState("source"); // source | amount | review | success
+  const [source, setSource] = useState(null);
+  const [phpAmount, setPhpAmount] = useState("");
+  const { rates } = useLiveRates();
+  const rate = rates?.USDPHP || 56.24;
+  const spread = 0.005;
+
+  const usdReceived = useMemo(() => {
+    const php = parseFloat(phpAmount);
+    if (!php || isNaN(php)) return 0;
+    return (php / rate) * (1 - spread);
+  }, [phpAmount, rate, spread]);
+
+  const spreadFee = useMemo(() => {
+    const php = parseFloat(phpAmount);
+    if (!php || isNaN(php)) return 0;
+    return (php / rate) * spread;
+  }, [phpAmount, rate, spread]);
+
+  const text = darkMode ? "text-white" : "text-[#0D1F3C]";
+  const muted = darkMode ? "text-white/50" : "text-[#0D1F3C]/50";
+  const inputCls = `w-full border rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition-colors ${darkMode ? "bg-white/5 border-white/10 text-white" : "bg-[#F5EFE3] border-black/10 text-[#0D1F3C]"}`;
+
+  if (phpStep === "success") {
+    const ref = "KF-CI-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+    return (
+      <div className="text-center py-4">
+        <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-emerald-500" />
+        </div>
+        <h3 className={`font-extrabold text-xl mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>On its way.</h3>
+        <p className="text-emerald-500 font-black text-2xl mb-1">${usdReceived.toFixed(2)}</p>
+        <p className={`text-sm ${muted} mb-4`}>will land in your wallet in about 5 minutes</p>
+        <div className={`rounded-xl p-4 mb-5 text-left space-y-2 ${darkMode ? "bg-white/5" : "bg-[#F5EFE3]"}`}>
+          {[
+            ["Amount sent", `₱${parseFloat(phpAmount).toLocaleString("en-PH")}`],
+            ["Wallet receives", `$${usdReceived.toFixed(2)}`],
+            ["Reference", ref],
+            ["Status", "Pending"],
+          ].map(([k, v]) => (
+            <div key={k} className="flex justify-between text-sm">
+              <span className={muted}>{k}</span>
+              <span className={`font-semibold ${text}`}>{v}</span>
+            </div>
+          ))}
+        </div>
+        <p className={`text-xs ${muted} mb-5`}>We'll notify you when funds clear. You can send once it settles.</p>
+        <button onClick={onClose} className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90">Done</button>
+      </div>
+    );
+  }
+
+  if (phpStep === "review") {
+    return (
+      <div>
+        <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>One last look.</h3>
+        <p className={`text-sm ${muted} mb-5`}>Tap confirm and we'll lock your rate.</p>
+        <div className={`rounded-2xl border p-4 mb-5 ${darkMode ? "bg-white/5 border-white/10" : "bg-white border-black/8"}`}>
+          <p className={`text-xs font-bold uppercase tracking-wider ${muted} mb-3`}>Your wallet receives</p>
+          <p className="font-black text-3xl text-primary mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>${usdReceived.toFixed(2)}</p>
+          <p className={`text-sm ${muted} mb-4`}>from ₱{parseFloat(phpAmount || 0).toLocaleString("en-PH")}</p>
+          {[
+            ["Source", source?.toUpperCase()],
+            ["Exchange rate", `1 USD = ₱${rate.toFixed(2)}`],
+            ["FX spread", `0.5% ($${spreadFee.toFixed(2)})`],
+            ["KinnectFi fee", "$0.00"],
+            ["Estimated arrival", "~5 minutes"],
+          ].map(([k, v]) => (
+            <div key={k} className={`flex justify-between py-2.5 border-t text-sm ${darkMode ? "border-white/5" : "border-black/5"}`}>
+              <span className={muted}>{k}</span>
+              <span className={`font-semibold ${text}`}>{v}</span>
+            </div>
+          ))}
+        </div>
+        <p className={`text-xs ${muted} mb-4`}>By confirming, you authorize KinnectFi to debit ₱{parseFloat(phpAmount || 0).toLocaleString("en-PH")} from your PH account at the rate above.</p>
+        <button onClick={() => setPhpStep("success")} className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 mb-3">
+          Lock rate & confirm →
+        </button>
+        <button onClick={() => setPhpStep("amount")} className={`w-full font-semibold py-3 rounded-xl border ${darkMode ? "border-white/10 text-white/60" : "border-black/10 text-[#0D1F3C]/50"}`}>
+          Back
+        </button>
+      </div>
+    );
+  }
+
+  if (phpStep === "amount") {
+    return (
+      <div>
+        <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>How much?</h3>
+        <p className={`text-sm ${muted} mb-5`}>Type in pesos — we'll convert at the live mid-market rate.</p>
+        <div className={`rounded-2xl border p-5 mb-4 ${darkMode ? "bg-white/5 border-white/10" : "bg-white border-black/8"}`}>
+          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-2 block`}>You send (PHP)</label>
+          <div className="flex items-baseline gap-2 mb-4">
+            <span className={`text-3xl font-light ${muted}`}>₱</span>
+            <input
+              value={phpAmount}
+              onChange={e => setPhpAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+              inputMode="decimal"
+              placeholder="0"
+              autoFocus
+              className="flex-1 text-4xl font-black tracking-tight bg-transparent outline-none text-primary min-w-0"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            />
+          </div>
+          <div className={`border-t pt-4 flex items-center justify-between ${darkMode ? "border-white/5" : "border-black/5"}`}>
+            <div>
+              <p className={`text-[10px] uppercase tracking-wider font-bold ${muted} mb-0.5`}>Wallet receives (USD)</p>
+              <p className={`font-black text-xl ${text}`}>${usdReceived.toFixed(2)}</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-primary" />
+          </div>
+          <div className={`mt-3 pt-3 border-t flex justify-between text-xs ${darkMode ? "border-white/5" : "border-black/5"}`}>
+            <span className={muted}>Rate: <strong className={text}>₱{rate.toFixed(2)}/USD</strong></span>
+            <span className={muted}>Spread: <strong className={text}>0.5%</strong></span>
+            <span className={muted}>Fee: <strong className="text-emerald-500">$0.00</strong></span>
+          </div>
+        </div>
+        <button
+          disabled={!phpAmount || parseFloat(phpAmount) <= 0}
+          onClick={() => setPhpStep("review")}
+          className="w-full bg-primary text-white font-bold py-4 rounded-xl hover:opacity-90 disabled:opacity-30"
+        >
+          Review →
+        </button>
+      </div>
+    );
+  }
+
+  // Source picker
+  return (
+    <div>
+      <h3 className={`font-extrabold text-lg mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Where are the pesos coming from?</h3>
+      <p className={`text-sm ${muted} mb-5`}>Send PHP from your Philippine account — we convert and credit your USD wallet.</p>
+      <div className="space-y-2 mb-5">
+        {PHP_SOURCES.map(s => (
+          <button key={s.id} onClick={() => { setSource(s.id); setPhpStep("amount"); }}
+            className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all ${darkMode ? "border-white/10 hover:border-primary/40" : "border-black/10 hover:border-primary/40"} hover:bg-primary/5 active:scale-[0.99]`}>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 ${s.color}`}>
+              {s.label[0]}
+            </div>
+            <div className="flex-1">
+              <p className={`font-bold text-sm ${text}`}>{s.label}</p>
+              <p className={`text-xs ${muted}`}>{s.sub}</p>
+            </div>
+            <ChevronRight className={`w-4 h-4 ${muted} flex-shrink-0`} />
+          </button>
+        ))}
+      </div>
+      <p className={`text-xs ${muted} text-center`}>You'll send pesos from your PH account; we convert at the live mid-market rate and credit your USD wallet — no remittance fee.</p>
+    </div>
+  );
+}
+
+
 
 const METHODS = [
   { id: "php",     label: "From the Philippines (PHP)", sub: "GCash, Maya, or any PH bank · ~5 min · 0.5% spread", icon: ArrowDownToLine, badge: "NEW" },
@@ -90,7 +253,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                 {m.badge && (
                   <span className={`text-[9px] font-black px-2 py-1 rounded-full flex-shrink-0 ${
                     m.badge === "INSTANT" ? "bg-emerald-500/20 text-emerald-500" :
-                    m.badge === "NEW"     ? "bg-blue-500/20 text-blue-400" :
+                    m.badge === "NEW"     ? "bg-primary/15 text-primary" :
                     "bg-primary/20 text-primary"
                   }`}>{m.badge}</span>
                 )}
@@ -102,6 +265,12 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
           </div>
 
           <AnimatePresence mode="wait">
+            {method === "php" && (
+              <motion.div key="php" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <PhpFundingFlow darkMode={darkMode} onClose={onClose} />
+              </motion.div>
+            )}
+
             {(method === "ach" || method === "wire") && (
               <motion.div key={method} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <div className={`rounded-2xl border p-4 mb-4 ${card}`}>
@@ -146,7 +315,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                     <p className={`font-extrabold text-xl mb-1 ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Deposit Successful!</p>
                     <p className="text-emerald-400 font-black text-2xl mb-1">${parseFloat(instantAmount || 0).toFixed(2)}</p>
                     <p className={`text-sm ${muted} mb-5`}>Added to your USD wallet · Available now</p>
-                    <button onClick={onClose} className="bg-primary text-secondary font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90">Done ✓</button>
+                    <button onClick={onClose} className="bg-primary text-white font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90">Done ✓</button>
                   </motion.div>
                 ) : (
                   <div className={`rounded-2xl border p-5 ${card}`}>
@@ -182,7 +351,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                           setInstantSuccess(true);
                         }
                       }}
-                      className="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
+                      className="w-full bg-primary text-white font-black py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
                     >
                       {depositing
                         ? <><span className="w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />Processing...</>
