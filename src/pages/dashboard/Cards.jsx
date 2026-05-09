@@ -229,7 +229,7 @@ export default function Cards() {
               </div>
               <div className="flex items-center gap-2">
                 <Wifi className={`w-3.5 h-3.5 ${cardData?.contactless_enabled ? "text-white/60" : "text-white/20"}`} />
-                <span className="text-white/40 text-[9px] font-bold tracking-widest">KAYAH</span>
+                <span className="text-white/40 text-[9px] font-bold tracking-widest">KINNECTFI</span>
               </div>
             </div>
 
@@ -283,7 +283,7 @@ export default function Cards() {
         <button
           onClick={handleIssue}
           disabled={issuing}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-secondary font-bold py-4 rounded-xl mb-3 hover:opacity-90 disabled:opacity-70 transition-all active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-4 rounded-xl mb-3 hover:opacity-90 disabled:opacity-70 transition-all active:scale-[0.98]"
         >
           {issuing ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Issuing your card...</>
@@ -584,7 +584,7 @@ export default function Cards() {
               <button
                 onClick={handlePhysicalOrder}
                 disabled={!physAddr.address || !physAddr.city || !physAddr.zip || saving}
-                className="w-full bg-primary text-secondary font-bold py-4 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
+                className="w-full bg-primary text-white font-bold py-4 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Confirm Order →"}
               </button>
@@ -601,7 +601,7 @@ export default function Cards() {
           />
           <button disabled={pinInput.length !== 4}
             onClick={() => { closeSheet(); showSuccess("PIN changed successfully!"); }}
-            className="w-full bg-primary text-secondary font-bold py-4 rounded-xl disabled:opacity-40">
+            className="w-full bg-primary text-white font-bold py-4 rounded-xl disabled:opacity-40">
             Save New PIN
           </button>
         </BottomSheet>
@@ -614,7 +614,7 @@ export default function Cards() {
               className="flex-1 bg-transparent outline-none text-lg font-bold" />
           </div>
           <button disabled={!limitInput || isNaN(limitInput)} onClick={handleSpendingLimitSave}
-            className="w-full bg-primary text-secondary font-bold py-4 rounded-xl disabled:opacity-40">
+            className="w-full bg-primary text-white font-bold py-4 rounded-xl disabled:opacity-40">
             Update Limit
           </button>
         </BottomSheet>
@@ -636,7 +636,7 @@ export default function Cards() {
           />
           <button disabled={!familyNameInput.trim()}
             onClick={() => { closeSheet(); showSuccess(`Family card invited for ${familyNameInput.trim()}!`); }}
-            className="w-full bg-primary text-secondary font-bold py-4 rounded-xl disabled:opacity-40">
+            className="w-full bg-primary text-white font-bold py-4 rounded-xl disabled:opacity-40">
             Send Invitation →
           </button>
         </BottomSheet>

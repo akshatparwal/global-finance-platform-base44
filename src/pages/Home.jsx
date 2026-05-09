@@ -68,10 +68,10 @@ export default function Home() {
               <img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain brightness-0 invert" />
             </div>
             <div>
-            <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Ka<span className="text-[#F4C94E]">yah</span>
-            </div>
-            <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest">Cross-Border Bank</div>
+              <div className="font-extrabold text-white text-sm sm:text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                kinnect<span className="text-[#F4C94E]">fi</span>
+              </div>
+              <div className="text-white/50 text-[7px] sm:text-[8px] uppercase tracking-widest">Financial home for Filipinos</div>
             </div>
           </div>
 
@@ -87,15 +87,15 @@ export default function Home() {
               >
                 {taglish ? (
                   <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Ang pera mo,<br />
-                    <span className="text-[#F4C94E]">konektado</span><br />
-                    sa puso mo.
+                    Ang financial<br />
+                    home ng mga<br />
+                    <span className="text-[#F4C94E]">Pilipino.</span>
                   </h1>
                 ) : (
                   <h1 className="text-3xl sm:text-5xl lg:text-[3.75rem] font-black text-white leading-[1.18] mb-4 sm:mb-5 tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    Your money,<br />
-                    <span className="text-[#F4C94E]">connected</span><br />
-                    to your heart.
+                    The financial<br />
+                    home for<br />
+                    <span className="text-[#F4C94E]">Filipinos abroad.</span>
                   </h1>
                 )}
                 {/* Live rate badge in hero */}
@@ -107,8 +107,8 @@ export default function Home() {
                 </div>
                 <p className="text-white/75 text-sm sm:text-base mb-5 sm:mb-7 max-w-sm leading-relaxed hidden sm:block">
                   {taglish
-                    ? "Ipadala ang pera sa pamilya mo — mabilis, ligtas, at walang bayad."
-                    : "Send money home instantly, securely, and with zero hidden fees."}
+                    ? "Libreng padala. Tunay na bangko. Para sa pamilya mo."
+                    : "Free remittance. Real banking. Built for the way you support family."}
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -190,7 +190,7 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
                 className="text-center mb-5 sm:mb-8"
               >
-                <h2 className="text-lg sm:text-[1.45rem] font-black mb-2 leading-snug" style={{ color: panelText, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <h2 className="text-base sm:text-lg font-black mb-2 leading-snug" style={{ color: panelText, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {txt.title}
                 </h2>
                 <p className="text-xs sm:text-sm leading-relaxed max-w-xs mx-auto hidden sm:block" style={{ color: panelMuted }}>
@@ -201,17 +201,18 @@ export default function Home() {
 
             <Link
               to="/auth"
-              aria-label={taglish ? "Magsimula na sa Kayah" : "Get started with Kayah — create your free account"}
-              className="flex items-center justify-center gap-2 font-bold rounded-xl py-3.5 sm:py-4 px-6 text-sm sm:text-base mb-2.5 sm:mb-3 hover:opacity-90 transition-opacity"
-              style={{ background: "#F4C94E", color: "#0B0E1A" }}
+              aria-label={taglish ? "Magsimula na sa KinnectFi" : "Get started with KinnectFi — create your free account"}
+              className="flex items-center justify-center font-bold rounded-xl py-3.5 sm:py-4 px-6 text-sm sm:text-base mb-3 hover:opacity-90 transition-opacity"
+              style={{ background: "#E8512A", color: "#FFFFFF" }}
             >
-              {taglish ? "Magsimula Na →" : "Get Started →"}
+              {taglish ? "Magsimula Na" : "Get started"}
             </Link>
-            <p className="text-center text-[11px] mb-4 sm:mb-7" style={{ color: panelMuted }}>
-              <Link to="/auth" aria-label="Sign in to your existing Kayah account" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
-                {taglish ? "May account ka na? Maligayang pagbabalik!" : "Already have an account? Welcome back!"}
-              </Link>
-            </p>
+            <Link to="/auth"
+              className="flex items-center justify-center font-semibold text-sm py-2 mb-4 sm:mb-6 hover:opacity-80 transition-opacity"
+              style={{ color: "#E8512A" }}
+            >
+              {taglish ? "May account ka na? Mag-sign in" : "I already have an account"}
+            </Link>
 
             <div className="flex items-center justify-center gap-2">
               {HERO_SLIDES.map((_, i) => (
@@ -248,7 +249,7 @@ export default function Home() {
         <div className="text-center mb-8 sm:mb-12">
           <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#F4C94E" }}>Why Kayah</p>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight mb-3" style={{ color: "#0D1F3C", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Built for the OFW. <span style={{ color: "#F4C94E" }}>Zero compromises.</span>
+            Built for the OFW. <span style={{ color: "#E8512A" }}>Zero compromises.</span>
           </h2>
 
           <p className="text-sm sm:text-base max-w-md mx-auto" style={{ color: "rgba(13,31,60,0.55)" }}>
@@ -266,7 +267,7 @@ export default function Home() {
               { emoji: "📈", title: "Live Exchange Rate", desc: `Today's rate: ₱${liveRate}/USD — the real mid-market rate, always.`, badge: "LIVE" },
               { emoji: "🔔", title: "Rate Alerts", desc: "Set your target rate and get notified the moment it hits. Never miss a peak.", badge: "SMART" },
               { emoji: "👨‍👩‍👧", title: "Family Wallets", desc: "Give your loved ones in the Philippines a linked wallet. Support them directly.", badge: "FAMILY" },
-              { emoji: "🎁", title: "Kayah Points", desc: "Earn points on every padala. Redeem for fee credits, cash back, or donations.", badge: "REWARDS" },
+              { emoji: "🎁", title: "KinnectFi Points", desc: "Earn points on every padala. Redeem for fee credits, cash back, or donations.", badge: "REWARDS" },
             ].map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}
                 className="rounded-2xl p-5 border" style={{ background: "#FFFFFF", borderColor: "rgba(13,31,60,0.08)" }}>
@@ -286,7 +287,7 @@ export default function Home() {
           <div className="px-5 py-8 sm:px-12 sm:py-10">
             <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "rgba(201,123,34,0.7)" }}>How it works</p>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white mb-6 sm:mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Send padala in <span style={{ color: "#F4C94E" }}>3 simple steps</span>
+              Send padala in <span style={{ color: "#E8512A" }}>3 simple steps</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {[
@@ -306,8 +307,8 @@ export default function Home() {
             <div className="mt-8 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
               <Link to="/auth"
                 className="inline-flex items-center gap-2 font-bold rounded-xl py-3.5 px-7 text-sm hover:opacity-90 transition-opacity"
-                style={{ background: "#F4C94E", color: "#0B0E1A" }}>
-                {taglish ? "Magsimula Na →" : "Create Free Account →"}
+                style={{ background: "#E8512A", color: "#FFFFFF" }}>
+                {taglish ? "Magsimula Na" : "Create Free Account"}
               </Link>
               <Link to="/auth" className="inline-flex items-center gap-2 ml-4 text-sm font-semibold hover:opacity-80 transition-opacity" style={{ color: "rgba(255,255,255,0.5)" }}>
                 Learn more <ChevronRight className="w-3.5 h-3.5" />

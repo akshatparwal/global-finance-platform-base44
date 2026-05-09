@@ -208,14 +208,33 @@ export default function Dashboard() {
       )}
 
       {/* Greeting */}
+      {/* Greeting header — matches design spec */}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-[#0D1F3C]/40 text-sm">{greeting}, <span className="text-[#0D1F3C]/80 font-medium">{user === null ? "..." : friendlyName}</span></p>
-        {!ratesLoading && (
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <p className="text-[#0D1F3C]/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
+        <div>
+          <p className="text-[#0D1F3C]/35 text-[10px] font-bold uppercase tracking-widest mb-0.5">
+            {(() => {
+              const h = new Date().getHours();
+              return h < 12 ? "Magandang Umaga" : h < 18 ? "Magandang Hapon" : "Magandang Gabi";
+            })()}
+          </p>
+          <p className="text-[#0D1F3C] text-2xl font-black leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {user === null ? "..." : friendlyName}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!ratesLoading && (
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-[#0D1F3C]/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
+            </div>
+          )}
+          {/* User initials avatar */}
+          <div className="w-9 h-9 rounded-full bg-[#0D1F3C] flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-xs font-black">
+              {user ? (user.full_name || user.email || "U").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() : ""}
+            </span>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Wallet Slider */}

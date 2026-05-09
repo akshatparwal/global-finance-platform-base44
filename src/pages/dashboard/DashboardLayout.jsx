@@ -123,7 +123,7 @@ export default function DashboardLayout() {
             <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center flex-shrink-0"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5 brightness-0 invert" /></div>
             <div>
               <div className="font-bold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>kinnect<span className="text-primary">fi</span></div>
-              <div className="text-white/35 text-[8px] uppercase tracking-widest mt-0.5">Cross-Border Bank</div>
+              <div className="text-white/35 text-[8px] uppercase tracking-widest mt-0.5">Financial Home for Filipinos</div>
             </div>
           </Link>
         </div>
