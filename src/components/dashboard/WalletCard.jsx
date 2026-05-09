@@ -21,51 +21,34 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) 
 
   return (
     <div
-      className="kf-hero-card rounded-2xl p-6 relative overflow-hidden w-full"
-      style={{
-        background: "rgba(20,24,41,0.9)",
-        boxShadow: `0 0 60px ${glowColor}, 0 0 0 1px rgba(244,201,78,0.10) inset`,
-      }}
+      className="kf-hero-card rounded-2xl p-5 relative overflow-hidden w-full"
     >
-      {/* Radial glow behind balance */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse 70% 60% at 50% 70%, rgba(244,201,78,0.14) 0%, transparent 70%)`,
-        }}
-      />
-
       {/* Header */}
-      <div className="relative z-10 flex justify-between items-start mb-6">
+      <div className="flex justify-between items-start mb-5">
         <div>
-          <p className="kf-label text-white/40 mb-0.5">{w.currency_code} Wallet</p>
-          <p className="text-white/70 text-sm font-medium">{w.flag} {w.currency_name}</p>
+          <p className="text-white/40 text-[10px] font-semibold uppercase tracking-widest mb-0.5">{w.currency_code} WALLET</p>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">{w.flag}</span>
+            <p className="text-white/60 text-sm">{w.currency_name}</p>
+          </div>
         </div>
         <div className="flex flex-col items-end gap-1">
           {w.yield_pct && isUSD && (
-            <span
-              className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-              style={{ background: "rgba(255,200,80,0.12)", color: "rgba(255,200,80,0.9)", border: "1px solid rgba(255,200,80,0.2)" }}
-            >
-              {w.yield_pct} APY
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400">
+              ⚡ {w.yield_pct} APY
             </span>
           )}
-          {w.currency_code === "USD" && usdcBalance !== null && (
-            <span
-              className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
-              style={{ background: "rgba(244,201,78,0.1)", color: "rgba(244,201,78,0.7)", border: "1px solid rgba(244,201,78,0.15)" }}
-            >
-              ON-CHAIN
-            </span>
-          )}
+          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
+            ● Verified
+          </span>
         </div>
       </div>
 
-      {/* Hero balance — dominant number */}
-      <div className="relative z-10 mb-4">
+      {/* Hero balance */}
+      <div className="mb-4">
         <div
-          className="font-light leading-none tracking-tight"
-          style={{ fontSize: "clamp(40px, 10vw, 64px)", color: "rgba(255,255,255,0.95)", fontFamily: "'Inter', sans-serif" }}
+          className="font-light leading-none tracking-tight text-white"
+          style={{ fontSize: "clamp(38px, 9vw, 56px)", fontFamily: "'Inter', sans-serif" }}
         >
           {isUSD
             ? `$${displayBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -74,18 +57,16 @@ export default function WalletCard({ w, usdcBalance, walletAddress, liveRate }) 
       </div>
 
       {/* Supporting info */}
-      <div className="relative z-10 flex items-end justify-between">
+      <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          {phpEquiv && <p className="text-white/30 text-xs">{phpEquiv}</p>}
+          {phpEquiv && <p className="text-white/35 text-xs">{phpEquiv}</p>}
+          {isUSD && <p className="text-white/35 text-xs">1 USD = ₱{liveRate?.toFixed(2)}</p>}
           {isUSD && displayBalance > 0 && yieldEarned > 0 && (
-            <p className="text-xs" style={{ color: "#2ECC71" }}>+${yieldEarned.toFixed(4)} yield</p>
-          )}
-          {isUSD && walletAddress && (
-            <p className="text-white/20 text-[9px] font-mono">{walletAddress.slice(0, 8)}…{walletAddress.slice(-6)}</p>
+            <p className="text-xs text-emerald-400">+${yieldEarned.toFixed(4)} yield</p>
           )}
         </div>
         {isUSD && w.yield_pct && (
-          <p className="text-white/20 text-[10px]">{apyPct}% APY</p>
+          <p className="text-white/25 text-[10px]">{apyPct}% APY</p>
         )}
       </div>
     </div>

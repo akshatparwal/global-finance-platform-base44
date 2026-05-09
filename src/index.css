@@ -6,45 +6,40 @@
 
 @layer base {
   :root {
-    /* KinnectFi dark cosmic tokens — ARQ monochrome + single accent */
-    --background:    228 40% 7%;       /* #0B0E1A deep navy */
-    --foreground:    0 0% 100%;        /* #FFFFFF text primary */
+    /* KinnectFi warm light mode — cream + coral orange */
+    --background:    36 33% 96%;       /* #FAF8F5 warm cream */
+    --foreground:    220 48% 14%;      /* #0D1F3C deep navy */
 
-    --card:          228 36% 11%;      /* #141829 surface */
-    --card-foreground: 0 0% 100%;
+    --card:          0 0% 100%;        /* #FFFFFF white cards */
+    --card-foreground: 220 48% 14%;
 
-    --popover:       228 36% 11%;
-    --popover-foreground: 0 0% 100%;
+    --popover:       0 0% 100%;
+    --popover-foreground: 220 48% 14%;
 
-    --primary:       44 89% 63%;       /* #F4C94E KinnectFi gold */
-    --primary-foreground: 228 40% 7%;
+    --primary:       16 82% 54%;       /* #E8512A coral orange */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary:     228 30% 16%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary:     36 33% 93%;       /* #F5EFE3 warm cream secondary */
+    --secondary-foreground: 220 48% 14%;
 
-    --muted:         228 28% 18%;
-    --muted-foreground: 0 0% 45%;      /* rgba(255,255,255,0.45) */
+    --muted:         36 25% 91%;
+    --muted-foreground: 220 20% 45%;
 
-    --accent:        44 89% 63%;
-    --accent-foreground: 228 40% 7%;
+    --accent:        16 82% 54%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive:   5 79% 56%;        /* #E74C3C — only shown when needed */
+    --destructive:   5 79% 56%;
     --destructive-foreground: 0 0% 98%;
 
-    --positive:      145 63% 49%;      /* #2ECC71 gains/received */
+    --positive:      158 54% 40%;      /* #2E9B6E green */
 
-    --border:        228 28% 16%;
-    --input:         228 28% 13%;
-    --ring:          44 89% 63%;
+    --border:        36 20% 88%;       /* warm light border */
+    --input:         36 20% 88%;
+    --ring:          16 82% 54%;
     --radius:        0.875rem;
 
     --font-body:    'Inter', system-ui, sans-serif;
     --font-heading: 'Inter', system-ui, sans-serif;
-
-    /* Glow palette — gold only, no rainbow */
-    --glow-gold:  rgba(244, 201, 78, 0.15);
-    --glow-coral: rgba(244, 201, 78, 0.08);
-    --glow-blue:  rgba(244, 201, 78, 0.06);
   }
 }
 
@@ -56,7 +51,7 @@
 
   html {
     overscroll-behavior: none;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -66,7 +61,7 @@
     -webkit-user-select: none;
     user-select: none;
     font-family: 'Inter', system-ui, sans-serif !important;
-    background-color: #0B0E1A;
+    background-color: #FAF8F5;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -88,68 +83,35 @@
 }
 
 /* ================================================================
-   KinnectFi ARQ — Glassmorphism Card System
+   KinnectFi — Light Mode Card System
    ================================================================ */
 
-/* Glass card — primary surface (#141829 base) */
+/* Standard card surface */
 .kf-glass {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(20, 24, 41, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 40px rgba(244, 201, 78, 0.08);
+  background: #FFFFFF;
+  border: 1px solid rgba(13, 31, 60, 0.08);
+  box-shadow: 0 1px 4px rgba(13, 31, 60, 0.06);
 }
 
-/* Hero wallet card — stronger gold glow */
+/* Hero wallet card — dark navy */
 .kf-hero-card {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background: rgba(20, 24, 41, 0.92);
-  border: 1px solid rgba(244, 201, 78, 0.10);
-  box-shadow:
-    0 0 60px rgba(244, 201, 78, 0.14),
-    0 0 0 1px rgba(244, 201, 78, 0.06) inset;
+  background: #0D1F3C;
+  border: 1px solid rgba(13, 31, 60, 0.12);
+  box-shadow: 0 4px 24px rgba(13, 31, 60, 0.18);
 }
-
-/* Standard bordered cards — no box shadow, just subtle glow */
-.rounded-2xl.border,
-.rounded-xl.border {
-  box-shadow: 0 0 24px rgba(255, 200, 80, 0.06);
-}
-
-/* Hero radial glow behind balance number */
-.kf-balance-glow {
-  position: relative;
-}
-.kf-balance-glow::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 280px;
-  height: 200px;
-  background: radial-gradient(ellipse, rgba(255, 200, 80, 0.18) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-.kf-balance-glow > * { position: relative; z-index: 1; }
 
 /* Label style */
 .kf-label {
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.4;
+  color: rgba(13, 31, 60, 0.4);
 }
 
-/* Cosmic background — monochrome base + single gold glow */
+/* App background — warm cream */
 .kf-cosmic-bg {
-  background:
-    radial-gradient(ellipse 60% 40% at 75% 8%, rgba(244, 201, 78, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 20% 85%, rgba(244, 201, 78, 0.03) 0%, transparent 60%),
-    #0B0E1A;
+  background: #FAF8F5;
 }
 
 /* ================================================================

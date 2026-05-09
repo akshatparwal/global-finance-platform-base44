@@ -38,8 +38,8 @@ export default function DashboardLayout() {
 
   const { activeTab, currentPath, stackDepth, isRoot, switchTab, resetTab, push, pop, loadScroll, saveScroll } = useTabStack();
   
-  // Always dark mode
-  const [darkMode] = useState(true);
+  // Always light mode — matches KinnectFi design
+  const [darkMode] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -99,17 +99,15 @@ export default function DashboardLayout() {
     },
   });
 
-  const bgMain = darkMode ? "kf-cosmic-bg" : "bg-[#f8f5f0]";
-  const bgSidebar = "bg-[#0B0E1A]";
-  const textMain = darkMode ? "text-white" : "text-[#1a2a4a]";
-  const textMuted = darkMode ? "text-white/40" : "text-[#1a2a4a]/50";
-  const activeClass = "bg-white/8 text-white";
-  const inactiveClass = "text-white/40 hover:text-white hover:bg-white/5";
+  const bgMain = "bg-[#FAF8F5]";
+  const bgSidebar = "bg-[#0D1F3C]";
+  const textMain = "text-[#0D1F3C]";
+  const textMuted = "text-[#0D1F3C]/40";
 
   if (!authChecked) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#0a0f1a]">
-        <div className="w-8 h-8 border-4 border-white/10 border-t-primary rounded-full animate-spin" />
+      <div className="fixed inset-0 flex items-center justify-center bg-[#FAF8F5]">
+        <div className="w-8 h-8 border-4 border-[#0D1F3C]/10 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -122,28 +120,23 @@ export default function DashboardLayout() {
         {/* Logo */}
         <div className="p-5 pb-6 border-b border-white/8">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white flex items-center justify-center flex-shrink-0 shadow-sm"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
+            <div className="w-9 h-9 rounded-xl overflow-hidden bg-white/10 flex items-center justify-center flex-shrink-0"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5 brightness-0 invert" /></div>
             <div>
-              <div className="font-extrabold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Globe className="w-2.5 h-2.5 text-primary/60" />
-                <span className="text-white/40 text-[8px] uppercase tracking-widest">Cross-Border Bank</span>
-              </div>
+              <div className="font-bold text-white text-base leading-none tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>kinnect<span className="text-primary">fi</span></div>
+              <div className="text-white/35 text-[8px] uppercase tracking-widest mt-0.5">Cross-Border Bank</div>
             </div>
           </Link>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 space-y-0.5">
+        <nav className="flex-1 px-3 py-3 space-y-0.5">
           {NAV.map(({ label, icon: NavIcon, path, color, bg }) => {
             const active = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
             return (
               <button key={path} onClick={() => handleTabClick(path)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-white/10 text-white" : "text-white/55 hover:text-white hover:bg-white/5"}`}>
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${active ? `${bg} ${color}` : "bg-white/5 text-white/40"}`}>
-                  <NavIcon className="w-3.5 h-3.5" />
-                </div>
-                <span className={active ? "text-white" : ""}>{label}</span>
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${active ? "bg-white/12 text-white" : "text-white/45 hover:text-white hover:bg-white/6"}`}>
+                <NavIcon className={`w-4 h-4 flex-shrink-0 ${active ? "text-primary" : "text-white/40"}`} />
+                <span>{label}</span>
                 {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />}
               </button>
             );
@@ -165,35 +158,35 @@ export default function DashboardLayout() {
       {/* Main */}
       <div className="flex-1 sm:ml-56 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className={`${darkMode ? "bg-[#0B0E1A]" : "bg-white"} border-b ${darkMode ? "border-white/5" : "border-black/10"} px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20`}>
+        <header className="bg-white border-b border-[#0D1F3C]/8 px-4 sm:px-6 h-14 flex items-center justify-between sticky top-0 z-20">
           {/* Mobile: Back button if not root, menu button if root */}
           {!isRoot ? (
-            <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => { pop(); navigate(activeTab); }} title="Go back">
+            <button className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg text-[#0D1F3C]/60 hover:bg-[#0D1F3C]/5 transition-colors" onClick={() => { pop(); navigate(activeTab); }} title="Go back">
               <ArrowLeft className="w-5 h-5" />
             </button>
           ) : (
-            <button className={`sm:hidden w-9 h-9 flex items-center justify-center rounded-lg ${darkMode ? "text-white/70 hover:bg-white/10" : "text-[#1a2a4a]/70 hover:bg-black/10"} transition-colors`} onClick={() => setMobileOpen(!mobileOpen)}>
+            <button className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg text-[#0D1F3C]/60 hover:bg-[#0D1F3C]/5 transition-colors" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           )}
           {/* Logo shown in mobile header */}
           <div className="sm:hidden flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg overflow-hidden bg-white flex items-center justify-center flex-shrink-0"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5" /></div>
-            <span className={`font-extrabold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Ka<span className="text-primary">yah</span></span>
+            <div className="w-7 h-7 rounded-lg overflow-hidden bg-[#0D1F3C] flex items-center justify-center flex-shrink-0"><img src="https://media.base44.com/images/public/69e68470b4eb59a82dcf3e9c/815953c27_svg_008.svg" className="w-full h-full object-contain p-0.5 brightness-0 invert" /></div>
+            <span className="font-extrabold text-sm text-[#0D1F3C]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>kinnect<span className="text-primary">fi</span></span>
           </div>
 
           <div className="flex items-center gap-2 ml-auto">
             {/* Support shortcut */}
             <Link to="/dashboard/support"
-              className={`hidden sm:flex w-11 h-11 items-center justify-center rounded-lg transition-colors ${darkMode ? "text-white/40 hover:text-white hover:bg-white/8" : "text-[#1a2a4a]/40 hover:bg-black/8"}`}>
+              className="hidden sm:flex w-11 h-11 items-center justify-center rounded-lg transition-colors text-[#0D1F3C]/40 hover:bg-[#0D1F3C]/5">
               <MessageCircle className="w-5 h-5" />
             </Link>
             <div className="relative" ref={notifRef}>
               <button onClick={() => { setNotifOpen(!notifOpen); if (!notifOpen) markAllRead(); }}
                 className="relative w-11 h-11 flex items-center justify-center hover:opacity-70 transition-opacity">
-                <Bell className={`w-5 h-5 ${textMuted}`} />
+                <Bell className="w-5 h-5 text-[#0D1F3C]/40" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-secondary text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-primary text-white text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
                     {unreadCount}
                   </span>
                 )}
@@ -213,8 +206,8 @@ export default function DashboardLayout() {
               </AnimatePresence>
             </div>
 
-            <div className={`hidden sm:flex items-center gap-1.5 text-xs ${textMuted}`}>
-              <Shield className="w-3 h-3 text-emerald-400" />
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#0D1F3C]/40">
+              <Shield className="w-3 h-3 text-emerald-500" />
               <span>Secured</span>
             </div>
           </div>
@@ -225,7 +218,7 @@ export default function DashboardLayout() {
           onScroll={() => { saveScroll(mainRef.current?.scrollTop ?? 0); }}
           onTouchStart={swipeHandlers.onTouchStart}
           onTouchEnd={swipeHandlers.onTouchEnd}
-          className={`flex-1 p-4 sm:p-6 pb-28 sm:pb-8 overflow-y-auto ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}
+          className="flex-1 p-4 sm:p-6 pb-28 sm:pb-8 overflow-y-auto text-[#0D1F3C]"
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -269,7 +262,7 @@ export default function DashboardLayout() {
           )}
         </AnimatePresence>
 
-        <footer className={`hidden sm:flex px-6 py-3 text-center text-[10px] ${darkMode ? "text-white/40" : "text-[#1a2a4a]/50"} border-t ${darkMode ? "border-white/5" : "border-black/10"} justify-between ${darkMode ? "bg-[#0B0E1A]" : "bg-white"}`}>
+        <footer className="hidden sm:flex px-6 py-3 text-center text-[10px] text-[#0D1F3C]/40 border-t border-[#0D1F3C]/8 justify-between bg-white">
           <div className="flex gap-4"><span>🔒 Bank-grade Security</span><span>✓ Regulated & Insured</span></div>
           <span>© 2026 KinnectFi. All rights reserved.</span>
         </footer>

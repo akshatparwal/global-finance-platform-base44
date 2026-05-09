@@ -37,8 +37,8 @@ export default function Dashboard() {
   const { walletAddress, usdcBalance, refetchBalance } = usePrivyWallet();
   const liveRate = rates?.USDPHP || 56.24;
   const card = "kf-glass rounded-2xl";
-  const muted = "text-white/40";
-  const textMain = "text-white";
+  const muted = "text-[#0D1F3C]/40";
+  const textMain = "text-[#0D1F3C]";
 
   const [offline, setOffline] = useState(false);
 
@@ -163,7 +163,7 @@ export default function Dashboard() {
         }}
       >
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${phase === "ready" ? "bg-primary text-secondary" : "bg-primary/10 text-primary"} transition-colors`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${phase === "ready" ? "bg-primary text-white" : "bg-primary/10 text-primary"} transition-colors`}
         >
           {refreshing ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -209,11 +209,11 @@ export default function Dashboard() {
 
       {/* Greeting */}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-white/40 text-sm">{greeting}, <span className="text-white/80">{user === null ? "..." : friendlyName}</span></p>
+        <p className="text-[#0D1F3C]/40 text-sm">{greeting}, <span className="text-[#0D1F3C]/80 font-medium">{user === null ? "..." : friendlyName}</span></p>
         {!ratesLoading && (
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <p className="text-white/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <p className="text-[#0D1F3C]/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
           </div>
         )}
       </div>
@@ -222,11 +222,11 @@ export default function Dashboard() {
       {loading ? (
         <WalletSkeleton darkMode={darkMode} />
       ) : wallets.length === 0 ? (
-        <div className="kf-glass rounded-2xl p-8 text-center">
-          <p className="text-white/60 text-sm mb-1">No wallets yet</p>
-          <p className="text-white/30 text-xs mb-3">Add funds to get started.</p>
-          <button onClick={() => setShowFundWallet(true)} className="bg-primary text-primary-foreground font-medium px-4 py-2 rounded-xl text-xs">Add Funds</button>
-        </div>
+      <div className="kf-glass rounded-2xl p-8 text-center">
+        <p className="text-[#0D1F3C]/60 text-sm mb-1">No wallets yet</p>
+        <p className="text-[#0D1F3C]/30 text-xs mb-3">Add funds to get started.</p>
+        <button onClick={() => setShowFundWallet(true)} className="bg-primary text-white font-medium px-4 py-2 rounded-xl text-xs">Add Funds</button>
+      </div>
       ) : (
         <div>
           {/* Mobile: swipeable slider — Desktop: show both side by side */}
@@ -257,7 +257,7 @@ export default function Dashboard() {
             <div className="sm:hidden flex justify-center gap-1.5 mt-2">
               {wallets.map((_, i) => (
                 <button key={i} onClick={() => setWalletSlide(i)}
-                  className={`h-1 rounded-full transition-all ${i === walletSlide ? "bg-primary w-6" : "bg-white/20 w-1.5"}`} />
+                  className={`h-1 rounded-full transition-all ${i === walletSlide ? "bg-primary w-6" : "bg-[#0D1F3C]/15 w-1.5"}`} />
               ))}
             </div>
           )}
@@ -274,19 +274,17 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => setShowFundWallet(true)}
-          className="flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-medium hover:opacity-90 active:scale-[0.97] transition-all"
-          style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
+          className="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold hover:opacity-90 active:scale-[0.97] transition-all bg-primary text-white"
         >
           <ArrowDownToLine className="w-4 h-4" />
-          Add Funds
+          Add money
         </button>
         <button
           onClick={() => navigate("/dashboard/pay")}
-          className="flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-medium hover:opacity-90 active:scale-[0.97] transition-all kf-glass"
-          style={{ color: "hsl(var(--primary))" }}
+          className="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-semibold hover:opacity-90 active:scale-[0.97] transition-all bg-[#0D1F3C] text-white"
         >
           <Send className="w-4 h-4" />
-          Send Money
+          Send
         </button>
       </div>
 
@@ -297,25 +295,25 @@ export default function Dashboard() {
 
       {/* Quick Send */}
       <div>
-        <p className="kf-label text-white/40 mb-3">Quick Send</p>
+        <p className="kf-label mb-3">People you send to</p>
         <div className="relative">
           <div className="flex gap-4 overflow-x-auto pb-2 pr-8" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
             {QUICK_SEND.map((p, i) => (
               <button key={i} onClick={() => navigate("/dashboard/pay")}
                 className="flex flex-col items-center gap-1.5 flex-shrink-0 active:scale-95 transition-transform">
                 <div
-                  className="w-[52px] h-[52px] rounded-full flex items-center justify-center text-lg"
+                  className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-base font-bold"
                   style={p.isAdd
-                    ? { background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.15)" }
-                    : { background: "rgba(255,200,80,0.1)", border: "1px solid rgba(255,200,80,0.15)" }}
+                    ? { background: "rgba(13,31,60,0.06)", border: "1px dashed rgba(13,31,60,0.2)" }
+                    : { background: "#E8512A20", border: "1px solid #E8512A30", color: "#E8512A" }}
                 >
-                  {p.isAdd ? <Plus className="w-4 h-4 text-white/25" /> : <span>{p.emoji}</span>}
+                  {p.isAdd ? <Plus className="w-4 h-4 text-[#0D1F3C]/30" /> : <span className="text-sm">{(p.label || "?").slice(0,2).toUpperCase()}</span>}
                 </div>
-                <span className="text-white/30 text-[10px] max-w-[52px] truncate text-center">{p.label}</span>
+                <span className="text-[#0D1F3C]/40 text-[10px] max-w-[52px] truncate text-center">{p.label}</span>
               </button>
             ))}
           </div>
-          <div className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-[#0B0E1A]" />
+          <div className="absolute right-0 top-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-[#FAF8F5]" />
         </div>
       </div>
 
@@ -323,15 +321,15 @@ export default function Dashboard() {
       {offline && (
         <div className="kf-glass flex items-center gap-2 px-4 py-2.5 rounded-xl" role="alert" aria-live="polite">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          <p className="text-white/50 text-xs">Showing cached data — offline</p>
+          <p className="text-[#0D1F3C]/50 text-xs">Showing cached data — offline</p>
         </div>
       )}
 
       {/* Activity Feed */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <p className="kf-label text-white/40">Activity</p>
-          <button onClick={() => navigate("/dashboard/transactions")} className="text-primary/60 text-[10px] tracking-wider hover:opacity-70">View all</button>
+          <p className="kf-label">Recent activity</p>
+          <button onClick={() => navigate("/dashboard/transactions")} className="text-primary text-[11px] font-semibold hover:opacity-70">View all</button>
         </div>
 
         {/* Recent Transfers */}
@@ -342,18 +340,12 @@ export default function Dashboard() {
         )}
         {!loading && transfers.length === 0 && (
           <div className="kf-glass rounded-2xl mb-4 px-5 py-6 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,200,80,0.1)" }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-primary/10">
               <Send className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white/80 text-sm font-medium mb-0.5">No transfers yet</p>
-              <p className="text-white/30 text-xs">Send money home — zero fees, live rates.</p>
+              <p className="text-[#0D1F3C]/80 text-sm font-medium mb-0.5">No transfers yet — when you send your first one, it'll show up here.</p>
             </div>
-            <button onClick={() => navigate("/dashboard/pay")}
-              className="text-primary text-xs font-medium px-3 py-2 rounded-xl flex-shrink-0 active:scale-95 transition-transform"
-              style={{ background: "rgba(255,200,80,0.1)", border: "1px solid rgba(255,200,80,0.15)" }}>
-              Send
-            </button>
           </div>
         )}
         {/* Monthly Yield Credit Entry */}
@@ -363,54 +355,28 @@ export default function Dashboard() {
           const daysPassed = now.getDate();
           const dailyYieldAmt = dailyYield;
           const monthYield = dailyYieldAmt * daysPassed;
-          // Last month's yield
-          const daysInLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-          const lastMonthYield = dailyYieldAmt * daysInLastMonth;
-          const lastMonthLabel = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
-          const dailyRows = Array.from({ length: daysPassed }, (_, i) => {
-            const d = new Date(now.getFullYear(), now.getMonth(), i + 1);
-            return { date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), amount: dailyYieldAmt };
-          }).reverse();
           return (
           <div className="kf-glass rounded-2xl overflow-hidden mb-3">
             <button
               onClick={() => setYieldExpanded(e => !e)}
-              className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-white/3"
-              style={{ borderBottom: yieldExpanded ? "1px solid rgba(255,255,255,0.05)" : "none" }}
+              className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-[#0D1F3C]/3"
+              style={{ borderBottom: yieldExpanded ? "1px solid rgba(13,31,60,0.06)" : "none" }}
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(100,220,150,0.1)", border: "1px solid rgba(100,220,150,0.15)" }}>
-                <TrendingUp className="w-4 h-4" style={{ color: "#2ECC71" }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-500/10">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white/70 text-sm font-medium">Yield Credit</p>
-                <p className="text-white/30 text-[10px]">{monthLabel} · {apyPct}% APY</p>
+                <p className="text-[#0D1F3C]/80 text-sm font-medium">Save · {apyPct}%</p>
+                <p className="text-[#0D1F3C]/35 text-[10px]">{monthLabel}</p>
               </div>
               <div className="text-right flex-shrink-0 flex items-center gap-2">
                 <div>
-                  <p className="text-sm font-light" style={{ color: "#2ECC71" }}>+${monthYield.toFixed(4)}</p>
-                  <p className="text-white/25 text-[10px]">+${dailyYieldAmt.toFixed(4)}/day</p>
+                  <p className="text-sm font-medium text-emerald-600">+${monthYield.toFixed(4)}</p>
+                  <p className="text-[#0D1F3C]/25 text-[10px]">+${dailyYieldAmt.toFixed(4)}/day</p>
                 </div>
-                <span className={`text-white/20 text-[10px] transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""}`}>▼</span>
+                <span className={`text-[#0D1F3C]/20 text-[10px] transition-transform inline-block ${yieldExpanded ? "rotate-180" : ""}`}>▼</span>
               </div>
             </button>
-            {yieldExpanded && (
-              <div className="max-h-56 overflow-y-auto">
-                <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.02)" }}>
-                  <div>
-                    <p className="text-white/60 text-xs">{lastMonthLabel}</p>
-                    <p className="text-white/25 text-[10px]">{daysInLastMonth} days</p>
-                  </div>
-                  <p className="text-xs" style={{ color: "#2ECC71" }}>+${lastMonthYield.toFixed(4)}</p>
-                </div>
-                {dailyRows.map((row, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                    <p className="text-white/30 text-xs">{row.date}</p>
-                    <p className="text-xs" style={{ color: "#2ECC71" }}>+${row.amount.toFixed(4)}</p>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
           );
         })()}
@@ -421,23 +387,23 @@ export default function Dashboard() {
               const initials = (t.recipient_name || "?").slice(0, 2).toUpperCase();
               return (
                 <button key={i} onClick={() => setSelectedTx(t)}
-                  className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors border-b last:border-0 hover:bg-white/4"
-                  style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+                  className="w-full flex items-center gap-3.5 px-4 py-3.5 text-left transition-colors border-b last:border-0 hover:bg-[#0D1F3C]/3"
+                  style={{ borderColor: "rgba(13,31,60,0.06)" }}>
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white/80 text-xs font-medium flex-shrink-0"
-                    style={{ background: "rgba(255,200,80,0.12)", border: "1px solid rgba(255,200,80,0.15)" }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-primary text-xs font-bold flex-shrink-0"
+                    style={{ background: "#E8512A15", border: "1px solid #E8512A20" }}
                   >
                     {initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/80 text-sm font-medium">{t.recipient_name}</p>
-                    <p className="text-white/30 text-[10px]">
+                    <p className="text-[#0D1F3C]/85 text-sm font-medium">{t.recipient_name}</p>
+                    <p className="text-[#0D1F3C]/35 text-[10px]">
                       {new Date(t.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · {t.recipient_bank || "Transfer"}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-light" style={{ color: "hsl(var(--primary))" }}>−${t.amount_usd}</p>
-                    {t.amount_php && <p className="text-white/25 text-[10px]">₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
+                    <p className="text-sm font-medium text-primary">−${t.amount_usd}</p>
+                    {t.amount_php && <p className="text-[#0D1F3C]/30 text-[10px]">₱{Number(t.amount_php).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>}
                   </div>
                 </button>
               );
