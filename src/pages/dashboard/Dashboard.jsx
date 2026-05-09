@@ -209,13 +209,27 @@ export default function Dashboard() {
 
       {/* Greeting */}
       <div className="flex items-center justify-between mb-1">
-        <p className="text-[#0D1F3C]/40 text-sm">{greeting}, <span className="text-[#0D1F3C]/80 font-medium">{user === null ? "..." : friendlyName}</span></p>
-        {!ratesLoading && (
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <p className="text-[#0D1F3C]/30 text-[10px]">₱{liveRate.toFixed(2)}/USD</p>
-          </div>
-        )}
+        <div>
+          <p className="text-[#0D1F3C]/40 text-xs uppercase tracking-wider">
+            {new Date().getHours() < 12 ? "Magandang umaga" : new Date().getHours() < 18 ? "Magandang hapon" : "Magandang gabi"}
+          </p>
+          <p className="text-[#0D1F3C] font-bold text-lg leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {user === null ? "..." : friendlyName}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!ratesLoading && (
+            <div className="flex items-center gap-1 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+              <p className="text-emerald-700 text-[10px] font-semibold">₱{liveRate.toFixed(2)}/USD</p>
+            </div>
+          )}
+          {user && (
+            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
+              {(user?.full_name || user?.email || "U").slice(0, 2).toUpperCase()}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Wallet Slider */}
@@ -285,6 +299,32 @@ export default function Dashboard() {
         >
           <Send className="w-4 h-4" />
           Send
+        </button>
+      </div>
+
+      {/* Card + Save mini tiles — per design */}
+      <div className="grid grid-cols-2 gap-3">
+        <button onClick={() => navigate("/dashboard/cards")}
+          className="kf-glass rounded-2xl p-4 text-left hover:border-primary/30 active:scale-[0.98] transition-all">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0D1F3C]/40">Card</span>
+            <span className="text-sm">💳</span>
+          </div>
+          <p className="text-xl font-black text-[#0D1F3C]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            ${(transfers.filter(t => t.category === "bills" || t.category === "subscriptions").reduce((s,t) => s + (t.amount_usd||0), 0)).toFixed(2)}
+          </p>
+          <p className="text-[#0D1F3C]/35 text-xs mt-0.5">Spent this month</p>
+        </button>
+        <button onClick={() => navigate("/dashboard/insights")}
+          className="kf-glass rounded-2xl p-4 text-left hover:border-primary/30 active:scale-[0.98] transition-all">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0D1F3C]/40">Save · {usdWallet?.yield_pct || "4.5%"}</span>
+            <span className="text-sm">⚡</span>
+          </div>
+          <p className="text-xl font-black text-[#0D1F3C]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            ${yieldEarned > 0 ? yieldEarned.toFixed(2) : "0.00"}
+          </p>
+          <p className="text-[#0D1F3C]/35 text-xs mt-0.5">Tap Save tab to earn</p>
         </button>
       </div>
 

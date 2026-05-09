@@ -10,10 +10,11 @@ import { haptic } from "@/utils/haptic";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 
 const METHODS = [
-  { id: "ach",     label: "ACH Transfer",      sub: "1–3 business days · Free",   icon: Building2,       badge: null },
-  { id: "wire",    label: "Wire Transfer",      sub: "Same day · Free",            icon: Zap,             badge: "FAST" },
-  { id: "instant", label: "Instant Deposit",    sub: "Via debit card · 1.5% fee",  icon: ArrowDownToLine, badge: "INSTANT" },
-  { id: "crypto",  label: "Buy USDC (Crypto)",  sub: "Card / bank → USDC on Base", icon: Wallet,          badge: "NEW" },
+  { id: "php",     label: "From the Philippines (PHP)", sub: "GCash, Maya, or any PH bank · ~5 min · 0.5% spread", icon: ArrowDownToLine, badge: "NEW" },
+  { id: "ach",     label: "Bank transfer (ACH)",        sub: "Linked US checking · 1–3 business days · Free",      icon: Building2,       badge: null },
+  { id: "wire",    label: "Wire Transfer",              sub: "Same day · Free",                                     icon: Zap,             badge: "FAST" },
+  { id: "instant", label: "Debit card",                 sub: "Visa or Mastercard · Instant · 2.9% fee",            icon: ArrowDownToLine, badge: "INSTANT" },
+  { id: "crypto",  label: "Buy USDC (Crypto)",          sub: "Card / bank → USDC on Base",                        icon: Wallet,          badge: null },
 ];
 
 function CopyRow({ label, value, darkMode }) {

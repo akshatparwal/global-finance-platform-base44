@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { Search, RefreshCw, Plus, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, AlertCircle, ChevronRight, RefreshCw, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedRate from "@/components/ui/AnimatedRate";
-import BestTimeToSend from "@/components/dashboard/BestTimeToSend";
 import { base44 } from "@/api/base44Client";
 import { useLiveRates } from "@/hooks/useLiveRates";
-import TransferEstimator from "@/components/dashboard/TransferEstimator";
 import { useToast } from "@/components/ui/use-toast";
 import { processTransfer } from "@/functions/processTransfer";
 import { haptic } from "@/utils/haptic";
@@ -16,131 +14,93 @@ import SendAuthGate from "@/components/transfer/SendAuthGate";
 import TransactionReceipt from "@/components/transfer/TransactionReceipt";
 import SendAnimation from "@/components/transfer/SendAnimation";
 import TransferTracker from "@/components/transfer/TransferTracker";
-import NoRecipientsEmptyState from "@/components/pay/NoRecipientsEmptyState";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { warmRateCache } from "@/functions/warmRateCache";
 
-const AVATAR_COLORS = ["bg-purple-500","bg-blue-500","bg-red-500","bg-yellow-500","bg-teal-500","bg-emerald-500","bg-pink-500","bg-indigo-500"];
+// Step IDs
+const STEP_RECIPIENT = "recipient";
+const STEP_AMOUNT = "amount";
+const STEP_REVIEW = "review";
 
-const MIN_AMOUNT = 1;
-const MAX_AMOUNT = 10000;
+const RELATIONSHIP_LABELS = { mother: "Mother", father: "Father", sibling: "Sibling", spouse: "Spouse", child: "Child", friend: "Friend", other: "" };
 
 export default function Pay() {
   const { darkMode } = useOutletContext() || {};
   const isOnline = useOnlineStatus();
   const navigate = useNavigate();
-  // Pre-fill from "Send Again" navigation
-  const prefill = (() => {
-    try { return new URLSearchParams(window.location.search); } catch { return new URLSearchParams(); }
-  })();
-  const [sendAmount, setSendAmount] = useState(prefill.get("amount") || "");
-  const [amountError, setAmountError] = useState("");
-  const LAST_RECIPIENT_KEY = "kf_last_recipient_id";
+  const { toast } = useToast();
+
+  const [step, setStep] = useState(STEP_RECIPIENT);
   const [selectedRecipient, setSelectedRecipient] = useState(null);
-  const prefillName = prefill.get("recipient") || "";
-  const prefillBank = prefill.get("bank") || "";
+  const [phpAmount, setPhpAmount] = useState("");
+  const [transferNote, setTransferNote] = useState("");
   const [recipients, setRecipients] = useState([]);
   const [recipientsLoading, setRecipientsLoading] = useState(true);
   const [transfers, setTransfers] = useState([]);
   const [sending, setSending] = useState(false);
-  const [recipientSearch, setRecipientSearch] = useState("");
-  const [transferNote, setTransferNote] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [completedTransfer, setCompletedTransfer] = useState(null);
   const [showSendAnim, setShowSendAnim] = useState(false);
   const [sendAnimData, setSendAnimData] = useState({ amount: "", recipient: "" });
   const [trackedTransfer, setTrackedTransfer] = useState(null);
-  const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
-  const { toast } = useToast();
   const [alertUser, setAlertUser] = useState(null);
   const [kycRequired, setKycRequired] = useState(false);
+
+  const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const rate = rates?.USDPHP || 56.24;
-  const receive = sendAmount ? (parseFloat(sendAmount) * rate).toFixed(2) : "0.00";
-  const card = darkMode ? "bg-[#1a2332] border-white/5" : "bg-white border-black/10";
-  const muted = darkMode ? "text-white/50" : "text-[#1a2a4a]/50";
-  const inputBg = darkMode ? "bg-[#0d1526] border-white/10 text-white placeholder-white/30" : "bg-[#f5efe6] border-black/10 text-[#1a2a4a]";
 
+  // Derived amounts
+  const phpVal = parseFloat(phpAmount) || 0;
+  const usdAmount = phpVal > 0 ? (phpVal / rate).toFixed(2) : "0.00";
 
-
-  // Pre-warm the backend rate cache in the background so processTransfer
-  // never needs to do a slow LLM fetch on the critical path.
-  useEffect(() => {
-    warmRateCache({}).catch(() => {}); // fire-and-forget, non-blocking
-  }, []);
+  const muted = "text-[#0D1F3C]/40";
 
   useEffect(() => {
+    warmRateCache({}).catch(() => {});
     base44.entities.Transfer.filter({ category: "remittance" }, "-created_date", 10).then(setTransfers).catch(() => {});
     base44.auth.me().catch(() => null).then(u => { if (u) { setAlertUser(u); setKycRequired(!u.onboarding_completed); } });
-    base44.entities.Recipient.list("-transfer_count", 6).then(r => {
-    setRecipients(r);
-    setRecipientsLoading(false);
-    // Auto-select recipient if pre-filled from Send Again
-    if (prefillName) {
-      const match = r.find(rec =>
-        (rec.full_name || "").toLowerCase() === prefillName.toLowerCase() ||
-        (rec.nickname || "").toLowerCase() === prefillName.toLowerCase()
-      );
-      if (match) { setSelectedRecipient(match); return; }
-    }
-    // Restore last used recipient
-    const lastId = localStorage.getItem(LAST_RECIPIENT_KEY);
-    if (lastId) {
-      const last = r.find(rec => rec.id === lastId);
-      if (last) setSelectedRecipient(last);
-    }
+    base44.entities.Recipient.list("-transfer_count", 20).then(r => {
+      setRecipients(r);
+      setRecipientsLoading(false);
     }).catch(() => setRecipientsLoading(false));
   }, []);
 
-
-
-  // Amount validation
-  const validateAmount = (val) => {
-    const amt = parseFloat(val);
-    if (!val || isNaN(amt)) return "Please enter an amount.";
-    if (amt < MIN_AMOUNT) return `Minimum transfer is $${MIN_AMOUNT}.`;
-    if (amt > MAX_AMOUNT) return `Maximum transfer is $${MAX_AMOUNT.toLocaleString()}.`;
-    return "";
+  const handleSelectRecipient = (r) => {
+    setSelectedRecipient(r);
+    setStep(STEP_AMOUNT);
+    haptic.light();
   };
 
-  const handleAmountChange = (val) => {
-    const cleaned = val.replace(/[^0-9.]/g, "");
-    setSendAmount(cleaned);
-    if (amountError) setAmountError(validateAmount(cleaned));
+  const handleContinueToReview = () => {
+    if (!phpVal || phpVal <= 0) return;
+    setStep(STEP_REVIEW);
   };
 
-  // Step 1: validate then show auth gate
   const handleSend = () => {
-    const error = validateAmount(sendAmount);
-    if (error) { setAmountError(error); return; }
     haptic.medium();
     setShowAuthGate(true);
   };
 
-  // Step 1b: auth passed → show confirm modal
   const handleAuthPassed = () => {
     setShowAuthGate(false);
     setShowConfirm(true);
   };
 
-  // Step 2: called after PIN confirmed
   const handleConfirmedSend = async () => {
-    const amt = parseFloat(sendAmount);
+    const amt = parseFloat(usdAmount);
     setSending(true);
     setShowConfirm(false);
 
     const recipientName = selectedRecipient?.nickname || selectedRecipient?.full_name || "Family";
     const recipientBank = selectedRecipient?.bank || "GCash";
 
-    // Optimistic UI
     const optimisticId = `optimistic-${Date.now()}`;
     setTransfers(prev => [{
-      id: optimisticId, amount_usd: amt, amount_php: parseFloat(receive),
+      id: optimisticId, amount_usd: amt, amount_php: phpVal,
       recipient_name: recipientName, recipient_bank: recipientBank,
       status: "pending", created_date: new Date().toISOString(),
     }, ...prev]);
-    setSendAmount("");
-    if (selectedRecipient?.id) localStorage.setItem(LAST_RECIPIENT_KEY, selectedRecipient.id);
 
     const res = await processTransfer({
       amount_usd: amt,
@@ -153,9 +113,7 @@ export default function Pay() {
     });
 
     if (!res?.data?.success) {
-      // Rollback optimistic update
       setTransfers(prev => prev.filter(t => t.id !== optimisticId));
-      setSendAmount(String(amt));
       setSending(false);
       haptic.error();
       sfx.error();
@@ -173,313 +131,339 @@ export default function Pay() {
     haptic.success();
     sfx.success();
 
-    // Send confirmation email
     const u = alertUser || await base44.auth.me().catch(() => null);
     if (u?.email) {
       base44.integrations.Core.SendEmail({
         to: u.email,
         from_name: "KinnectFi",
-        subject: `✅ Transfer Confirmed — $${amt.toFixed(2)} to ${recipientName}`,
-        body: `Hi ${u.full_name || "there"},\n\nYour transfer has been sent successfully!\n\n📤 Amount Sent: $${amt.toFixed(2)} USD\n🇵🇭 Received: ₱${parseFloat(receive).toLocaleString("en-PH", { minimumFractionDigits: 2 })} PHP\n👤 To: ${recipientName}\n🏦 Via: ${recipientBank}\n💱 Rate: ₱${rate.toFixed(2)}/USD\n💸 Fee: $0.00\n📋 Ref: ${finalTransfer.reference_id || "KF-" + finalTransfer.id?.slice(0,8).toUpperCase()}\n\nThank you for using KinnectFi — the neobank built for Filipino families.\n\n— The KinnectFi Team`,
+        subject: `✅ Transfer Confirmed — ₱${phpVal.toLocaleString()} to ${recipientName}`,
+        body: `Hi ${u.full_name || "there"},\n\nYour transfer was sent!\n\n₱${phpVal.toLocaleString()} PHP to ${recipientName} via ${recipientBank}\nYou paid: $${amt}\nRate: ₱${rate.toFixed(2)}/USD · Fee: $0.00\n\n— The KinnectFi Team`,
       }).catch(() => {});
     }
 
-    setSendAnimData({ amount: amt.toFixed(2), recipient: recipientName });
+    setSendAnimData({ amount: phpVal.toLocaleString(), recipient: recipientName });
     setShowSendAnim(true);
     setCompletedTransfer(finalTransfer);
+    setPhpAmount("");
+    setStep(STEP_RECIPIENT);
     setSending(false);
   };
 
-  return (
-    <div className="max-w-4xl mx-auto">
-      {/* Offline banner */}
-      {!isOnline && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 mb-4" role="alert">
-          <span className="text-xl flex-shrink-0">📶</span>
-          <div>
-            <p className="text-yellow-400 text-sm font-bold">You're offline</p>
-            <p className="text-yellow-400/70 text-xs">Transfers are disabled until you reconnect.</p>
-          </div>
-        </div>
-      )}
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h1 className="text-base font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Send Money
-          </h1>
-          <p className={`text-[11px] sm:text-xs ${muted}`}>Fast, secure cross-border transfers</p>
-        </div>
-        <div className="flex items-center gap-1 bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1">
-          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-          <span className="text-primary text-[9px] sm:text-[10px] font-bold">{new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase()}</span>
-        </div>
-      </div>
-
-      {/* KYC gate banner */}
+  // ── STEP 1: PICK RECIPIENT ──
+  const renderRecipient = () => (
+    <div className="max-w-lg mx-auto">
+      {/* KYC gate */}
       {kycRequired && (
-        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-orange-500/10 border border-orange-500/30 mb-4">
-          <span className="text-orange-400 text-xl flex-shrink-0">🪪</span>
+        <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-orange-50 border border-orange-200 mb-5">
+          <span className="text-orange-500 text-xl flex-shrink-0">🪪</span>
           <div className="flex-1">
-            <p className="text-orange-400 text-sm font-bold">Identity Verification Required</p>
-            <p className="text-orange-400/70 text-xs mt-0.5">Complete KYC in your profile to unlock transfers. This keeps your money safe.</p>
+            <p className="text-orange-700 text-sm font-bold">Identity Verification Required</p>
+            <p className="text-orange-600/70 text-xs mt-0.5">Complete KYC to unlock transfers.</p>
           </div>
-          <button onClick={() => window.location.href = "/dashboard/profile"}
-            className="text-orange-400 text-xs font-bold border border-orange-400/40 px-3 py-1.5 rounded-lg hover:bg-orange-400/10 flex-shrink-0">
+          <button onClick={() => navigate("/dashboard/profile")}
+            className="text-orange-600 text-xs font-bold border border-orange-300 px-3 py-1.5 rounded-lg flex-shrink-0">
             Verify →
           </button>
         </div>
       )}
 
-      {/* Best Time to Send — intelligent rate-aware badge */}
-      <BestTimeToSend rate={rate} ratesLoading={ratesLoading} darkMode={darkMode} />
+      <h1 className="text-2xl font-black text-[#0D1F3C] mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        Who are you<br />sending to?
+      </h1>
+      <p className={`text-sm ${muted} mb-6`}>Free transfers, every time. Funds land in their PH bank account in seconds.</p>
 
-      {/* Send form */}
-      <div className={`border rounded-2xl p-3 sm:p-4 mb-4 ${card}`}>
-        <div className={`flex items-center gap-3 border rounded-xl px-4 py-3 mb-5 ${inputBg}`}>
-          <Search className="w-4 h-4 opacity-40" />
-          <input
-            placeholder="Search by name or bank..."
-            className="flex-1 bg-transparent outline-none text-sm"
-            value={recipientSearch}
-            onChange={e => setRecipientSearch(e.target.value)}
-          />
-          {recipientSearch && (
-            <button onClick={() => setRecipientSearch("")} className="opacity-40 hover:opacity-70 text-xs font-bold">✕</button>
-          )}
-        </div>
-
-        {!recipientsLoading && recipients.length === 0 && <NoRecipientsEmptyState darkMode={darkMode} />}
-
-        {/* Send Again suggestion — last transfer */}
-        {!recipientsLoading && transfers.length > 0 && recipients.length > 0 && (() => {
-          const last = transfers[0];
-          const daysSince = Math.floor((Date.now() - new Date(last.created_date)) / 86400000);
-          return (
-            <button
-              onClick={() => { setSendAmount(String(last.amount_usd)); setSelectedRecipient(recipients.find(r => r.full_name === last.recipient_name || r.nickname === last.recipient_name) || null); haptic.light(); }}
-              className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl border mb-4 text-left active:scale-[0.98] transition-all ${darkMode ? "border-primary/20 bg-primary/5 hover:border-primary/40" : "border-primary/15 bg-primary/4 hover:border-primary/35"}`}
-            >
-              <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
-                {last.recipient_name?.[0] || "?"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-bold ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>Send again to {last.recipient_name}</p>
-                <p className={`text-xs ${muted}`}>${last.amount_usd} · {daysSince === 0 ? "today" : daysSince === 1 ? "yesterday" : `${daysSince}d ago`}</p>
-              </div>
-              <div className="flex items-center gap-1.5 bg-primary text-secondary font-bold text-xs px-3 py-2 rounded-xl flex-shrink-0">
-                <span>Repeat</span><span>→</span>
-              </div>
-            </button>
-          );
-        })()}
-
-        <div className="flex items-center gap-3 mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
-          <span className={`text-xs font-bold uppercase tracking-wider ${muted} flex-shrink-0`}>Recent:</span>
-          <div className="flex gap-2 flex-shrink-0">
-            {recipientsLoading && [1,2,3,4].map(i => (
-              <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                <div className={`w-11 h-11 rounded-full animate-pulse ${darkMode ? "bg-white/10" : "bg-black/10"}`} />
-                <div className={`w-10 h-2 rounded-full animate-pulse ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
-              </div>
+      {/* Saved recipients */}
+      {(recipientsLoading || recipients.length > 0) && (
+        <>
+          <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-3`}>Saved recipients</p>
+          <div className="space-y-2 mb-6">
+            {recipientsLoading && [1,2,3].map(i => (
+              <div key={i} className="h-16 rounded-2xl bg-[#0D1F3C]/5 animate-pulse" />
             ))}
-            {!recipientsLoading && recipients.length === 0 && (
-              <span className={`text-xs ${muted} italic py-3`}>No recipients yet</span>
-            )}
-            {recipients
-              .filter(r => !recipientSearch || (r.nickname + " " + r.full_name + " " + r.bank).toLowerCase().includes(recipientSearch.toLowerCase()))
-              .map((r, i) => {
+            {recipients.map(r => {
               const initials = (r.nickname || r.full_name || "?").slice(0, 2).toUpperCase();
-              const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
-              const isSelected = selectedRecipient?.id === r.id;
+              const rel = RELATIONSHIP_LABELS[r.relationship] || "";
+              const lastTx = transfers.find(t => t.recipient_name === r.full_name || t.recipient_name === r.nickname);
               return (
-                <button key={r.id} onClick={() => setSelectedRecipient(isSelected ? null : r)}
-                  className="flex flex-col items-center gap-1 group flex-shrink-0">
-                  <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center text-white text-xs font-black group-hover:scale-110 transition-transform ring-2 ${isSelected ? "ring-primary" : "ring-transparent"}`}>{initials}</div>
-                  <span className={`text-[9px] ${muted} max-w-[44px] truncate`}>{r.nickname || r.full_name}</span>
+                <button key={r.id} onClick={() => handleSelectRecipient(r)}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-[#0D1F3C]/8 rounded-2xl text-left hover:border-primary/40 hover:shadow-sm active:scale-[0.99] transition-all">
+                  <div className="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <p className="font-bold text-[#0D1F3C] text-sm">{r.nickname || r.full_name}</p>
+                      {rel && <span className="text-[#0D1F3C]/35 text-xs">· {rel}</span>}
+                    </div>
+                    <p className={`text-xs ${muted}`}>{r.bank}{r.account_number ? ` ••••${r.account_number.slice(-4)}` : ""}</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                      <span className="text-emerald-600 text-[10px] font-semibold">Verified · name matches</span>
+                    </div>
+                  </div>
+                  {lastTx && (
+                    <div className="text-right flex-shrink-0">
+                      <p className={`text-[10px] ${muted}`}>Last sent</p>
+                      <p className="text-[#0D1F3C] text-sm font-bold">₱{Number(lastTx.amount_php || 0).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>
+                    </div>
+                  )}
                 </button>
               );
             })}
-            <button onClick={() => navigate("/dashboard/recipients")} className="flex flex-col items-center gap-1 flex-shrink-0">
-              <div className="w-10 h-10 rounded-full border-2 border-dashed border-current opacity-30 flex items-center justify-center"><Plus className="w-3 h-3" /></div>
-              <span className={`text-[9px] ${muted}`}>Add</span>
-            </button>
           </div>
-        </div>
+        </>
+      )}
 
-        {selectedRecipient && (
-          <div className="mb-3 bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 flex items-center gap-2 min-w-0">
-            <span className="text-primary text-sm flex-shrink-0">✓</span>
-            <span className="text-primary text-xs sm:text-sm font-bold truncate">
-              {selectedRecipient.nickname || selectedRecipient.full_name} · {selectedRecipient.bank}
-            </span>
+      {/* Send to someone new */}
+      <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-3`}>Send to someone new</p>
+      <div className="space-y-2 mb-6">
+        <button onClick={() => navigate("/dashboard/recipients")}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-white border border-[#0D1F3C]/8 rounded-2xl text-left hover:border-primary/30 active:scale-[0.99] transition-all">
+          <div className="w-10 h-10 rounded-xl bg-[#0D1F3C]/5 flex items-center justify-center flex-shrink-0">
+            <span className="text-lg">🏦</span>
           </div>
-        )}
-
-        {/* Amount input */}
-        <div className={`rounded-2xl p-3 sm:p-5 mb-4 text-center ${darkMode ? "bg-white/3" : "bg-black/3"}`}>
-          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>You Send (USD)</label>
-          <div className="relative flex items-center justify-center mb-1">
-            <span className={`text-4xl sm:text-5xl font-black tracking-tight pointer-events-none select-none ${darkMode ? "text-white/30" : "text-[#1a2a4a]/30"}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>$</span>
-            <input
-              value={sendAmount}
-              onChange={e => handleAmountChange(e.target.value)}
-              inputMode="decimal"
-              type="number"
-              min={MIN_AMOUNT}
-              max={MAX_AMOUNT}
-              placeholder="0"
-              autoComplete="off"
-              className={`text-4xl sm:text-5xl font-black tracking-tight bg-transparent outline-none border-none w-full text-center ${amountError ? "text-red-400" : darkMode ? "text-white" : "text-[#1a2a4a]"}`}
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 48, WebkitAppearance: "none", MozAppearance: "textfield" }}
-              aria-label="Amount to send in USD"
-            />
+          <div className="flex-1">
+            <p className="font-semibold text-[#0D1F3C] text-sm">Add a PH bank account</p>
+            <p className={`text-xs ${muted}`}>BPI, BDO, Metrobank, UnionBank, others</p>
           </div>
-          <div className={`h-px my-3 ${darkMode ? "bg-white/8" : "bg-black/8"}`} />
-          <label className={`text-[10px] font-bold uppercase tracking-widest ${muted} mb-1 block`}>They Receive (PHP)</label>
-          <div className="text-3xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            <AnimatedRate
-              value={sendAmount ? parseFloat(receive) : 0}
-              prefix="₱"
-              decimals={2}
-              className="text-3xl font-black text-primary"
-            />
+          <ChevronRight className="w-4 h-4 text-[#0D1F3C]/25 flex-shrink-0" />
+        </button>
+        <button className="w-full flex items-center gap-3 px-4 py-4 bg-white border border-[#0D1F3C]/8 rounded-2xl text-left opacity-60">
+          <div className="w-10 h-10 rounded-xl bg-[#0D1F3C]/5 flex items-center justify-center flex-shrink-0">
+            <Phone className="w-4 h-4 text-[#0D1F3C]/40" />
           </div>
-          {amountError && (
-            <div className="flex items-center justify-center gap-1.5 mt-2">
-              <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-              <p className="text-red-400 text-xs font-semibold">{amountError}</p>
-            </div>
-          )}
-          <p className={`text-[10px] ${muted} mt-2`}>Min ${MIN_AMOUNT} · Max ${MAX_AMOUNT.toLocaleString()}</p>
-        </div>
-
-        <div className={`flex items-center justify-between py-2.5 border-t border-b ${darkMode ? "border-white/5" : "border-black/5"} mb-3`}>
-          <div className="flex items-center gap-2">
-            <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
-            <span className={`text-xs font-bold uppercase tracking-wider ${muted}`}>Live Exchange Rate</span>
+          <div className="flex-1">
+            <p className="font-semibold text-[#0D1F3C] text-sm">Send to a phone number</p>
+            <p className={`text-xs ${muted}`}>GCash or Maya — coming soon</p>
           </div>
-          <div className="text-right">
-          <span className={`font-bold text-sm ${darkMode ? "text-white" : "text-[#1a2a4a]"}`}>
-            1 USD = {ratesLoading ? "..." : <AnimatedRate value={rate} prefix="₱" suffix=" PHP" decimals={2} />}
-          </span>
-          {lastUpdatedLabel && <p className={`text-[9px] ${darkMode ? "text-white/30" : "text-black/30"} mt-0.5`}>Updated {lastUpdatedLabel}</p>}
-        </div>
-        </div>
-
-        <div className="mb-3">
-          <TransferEstimator sendAmount={sendAmount} rate={rate} darkMode={darkMode} />
-        </div>
-
-        {/* Note/memo field */}
-        <div className="mb-3">
-          <label className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-1 block`}>Note (optional)</label>
-          <input
-            value={transferNote}
-            onChange={e => setTransferNote(e.target.value)}
-            placeholder="for groceries, school fees..."
-            className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-primary transition-colors ${inputBg}`}
-          />
-        </div>
-
-        <motion.button
-          onClick={handleSend}
-          disabled={!sendAmount || parseFloat(sendAmount) <= 0 || sending || !isOnline || kycRequired}
-          aria-label={`Send ${sendAmount || 0} USD to ${selectedRecipient?.label || "recipient"}`}
-          animate={{
-            opacity: sendAmount && parseFloat(sendAmount) > 0 && isOnline && !kycRequired ? 1 : 0.3,
-            scale: sendAmount && parseFloat(sendAmount) > 0 && isOnline && !kycRequired ? 1 : 0.98,
-          }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ duration: 0.18 }}
-          className="w-full py-3.5 rounded-xl font-bold text-sm sm:text-base text-secondary bg-primary cursor-pointer disabled:cursor-not-allowed"
-        >
-          {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline — Reconnect to Send" : sending ? "Sending..." : "Review & Send →"}
-        </motion.button>
+        </button>
       </div>
 
-      {/* Transfer History */}
-      <div>
-          <h3 className="font-bold mb-3">Recent Transfers</h3>
-          {transfers.length === 0 ? (
-            <div className={`border rounded-xl p-6 text-center ${card}`}>
-              <p className={`text-sm ${muted}`}>No transfers yet. Send your first padala!</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {transfers.map((t, i) => (
-                <button key={i} onClick={() => setTrackedTransfer(t)}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left hover:border-primary/30 transition-colors ${card}`}>
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black flex-shrink-0">
-                    {t.recipient_name?.[0] || "?"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm">{t.recipient_name}</p>
-                    <p className={`text-xs ${muted} truncate`}>{t.recipient_bank} · {new Date(t.created_date).toLocaleDateString()}</p>
-                    {t.note && <p className={`text-xs ${muted} truncate italic`}>"{t.note}"</p>}
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-sm">${t.amount_usd}</p>
-                    <span className={`text-[10px] font-bold uppercase ${t.status === "completed" ? "text-emerald-500" : "text-primary"}`}>{t.status}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Trust note */}
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-[#0D1F3C]/4">
+        <span className="text-sm flex-shrink-0">🔒</span>
+        <p className={`text-xs ${muted}`}>Real-time verification with PH banks. Recipient gets a notification before funds land.</p>
+      </div>
 
-      {/* Send animation */}
-      <SendAnimation
-        show={showSendAnim}
-        amount={sendAnimData.amount}
-        recipientName={sendAnimData.recipient}
-        onDone={() => setShowSendAnim(false)}
+      {/* Recent transfers */}
+      {transfers.length > 0 && (
+        <div className="mt-6">
+          <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-3`}>Recent transfers</p>
+          <div className="space-y-2">
+            {transfers.slice(0, 3).map((t, i) => (
+              <button key={i} onClick={() => setTrackedTransfer(t)}
+                className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-[#0D1F3C]/8 rounded-xl text-left hover:border-primary/20 transition-all">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs flex-shrink-0">
+                  {(t.recipient_name || "?").slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[#0D1F3C] text-sm">{t.recipient_name}</p>
+                  <p className={`text-xs ${muted}`}>{t.recipient_bank} · {new Date(t.created_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="font-bold text-sm text-[#0D1F3C]">₱{Number(t.amount_php || 0).toLocaleString("en-PH", { maximumFractionDigits: 0 })}</p>
+                  <span className={`text-[10px] font-bold ${t.status === "completed" ? "text-emerald-600" : "text-primary"}`}>{t.status}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── STEP 2: ENTER AMOUNT (PHP-FIRST) ──
+  const renderAmount = () => (
+    <div className="max-w-lg mx-auto">
+      <button onClick={() => setStep(STEP_RECIPIENT)} className="flex items-center gap-1.5 text-[#0D1F3C]/50 text-sm mb-4 hover:text-[#0D1F3C] transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
+
+      {/* Recipient header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-primary font-black text-sm flex-shrink-0">
+          {(selectedRecipient?.nickname || selectedRecipient?.full_name || "?").slice(0, 2).toUpperCase()}
+        </div>
+        <div>
+          <p className="font-black text-[#0D1F3C] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            {selectedRecipient?.full_name || selectedRecipient?.nickname}
+          </p>
+          <p className={`text-xs ${muted}`}>{selectedRecipient?.bank}{selectedRecipient?.account_number ? ` ••••${selectedRecipient.account_number.slice(-4)}` : ""}</p>
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="text-emerald-600 text-[10px] font-semibold">Verified</span>
+          </div>
+        </div>
+      </div>
+
+      {/* PHP amount input — primary */}
+      <div className="bg-white border border-[#0D1F3C]/8 rounded-2xl p-6 mb-4 text-center">
+        <p className={`text-[11px] font-bold uppercase tracking-wider ${muted} mb-3`}>
+          {selectedRecipient?.nickname || (selectedRecipient?.full_name?.split(" ")[0])} receives
+        </p>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <span className="text-4xl font-black text-[#0D1F3C]/25" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₱</span>
+          <input
+            value={phpAmount}
+            onChange={e => setPhpAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+            inputMode="decimal"
+            type="number"
+            placeholder="0"
+            autoFocus
+            className="text-4xl font-black text-[#0D1F3C] bg-transparent outline-none border-none w-full text-center"
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", minHeight: 52, WebkitAppearance: "none" }}
+          />
+        </div>
+        <div className="h-px bg-[#0D1F3C]/8 my-3" />
+        <p className={`text-xs ${muted} mb-1`}>You pay</p>
+        <p className="text-2xl font-black text-primary" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          ${usdAmount}
+        </p>
+      </div>
+
+      {/* Rate row */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white border border-[#0D1F3C]/8 rounded-xl mb-3">
+        <div className="flex items-center gap-2">
+          <RefreshCw className={`w-3 h-3 text-primary ${ratesLoading ? "animate-spin" : ""}`} />
+          <span className={`text-xs font-semibold ${muted}`}>Mid-market rate · no fees</span>
+        </div>
+        <span className="text-[#0D1F3C] text-sm font-bold">
+          1 USD = <AnimatedRate value={rate} prefix="₱" decimals={2} />
+        </span>
+      </div>
+
+      {/* Feature callouts */}
+      <div className="space-y-2 mb-5">
+        {[
+          { icon: "⚡", title: "Delivers in seconds", sub: "Real-time via InstaPay rails" },
+          { icon: "🆓", title: "Free, every time", sub: "No remittance fee. Mid-market rate, locked at confirm." },
+          { icon: "🔔", title: `${selectedRecipient?.nickname || "Recipient"} gets notified`, sub: `She'll see the transfer before it lands.` },
+        ].map((f, i) => (
+          <div key={i} className="flex items-center gap-3 px-4 py-2.5">
+            <span className="text-base flex-shrink-0">{f.icon}</span>
+            <div>
+              <p className="text-[#0D1F3C] text-xs font-semibold">{f.title}</p>
+              <p className={`text-xs ${muted}`}>{f.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Note */}
+      <input
+        value={transferNote}
+        onChange={e => setTransferNote(e.target.value)}
+        placeholder="Add a note (optional)"
+        className="w-full border border-[#0D1F3C]/10 bg-white rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-[#0D1F3C] placeholder-[#0D1F3C]/30 mb-4"
       />
 
-      {/* Transfer tracker */}
-      <AnimatePresence>
-        {trackedTransfer && (
-          <TransferTracker transfer={trackedTransfer} onClose={() => setTrackedTransfer(null)} darkMode={darkMode} />
-        )}
+      <motion.button
+        onClick={handleContinueToReview}
+        disabled={!phpVal || phpVal <= 0 || !isOnline || kycRequired}
+        animate={{ opacity: phpVal > 0 && isOnline && !kycRequired ? 1 : 0.35 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full py-4 rounded-2xl font-bold text-base text-white bg-primary disabled:cursor-not-allowed"
+      >
+        {kycRequired ? "🪪 Complete KYC to Send" : !isOnline ? "📶 Offline" : "Continue →"}
+      </motion.button>
+    </div>
+  );
+
+  // ── STEP 3: REVIEW ──
+  const renderReview = () => (
+    <div className="max-w-lg mx-auto">
+      <button onClick={() => setStep(STEP_AMOUNT)} className="flex items-center gap-1.5 text-[#0D1F3C]/50 text-sm mb-4 hover:text-[#0D1F3C] transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
+
+      <h2 className="text-xl font-black text-[#0D1F3C] mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Review send</h2>
+      <p className={`text-sm ${muted} mb-5`}>One last look — tap confirm to lock your rate.</p>
+
+      {/* Big amount */}
+      <div className="bg-white border border-[#0D1F3C]/8 rounded-2xl p-6 mb-4 text-center">
+        <p className={`text-xs ${muted} mb-1`}>{selectedRecipient?.nickname || selectedRecipient?.full_name?.split(" ")[0]} receives</p>
+        <p className="text-4xl font-black text-[#0D1F3C] mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          ₱{phpVal.toLocaleString("en-PH")}
+        </p>
+        <p className={`text-sm ${muted}`}>You pay <strong className="text-[#0D1F3C]">${usdAmount}</strong> · 1 USD = ₱{rate.toFixed(2)}</p>
+      </div>
+
+      {/* Details */}
+      <div className="bg-white border border-[#0D1F3C]/8 rounded-2xl overflow-hidden mb-5">
+        {[
+          { label: "Sending to", value: selectedRecipient?.full_name || selectedRecipient?.nickname, badge: true },
+          { label: "Relationship", value: RELATIONSHIP_LABELS[selectedRecipient?.relationship] || "—" },
+          { label: "Bank", value: selectedRecipient?.bank || "—" },
+          { label: "Account", value: selectedRecipient?.account_number ? `••••${selectedRecipient.account_number.slice(-4)}` : "—" },
+          { label: "Rails", value: "InstaPay (real-time)" },
+          { label: "Exchange rate", value: `1 USD = ₱${rate.toFixed(2)}` },
+          { label: "KinnectFi fee", value: "$0.00", green: true },
+          { label: "Estimated arrival", value: "In seconds" },
+        ].map((row, i) => (
+          <div key={i} className="flex items-center justify-between px-4 py-3 border-b last:border-0 border-[#0D1F3C]/6">
+            <span className={`text-sm ${muted}`}>{row.label}</span>
+            <div className="flex items-center gap-2">
+              {row.badge && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+              <span className={`text-sm font-semibold ${row.green ? "text-emerald-600" : "text-[#0D1F3C]"}`}>{row.value}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {transferNote && (
+        <div className="px-4 py-3 bg-[#0D1F3C]/4 rounded-xl mb-4">
+          <p className={`text-xs ${muted}`}>Note: <span className="text-[#0D1F3C]">{transferNote}</span></p>
+        </div>
+      )}
+
+      <button
+        onClick={handleSend}
+        disabled={sending || !isOnline}
+        className="w-full py-4 rounded-2xl font-bold text-base text-white bg-primary disabled:opacity-40 active:scale-[0.98] transition-all"
+      >
+        {sending ? "Sending..." : "Lock rate & confirm →"}
+      </button>
+      <p className={`text-center text-xs ${muted} mt-3`}>Rate will lock when you confirm</p>
+    </div>
+  );
+
+  return (
+    <div className="pb-4">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial={{ x: step === STEP_RECIPIENT ? -20 : 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          {step === STEP_RECIPIENT && renderRecipient()}
+          {step === STEP_AMOUNT && renderAmount()}
+          {step === STEP_REVIEW && renderReview()}
+        </motion.div>
       </AnimatePresence>
 
-      {/* Auth gate */}
-      <AnimatePresence>
-        {showAuthGate && (
-          <SendAuthGate
-            onAuthorized={handleAuthPassed}
-            onCancel={() => setShowAuthGate(false)}
-            darkMode={darkMode}
-          />
-        )}
-      </AnimatePresence>
+      {/* Send animation */}
+      <SendAnimation show={showSendAnim} amount={sendAnimData.amount} recipientName={sendAnimData.recipient} onDone={() => setShowSendAnim(false)} />
 
-      {/* Confirm modal */}
+      <AnimatePresence>
+        {trackedTransfer && <TransferTracker transfer={trackedTransfer} onClose={() => setTrackedTransfer(null)} darkMode={darkMode} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAuthGate && <SendAuthGate onAuthorized={handleAuthPassed} onCancel={() => setShowAuthGate(false)} darkMode={darkMode} />}
+      </AnimatePresence>
       <AnimatePresence>
         {showConfirm && (
           <TransferConfirmModal
-            transfer={{
-              amount: sendAmount,
-              receive,
-              rate,
-              recipient: selectedRecipient?.nickname || selectedRecipient?.full_name || "Family",
-              bank: selectedRecipient?.bank || "GCash",
-            }}
+            transfer={{ amount: usdAmount, receive: phpAmount, rate, recipient: selectedRecipient?.nickname || selectedRecipient?.full_name || "Family", bank: selectedRecipient?.bank || "GCash" }}
             onConfirm={handleConfirmedSend}
             onClose={() => setShowConfirm(false)}
             darkMode={darkMode}
           />
         )}
       </AnimatePresence>
-
-      {/* Receipt modal */}
       <AnimatePresence>
-        {completedTransfer && (
-          <TransactionReceipt
-            transfer={completedTransfer}
-            onClose={() => setCompletedTransfer(null)}
-            darkMode={darkMode}
-          />
-        )}
+        {completedTransfer && <TransactionReceipt transfer={completedTransfer} onClose={() => setCompletedTransfer(null)} darkMode={darkMode} />}
       </AnimatePresence>
     </div>
   );
