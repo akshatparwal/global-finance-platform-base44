@@ -99,8 +99,8 @@ export default function Insights() {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="mb-4">
-          <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Insights</h1>
-          <p className={`text-xs ${muted}`}>Spending intelligence & analytics</p>
+          <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Save & Insights</h1>
+          <p className={`text-xs ${muted}`}>Earn 5% APY · spending intelligence & rate alerts</p>
         </div>
         {[1, 2, 3].map(i => (
           <div key={i} className={`border rounded-2xl p-6 animate-pulse ${card}`}>
@@ -116,8 +116,8 @@ export default function Insights() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="mb-2">
-        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Insights</h1>
-        <p className={`text-xs ${muted}`}>Spending intelligence & analytics</p>
+        <h1 className="text-lg font-extrabold sm:text-2xl" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Save & Insights</h1>
+        <p className={`text-xs ${muted}`}>Earn 5% APY · spending intelligence & rate alerts</p>
       </div>
 
       {/* Monthly Budget Overview */}

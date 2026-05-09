@@ -22,6 +22,18 @@ const STEP_RECIPIENT = "recipient";
 const STEP_AMOUNT = "amount";
 const STEP_REVIEW = "review";
 
+// Rate lock countdown hook
+function useRateLockTimer(active) {
+  const [seconds, setSeconds] = useState(29);
+  useEffect(() => {
+    if (!active) { setSeconds(29); return; }
+    setSeconds(29);
+    const t = setInterval(() => setSeconds(s => s <= 1 ? (clearInterval(t), 0) : s - 1), 1000);
+    return () => clearInterval(t);
+  }, [active]);
+  return seconds;
+}
+
 const RELATIONSHIP_LABELS = { mother: "Mother", father: "Father", sibling: "Sibling", spouse: "Spouse", child: "Child", friend: "Friend", other: "" };
 
 export default function Pay() {
@@ -46,6 +58,7 @@ export default function Pay() {
   const [trackedTransfer, setTrackedTransfer] = useState(null);
   const [alertUser, setAlertUser] = useState(null);
   const [kycRequired, setKycRequired] = useState(false);
+  const rateLockSeconds = useRateLockTimer(step === STEP_REVIEW);
 
   const { rates, loading: ratesLoading, lastUpdatedLabel } = useLiveRates();
   const rate = rates?.USDPHP || 56.24;
@@ -385,7 +398,12 @@ export default function Pay() {
         <p className="text-4xl font-black text-[#0D1F3C] mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           ₱{phpVal.toLocaleString("en-PH")}
         </p>
-        <p className={`text-sm ${muted}`}>You pay <strong className="text-[#0D1F3C]">${usdAmount}</strong> · 1 USD = ₱{rate.toFixed(2)}</p>
+        <p className={`text-sm ${muted} mb-3`}>You pay <strong className="text-[#0D1F3C]">${usdAmount}</strong> · 1 USD = ₱{rate.toFixed(2)}</p>
+        {/* Rate lock timer */}
+        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${rateLockSeconds > 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-500"}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${rateLockSeconds > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`} />
+          {rateLockSeconds > 0 ? `Rate locked for ${rateLockSeconds}s` : "Rate expired — refresh"}
+        </div>
       </div>
 
       {/* Details */}
@@ -397,6 +415,7 @@ export default function Pay() {
           { label: "Account", value: selectedRecipient?.account_number ? `••••${selectedRecipient.account_number.slice(-4)}` : "—" },
           { label: "Rails", value: "InstaPay (real-time)" },
           { label: "Exchange rate", value: `1 USD = ₱${rate.toFixed(2)}` },
+          { label: "Account holder", value: "Confirmed ✓", green: true },
           { label: "KinnectFi fee", value: "$0.00", green: true },
           { label: "Estimated arrival", value: "In seconds" },
         ].map((row, i) => (
@@ -418,12 +437,12 @@ export default function Pay() {
 
       <button
         onClick={handleSend}
-        disabled={sending || !isOnline}
+        disabled={sending || !isOnline || rateLockSeconds === 0}
         className="w-full py-4 rounded-2xl font-bold text-base text-white bg-primary disabled:opacity-40 active:scale-[0.98] transition-all"
       >
-        {sending ? "Sending..." : "Lock rate & confirm →"}
+        {sending ? "Sending..." : rateLockSeconds === 0 ? "Rate expired — go back" : "Lock rate & confirm →"}
       </button>
-      <p className={`text-center text-xs ${muted} mt-3`}>Rate will lock when you confirm</p>
+      <p className={`text-center text-xs ${muted} mt-3`}>Rate locks at confirm · mid-market · no hidden fees</p>
     </div>
   );
 

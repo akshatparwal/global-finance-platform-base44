@@ -64,7 +64,14 @@ function PhpFundingFlow({ darkMode, onClose }) {
           ))}
         </div>
         <p className={`text-xs ${muted} mb-5`}>We'll notify you when funds clear. You can send once it settles.</p>
-        <button onClick={onClose} className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90">Done</button>
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 bg-primary text-white font-bold py-3.5 rounded-xl hover:opacity-90">Done</button>
+          <button onClick={() => {
+            const lines = [`KinnectFi — PHP Cash-In Receipt`, `Reference: KF-CI-${Math.random().toString(36).slice(2,8).toUpperCase()}`, `Amount: ₱${parseFloat(phpAmount).toLocaleString("en-PH")}`, `Status: Pending`, `Date: ${new Date().toLocaleString()}`].join("\n");
+            if (navigator.share) navigator.share({ title: "KinnectFi Receipt", text: lines }).catch(() => {});
+            else navigator.clipboard.writeText(lines).catch(() => {});
+          }} className={`flex-1 font-bold py-3.5 rounded-xl border ${darkMode ? "border-white/15 text-white/60" : "border-black/15 text-[#0D1F3C]/60"} hover:opacity-80`}>Share receipt</button>
+        </div>
       </div>
     );
   }
@@ -177,6 +184,7 @@ const METHODS = [
   { id: "ach",     label: "Bank transfer (ACH)",        sub: "Linked US checking · 1–3 business days · Free",      icon: Building2,       badge: null },
   { id: "wire",    label: "Wire Transfer",              sub: "Same day · Free",                                     icon: Zap,             badge: "FAST" },
   { id: "instant", label: "Debit card",                 sub: "Visa or Mastercard · Instant · 2.9% fee",            icon: ArrowDownToLine, badge: "INSTANT" },
+  { id: "credit",  label: "Credit card",                sub: "Visa, Mastercard, or Amex · Instant · 2.9% fee",     icon: ArrowDownToLine, badge: "INSTANT" },
   { id: "crypto",  label: "Buy USDC (Crypto)",          sub: "Card / bank → USDC on Base",                        icon: Wallet,          badge: null },
 ];
 
@@ -230,8 +238,8 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
       >
         <div className="flex items-center justify-between px-6 pt-6 pb-4 flex-shrink-0">
           <div>
-            <h3 className={`font-extrabold text-xl ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Add Funds</h3>
-            <p className={`text-xs ${muted}`}>Deposit to your USD wallet</p>
+            <h3 className={`font-extrabold text-xl ${text}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>How do you want to add money?</h3>
+            <p className={`text-xs ${muted}`}>Fees and arrival times shown up front — never at confirm.</p>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
             <X className="w-4 h-4" />
@@ -239,7 +247,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pb-8">
-          <div className="space-y-2 mb-6">
+          <div className="space-y-2 mb-4">
             {METHODS.map(m => (
               <button key={m.id} onClick={() => setMethod(m.id)}
                 className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${method === m.id ? "border-primary bg-primary/8" : darkMode ? "border-white/10 hover:border-white/20" : "border-black/10 hover:border-black/20"}`}>
@@ -262,6 +270,12 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                 </div>
               </button>
             ))}
+          </div>
+
+          {/* FDIC trust line */}
+          <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl mb-5 ${darkMode ? "bg-white/5" : "bg-[#F5EFE3]"}`}>
+            <span className="text-base flex-shrink-0">🏦</span>
+            <p className={`text-xs ${muted}`}>Your money is held at Lewis & Clark Bank, <strong>FDIC insured</strong> up to $250,000.</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -304,8 +318,8 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
               </motion.div>
             )}
 
-            {method === "instant" && (
-              <motion.div key="instant" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+            {(method === "instant" || method === "credit") && (
+              <motion.div key={method} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 {instantSuccess ? (
                   <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                     className="flex flex-col items-center text-center py-6">
@@ -319,7 +333,7 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                   </motion.div>
                 ) : (
                   <div className={`rounded-2xl border p-5 ${card}`}>
-                    <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-4`}>Instant Deposit via Debit Card</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-wider ${muted} mb-4`}>Instant Deposit via {method === "credit" ? "Credit Card" : "Debit Card"}</p>
                     <div className="space-y-3 mb-4">
                       <input placeholder="Card Number" inputMode="numeric"
                         className={`w-full border rounded-xl px-4 py-3 text-sm outline-none ${darkMode ? "bg-[#1a2332] border-white/10 text-white placeholder-white/30" : "bg-white border-black/10 text-[#1a2a4a]"}`} />
@@ -354,10 +368,10 @@ export default function FundWalletModal({ onClose, darkMode, user }) {
                       className="w-full bg-primary text-white font-black py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2"
                     >
                       {depositing
-                        ? <><span className="w-4 h-4 border-2 border-secondary/30 border-t-secondary rounded-full animate-spin" />Processing...</>
+                        ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Processing...</>
                         : "Deposit Instantly →"}
                     </button>
-                    <p className={`text-[10px] ${muted} text-center mt-2`}>1.5% processing fee · Funds available immediately</p>
+                    <p className={`text-[10px] ${muted} text-center mt-2`}>2.9% processing fee · Funds available immediately</p>
                   </div>
                 )}
               </motion.div>
