@@ -1,0 +1,37 @@
+{
+  "name": "Award Referral Points on First Transfer",
+  "description": "When a new remittance is created, checks if the sender was referred and awards 500 points to the referrer on their first transfer.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.category == \"remittance\") and (.trigger.data.status == \"completed\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Transfer"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "award_referral_points_on_first_transfer",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "awardReferralPoints",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "awardReferralPoints"
+  }
+}
